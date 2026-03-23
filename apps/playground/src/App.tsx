@@ -27,6 +27,8 @@ import { PaulyRadioGroup } from '../../../registry/radio';
 import { PaulyCheckbox, PaulyCheckboxGroup } from '../../../registry/checkbox';
 import { PaulySignature } from '../../../registry/signature';
 import { PaulyConditional } from '../../../registry/conditional';
+import { PaulyCamera } from '../../../registry/camera';
+import { PaulyQRScanner } from '../../../registry/qr-scanner';
 
 // ─── Zod Schema ───────────────────────────────────────────────────────────────
 
@@ -65,6 +67,8 @@ const registrationSchema = z.object({
       (val) => val !== null && val !== '',
       'Please provide your signature'
     ),
+  avatar: z.string().nullable().optional(),
+  promoCodeQR: z.string().nullable().optional(),
 });
 
 const roleOptions = [
@@ -373,6 +377,25 @@ export default function App() {
               name="signature"
               label="Sign Here"
               required
+            />
+          </FieldWithCounter>
+
+          {/* ── Separator ─────────────────────────────────────────── */}
+          <hr style={{ border: 'none', borderTop: '1px solid #e5e7eb', margin: '8px 0 20px' }} />
+
+          {/* ── Camera (getUserMedia, zero re-renders during stream) ─ */}
+          <FieldWithCounter name="avatar">
+            <PaulyCamera
+              name="avatar"
+              label="Take a Selfie"
+            />
+          </FieldWithCounter>
+
+          {/* ── QR Scanner (BarcodeDetector + rAF loop) ──────────── */}
+          <FieldWithCounter name="promoCodeQR">
+            <PaulyQRScanner
+              name="promoCodeQR"
+              label="Scan Promo QR"
             />
           </FieldWithCounter>
 

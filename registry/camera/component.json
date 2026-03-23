@@ -1,0 +1,12 @@
+{
+  "name": "camera",
+  "category": "input",
+  "files": ["PaulyCamera.tsx", "PaulyCamera.module.css", "types.ts", "index.ts"],
+  "npmDependencies": {},
+  "peerDependencies": { "react": ">=18.0.0", "@pauly/core": ">=0.1.0" },
+  "registryDependencies": ["label", "field-error"],
+  "versionRange": ">=0.1.0",
+  "browserOnly": true,
+  "tags": ["camera", "photo", "capture", "media", "hardware"],
+  "exports": ["PaulyCamera", "PaulyCameraProps"]
+}

@@ -1,0 +1,92 @@
+/* ─── PaulyCamera ────────────────────────────────────────────────────────────── */
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+/* ── Action Buttons ──────────────────────────────────────────────────────────── */
+.actionBtn {
+  all: unset;
+  cursor: pointer;
+  font-family: var(--pauly-font-family, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--pauly-camera-action-color, #6b7280);
+  padding: 4px 10px;
+  border-radius: 6px;
+  transition:
+    color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.actionBtn:hover:not(:disabled) {
+  color: var(--pauly-ring-color, #3b82f6);
+  background-color: var(--pauly-camera-action-hover-bg, #eff6ff);
+}
+
+.captureBtn {
+  color: var(--pauly-camera-capture-color, #059669);
+}
+
+.captureBtn:hover:not(:disabled) {
+  color: var(--pauly-camera-capture-hover-color, #047857);
+  background-color: var(--pauly-camera-capture-hover-bg, #ecfdf5);
+}
+
+.actionBtn:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 var(--pauly-ring-width, 3px) var(--pauly-ring-shadow-color, rgba(59, 130, 246, 0.15));
+}
+
+.actionBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ── Viewport ────────────────────────────────────────────────────────────────── */
+.viewport {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border: var(--pauly-camera-border-width, 1.5px) solid var(--pauly-camera-border-color, #d1d5db);
+  border-radius: var(--pauly-camera-border-radius, 8px);
+  background-color: var(--pauly-camera-bg, #111827);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.viewportError {
+  border-color: var(--pauly-error-border-color, #ef4444);
+}
+
+.viewportError:focus-within {
+  box-shadow:
+    0 0 0 var(--pauly-ring-width, 3px) var(--pauly-error-ring-color, rgba(239, 68, 68, 0.15));
+}
+
+/* ── Video / Preview ─────────────────────────────────────────────────────────── */
+.video,
+.preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.video {
+  transform: scaleX(-1); /* Mirror for selfie mode */
+}
