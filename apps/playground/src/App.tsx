@@ -23,6 +23,7 @@ import { PaulyForm, createZodAdapter } from '@pauly/core';
 import { PaulyText } from '../../../registry/text-input';
 import { PaulyCheckbox, PaulyCheckboxGroup } from '../../../registry/checkbox';
 import { PaulySignature } from '../../../registry/signature';
+import { PaulyConditional } from '../../../registry/conditional';
 
 // ─── Zod Schema ───────────────────────────────────────────────────────────────
 
@@ -47,6 +48,8 @@ const registrationSchema = z.object({
   roles: z
     .array(z.string())
     .min(1, 'Select at least one role'),
+  hasReason: z.boolean().optional(),
+  reason: z.string().optional(),
   signature: z
     .string()
     .nullable()
@@ -296,6 +299,26 @@ export default function App() {
               required
             />
           </FieldWithCounter>
+
+          {/* ── Conditional Section (dynamic mount/unmount) ─────── */}
+          <FieldWithCounter name="hasReason">
+            <PaulyCheckbox
+              name="hasReason"
+              label="I have a specific reason"
+            />
+          </FieldWithCounter>
+
+          <PaulyConditional
+            watch="hasReason"
+            condition={(val) => val === true}
+          >
+            <FieldWithCounter name="reason">
+              <PaulyText
+                name="reason"
+                label="Why?"
+              />
+            </FieldWithCounter>
+          </PaulyConditional>
 
           {/* ── Separator ─────────────────────────────────────────── */}
           <hr style={{ border: 'none', borderTop: '1px solid #e5e7eb', margin: '8px 0 20px' }} />

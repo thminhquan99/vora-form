@@ -14,9 +14,9 @@ import styles from './PaulyCheckbox.module.css';
  * Uses `defaultChecked` (not `checked`) to keep the input uncontrolled.
  * When toggled:
  * 1. Browser updates `.checked` on the DOM immediately.
- * 2. `onChange` detects `target.type === 'checkbox'` and calls
- *    `setSilentValue(name, target.checked)` — no React re-render.
- * 3. Value syncs to the store for `getAllValues()` and blur validation.
+ * 2. `onChange` calls `field.setValue(target.checked)` — this notifies
+ *    subscribers (e.g., `PaulyConditional`) via pub/sub.
+ * 3. The checkbox itself stays uncontrolled (`defaultChecked`).
  *
  * ### Accessibility
  *
@@ -47,7 +47,7 @@ export function PaulyCheckbox({
           name={name}
           type="checkbox"
           defaultChecked={!!field.value}
-          onChange={field.onChange}
+          onChange={(e) => field.setValue(e.target.checked)}
           onBlur={field.onBlur}
           disabled={disabled}
           required={required}
