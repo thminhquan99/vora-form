@@ -20,6 +20,8 @@ export type { UseFormCoreReturn } from './useFormCore';
 export { usePaulyField } from './usePaulyField';
 export type { UsePaulyFieldReturn } from './usePaulyField';
 
+export { useAsyncValidation } from './useAsyncValidation';
+
 // ── Types ─────────────────────────────────────────────────────────────────────
 export type {
   PaulyFieldProps,

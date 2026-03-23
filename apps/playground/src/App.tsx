@@ -19,7 +19,7 @@
 
 import React, { useRef } from 'react';
 import { z } from 'zod';
-import { PaulyForm, createZodAdapter } from '@pauly/core';
+import { PaulyForm, createZodAdapter, useAsyncValidation } from '@pauly/core';
 import { PaulyText } from '../../../registry/text-input';
 import { PaulyTextarea } from '../../../registry/textarea';
 import { PaulySelect } from '../../../registry/select';
@@ -51,6 +51,9 @@ const registrationSchema = z.object({
   lastName: z
     .string()
     .min(2, 'Last name must be at least 2 characters'),
+  username: z
+    .string()
+    .min(3, 'Username must be at least 3 characters'),
   email: z
     .string()
     .min(1, 'Email is required')
@@ -189,6 +192,42 @@ function FieldWithCounter({
       </div>
       {children}
     </div>
+  );
+}
+
+// ─── Username Field (async validation demo) ──────────────────────────────────
+
+/**
+ * Wrapper component that demonstrates `useAsyncValidation`.
+ *
+ * MUST be rendered inside a `<PaulyForm>` because the hook calls
+ * `useFormContext()`. The hook subscribes directly to the store's
+ * pub/sub — typing does NOT trigger React re-renders. Only when the
+ * debounced validator sets/clears an error does the error subscriber
+ * (`<PaulyFieldError>`) re-render.
+ */
+function UsernameField() {
+  useAsyncValidation<string>(
+    'username',
+    async (val) => {
+      if (!val || val.length < 3) return undefined;
+      // Mock API call — simulate network latency
+      await new Promise((r) => setTimeout(r, 400));
+      if (val.toLowerCase() === 'admin' || val.toLowerCase() === 'root') {
+        return 'This username is already taken.';
+      }
+      return undefined;
+    },
+    600
+  );
+
+  return (
+    <PaulyText
+      name="username"
+      label="Username"
+      placeholder="Pick a username"
+      required
+    />
   );
 }
 
@@ -407,6 +446,11 @@ export default function App() {
               placeholder="Doe"
               required
             />
+          </FieldWithCounter>
+
+          {/* ── Username (debounced async validation) ───────────── */}
+          <FieldWithCounter name="username">
+            <UsernameField />
           </FieldWithCounter>
 
           <FieldWithCounter name="email">

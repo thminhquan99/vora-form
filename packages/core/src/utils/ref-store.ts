@@ -97,7 +97,7 @@ export type Listener = () => void;
  * The subset of subscriber topics. Allows subscribing to value changes,
  * error changes, or both.
  */
-export type SubscriptionTopic = 'value' | 'error';
+export type SubscriptionTopic = 'value' | 'error' | 'input';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -262,6 +262,7 @@ export class FormStore {
     this.errors.delete(path);
     this.listeners.delete(this.listenerKey(path, 'value'));
     this.listeners.delete(this.listenerKey(path, 'error'));
+    this.listeners.delete(this.listenerKey(path, 'input'));
   }
 
   // ── Value Access ──────────────────────────────────────────────────────────
@@ -363,8 +364,11 @@ export class FormStore {
   setSilentValue(path: string, value: unknown): void {
     this.values.set(path, value);
 
-    // Note: NO notify() call — this is intentional.
-    // The DOM already reflects the change; we just sync the store.
+    // Notify 'input' subscribers — this is used by useAsyncValidation
+    // to trigger debounced validation without a React re-render.
+    // The 'value' topic is NOT notified, so useSyncExternalStore
+    // subscriptions remain dormant (zero re-renders during typing).
+    this.notify(path, 'input');
   }
 
   /**
