@@ -1,0 +1,15 @@
+{
+  "name": "paulyform",
+  "private": true,
+  "description": "PaulyForm — Uncontrolled-first, zero re-render form library for React",
+  "scripts": {
+    "typecheck": "pnpm -r typecheck && tsc -p registry/tsconfig.json"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=9.0.0"
+  }
+}

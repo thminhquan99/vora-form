@@ -1,0 +1,24 @@
+{
+  "name": "text-input",
+  "category": "text-input",
+  "files": [
+    "PaulyText.tsx",
+    "PaulyText.module.css",
+    "types.ts",
+    "index.ts"
+  ],
+  "npmDependencies": {},
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0",
+    "@pauly/core": ">=0.1.0"
+  },
+  "registryDependencies": [
+    "label",
+    "field-error"
+  ],
+  "versionRange": ">=0.1.0",
+  "browserOnly": false,
+  "tags": ["text", "input", "email", "tel", "url", "form"],
+  "exports": ["PaulyText", "PaulyTextProps"]
+}

@@ -1,0 +1,127 @@
+/* ─── PaulyCheckbox & PaulyCheckboxGroup ─────────────────────────────────── */
+/* Themeable via CSS custom properties. Override at :root or container level.  */
+
+/* ── Shared wrapper ──────────────────────────────────────────────────────── */
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.groupWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.optionsList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pauly-checkbox-group-gap, 8px);
+}
+
+/* ── Checkbox + Label row ────────────────────────────────────────────────── */
+.checkboxRow {
+  display: flex;
+  align-items: center;
+  gap: var(--pauly-checkbox-label-gap, 10px);
+}
+
+/* ── Native Checkbox ─────────────────────────────────────────────────────── */
+.checkbox {
+  /* Reset native appearance */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  margin: 0;
+
+  /* Size */
+  width: var(--pauly-checkbox-size, 18px);
+  height: var(--pauly-checkbox-size, 18px);
+  flex-shrink: 0;
+
+  /* Shape & Border */
+  border: var(--pauly-checkbox-border-width, 1.5px) solid var(--pauly-checkbox-border-color, #d1d5db);
+  border-radius: var(--pauly-checkbox-border-radius, 4px);
+  background-color: var(--pauly-checkbox-bg, #ffffff);
+
+  /* Transition */
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease,
+    box-shadow 0.15s ease;
+
+  /* Cursor */
+  cursor: pointer;
+  position: relative;
+}
+
+/* ── Checkmark ───────────────────────────────────────────────────────────── */
+.checkbox::after {
+  content: '';
+  position: absolute;
+  display: block;
+  top: 2px;
+  left: 5px;
+  width: 5px;
+  height: 9px;
+  border: solid transparent;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  transition: border-color 0.1s ease;
+}
+
+.checkbox:checked {
+  background-color: var(--pauly-checkbox-checked-bg, #3b82f6);
+  border-color: var(--pauly-checkbox-checked-border-color, #3b82f6);
+}
+
+.checkbox:checked::after {
+  border-color: var(--pauly-checkbox-checkmark-color, #ffffff);
+}
+
+/* ── Focus Ring ──────────────────────────────────────────────────────────── */
+.checkbox:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 var(--pauly-ring-width, 3px) var(--pauly-ring-shadow-color, rgba(59, 130, 246, 0.15));
+  border-color: var(--pauly-ring-color, #3b82f6);
+}
+
+/* ── Error State ─────────────────────────────────────────────────────────── */
+.checkboxError {
+  border-color: var(--pauly-error-border-color, #ef4444);
+}
+
+.checkboxError:focus-visible {
+  box-shadow:
+    0 0 0 var(--pauly-ring-width, 3px) var(--pauly-error-ring-color, rgba(239, 68, 68, 0.15));
+  border-color: var(--pauly-error-border-color, #ef4444);
+}
+
+/* ── Hover ───────────────────────────────────────────────────────────────── */
+.checkbox:hover:not(:checked):not(:disabled):not(.checkboxError) {
+  border-color: var(--pauly-checkbox-hover-border-color, #9ca3af);
+}
+
+/* ── Disabled ────────────────────────────────────────────────────────────── */
+.checkbox:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Label ───────────────────────────────────────────────────────────────── */
+.label {
+  font-family: var(--pauly-font-family, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif);
+  font-size: var(--pauly-checkbox-label-font-size, 0.9375rem);
+  font-weight: var(--pauly-checkbox-label-font-weight, 400);
+  line-height: 1.4;
+  color: var(--pauly-checkbox-label-color, #374151);
+  cursor: pointer;
+  user-select: none;
+}
+
+.required {
+  color: var(--pauly-required-color, #ef4444);
+  font-weight: 600;
+}
