@@ -1,0 +1,20 @@
+{
+  "name": "label",
+  "category": "display",
+  "files": [
+    "PaulyLabel.tsx",
+    "PaulyLabel.module.css",
+    "types.ts",
+    "index.ts"
+  ],
+  "npmDependencies": {},
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0"
+  },
+  "registryDependencies": [],
+  "versionRange": ">=0.1.0",
+  "browserOnly": false,
+  "tags": ["label", "form", "accessibility"],
+  "exports": ["PaulyLabel", "PaulyLabelProps"]
+}
