@@ -21,6 +21,9 @@ import React, { useRef } from 'react';
 import { z } from 'zod';
 import { PaulyForm, createZodAdapter } from '@pauly/core';
 import { PaulyText } from '../../../registry/text-input';
+import { PaulyTextarea } from '../../../registry/textarea';
+import { PaulySelect } from '../../../registry/select';
+import { PaulyRadioGroup } from '../../../registry/radio';
 import { PaulyCheckbox, PaulyCheckboxGroup } from '../../../registry/checkbox';
 import { PaulySignature } from '../../../registry/signature';
 import { PaulyConditional } from '../../../registry/conditional';
@@ -42,6 +45,11 @@ const registrationSchema = z.object({
     .string()
     .min(1, 'Email is required')
     .email('Please enter a valid email address'),
+  bio: z.string().max(500, 'Bio must be 500 characters or less').optional(),
+  country: z.string().min(1, 'Please select a country'),
+  plan: z.enum(['free', 'pro', 'enterprise'], {
+    errorMap: () => ({ message: 'Please select a plan' }),
+  }),
   acceptTerms: z
     .boolean()
     .refine((val) => val === true, 'You must accept the terms'),
@@ -274,6 +282,42 @@ export default function App() {
               label="Email"
               placeholder="john@example.com"
               type="email"
+              required
+            />
+          </FieldWithCounter>
+
+          <FieldWithCounter name="bio">
+            <PaulyTextarea
+              name="bio"
+              label="Biography"
+              placeholder="Tell us about yourself..."
+              rows={3}
+            />
+          </FieldWithCounter>
+
+          <FieldWithCounter name="country">
+            <PaulySelect
+              name="country"
+              label="Country"
+              placeholder="Select a country..."
+              options={[
+                { label: 'USA', value: 'us' },
+                { label: 'Vietnam', value: 'vn' },
+                { label: 'UK', value: 'uk' },
+              ]}
+              required
+            />
+          </FieldWithCounter>
+
+          <FieldWithCounter name="plan">
+            <PaulyRadioGroup
+              name="plan"
+              label="Subscription Plan"
+              options={[
+                { label: 'Free', value: 'free' },
+                { label: 'Pro', value: 'pro' },
+                { label: 'Enterprise', value: 'enterprise' },
+              ]}
               required
             />
           </FieldWithCounter>

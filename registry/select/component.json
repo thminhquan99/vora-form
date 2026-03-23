@@ -1,0 +1,12 @@
+{
+  "name": "select",
+  "category": "input",
+  "files": ["PaulySelect.tsx", "PaulySelect.module.css", "types.ts", "index.ts"],
+  "npmDependencies": {},
+  "peerDependencies": { "react": ">=18.0.0", "@pauly/core": ">=0.1.0" },
+  "registryDependencies": ["label", "field-error"],
+  "versionRange": ">=0.1.0",
+  "browserOnly": false,
+  "tags": ["select", "dropdown", "form"],
+  "exports": ["PaulySelect", "PaulySelectProps", "SelectOption"]
+}

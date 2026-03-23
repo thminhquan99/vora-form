@@ -1,0 +1,73 @@
+/* ─── PaulyRadioGroup ────────────────────────────────────────────────────────── */
+
+.fieldset {
+  border: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.legend {
+  font-family: var(--pauly-font-family, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif);
+  font-size: var(--pauly-label-font-size, 0.875rem);
+  font-weight: var(--pauly-label-font-weight, 600);
+  color: var(--pauly-label-color, #374151);
+  margin-bottom: 8px;
+  padding: 0;
+}
+
+.required {
+  color: var(--pauly-required-color, #ef4444);
+}
+
+.optionsList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.radioRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.radio {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--pauly-ring-color, #3b82f6);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.radio:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 var(--pauly-ring-width, 3px) var(--pauly-ring-shadow-color, rgba(59, 130, 246, 0.15));
+  border-radius: 50%;
+}
+
+.radioError {
+  accent-color: var(--pauly-error-border-color, #ef4444);
+}
+
+.radio:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.label {
+  font-family: var(--pauly-font-family, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif);
+  font-size: var(--pauly-input-font-size, 0.9375rem);
+  color: var(--pauly-input-color, #1f2937);
+  cursor: pointer;
+  user-select: none;
+}
+
+.radio:disabled + .label {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
