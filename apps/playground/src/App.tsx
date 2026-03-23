@@ -37,6 +37,7 @@ import {
 } from '../../../registry/table';
 import { PaulySwitch } from '../../../registry/switch';
 import { PaulyDropzone } from '../../../registry/dropzone';
+import { PaulyCombobox } from '../../../registry/combobox';
 
 // ─── Zod Schema ───────────────────────────────────────────────────────────────
 
@@ -94,6 +95,7 @@ const registrationSchema = z.object({
       z.custom<File>((v) => v instanceof File, 'Invalid file')
     )
     .min(1, 'Please upload at least one file'),
+  timezone: z.string().min(1, 'Please select a timezone'),
 });
 
 const roleOptions = [
@@ -105,6 +107,29 @@ const roleOptions = [
 const validate = createZodAdapter(registrationSchema);
 
 // ─── RenderCounter ────────────────────────────────────────────────────────────
+const planOptions = [
+  { label: 'Free', value: 'free' },
+  { label: 'Pro', value: 'pro' },
+  { label: 'Enterprise', value: 'enterprise' },
+];
+
+const timezoneOptions = [
+  { label: 'America/New_York (EST)', value: 'America/New_York' },
+  { label: 'America/Chicago (CST)', value: 'America/Chicago' },
+  { label: 'America/Denver (MST)', value: 'America/Denver' },
+  { label: 'America/Los_Angeles (PST)', value: 'America/Los_Angeles' },
+  { label: 'America/Sao_Paulo (BRT)', value: 'America/Sao_Paulo' },
+  { label: 'Europe/London (GMT)', value: 'Europe/London' },
+  { label: 'Europe/Berlin (CET)', value: 'Europe/Berlin' },
+  { label: 'Europe/Moscow (MSK)', value: 'Europe/Moscow' },
+  { label: 'Asia/Dubai (GST)', value: 'Asia/Dubai' },
+  { label: 'Asia/Kolkata (IST)', value: 'Asia/Kolkata' },
+  { label: 'Asia/Shanghai (CST)', value: 'Asia/Shanghai' },
+  { label: 'Asia/Tokyo (JST)', value: 'Asia/Tokyo' },
+  { label: 'Asia/Ho_Chi_Minh (ICT)', value: 'Asia/Ho_Chi_Minh' },
+  { label: 'Australia/Sydney (AEST)', value: 'Australia/Sydney' },
+  { label: 'Pacific/Auckland (NZST)', value: 'Pacific/Auckland' },
+];
 
 /**
  * A debugging component that visually displays how many times its
@@ -482,6 +507,18 @@ export default function App() {
                 { label: 'Vietnam', value: 'vn' },
                 { label: 'UK', value: 'uk' },
               ]}
+              required
+            />
+          </FieldWithCounter>
+
+          <FieldWithCounter name="timezone">
+            <PaulyCombobox
+              name="timezone"
+              label="Timezone"
+              options={timezoneOptions}
+              placeholder="Select timezone..."
+              searchPlaceholder="Search timezones..."
+              emptyText="No timezone found."
               required
             />
           </FieldWithCounter>
