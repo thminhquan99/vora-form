@@ -29,6 +29,12 @@ import { PaulySignature } from '../../../registry/signature';
 import { PaulyConditional } from '../../../registry/conditional';
 import { PaulyCamera } from '../../../registry/camera';
 import { PaulyQRScanner } from '../../../registry/qr-scanner';
+import {
+  PaulyTable,
+  PaulyTableRow,
+  PaulyTableCell,
+  usePaulyTable,
+} from '../../../registry/table';
 
 // ─── Zod Schema ───────────────────────────────────────────────────────────────
 
@@ -69,6 +75,14 @@ const registrationSchema = z.object({
     ),
   avatar: z.string().nullable().optional(),
   promoCodeQR: z.string().nullable().optional(),
+  workExperience: z
+    .array(
+      z.object({
+        company: z.string(),
+        role: z.string(),
+      })
+    )
+    .optional(),
 });
 
 const roleOptions = [
@@ -166,6 +180,113 @@ function FieldWithCounter({
         <RenderCounter label={name} />
       </div>
       {children}
+    </div>
+  );
+}
+
+// ─── Work Experience Table ────────────────────────────────────────────────────
+
+/**
+ * Demonstrates the PaulyTable composition pattern for array editing.
+ *
+ * Typing in Row 1's Company does NOT re-render Row 2's Role.
+ * Only append/remove triggers the table wrapper re-render.
+ */
+function WorkExperienceTable() {
+  const { append, remove, rowCount } = usePaulyTable('workExperience');
+
+  return (
+    <div style={{ marginBottom: '20px' }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: '8px',
+        }}
+      >
+        <span
+          style={{
+            fontSize: '0.875rem',
+            fontWeight: 600,
+            color: '#374151',
+          }}
+        >
+          Work Experience
+        </span>
+        <button
+          type="button"
+          onClick={() => append({ company: '', role: '' })}
+          style={{
+            padding: '4px 12px',
+            fontSize: '0.8125rem',
+            fontWeight: 500,
+            color: '#059669',
+            backgroundColor: '#ecfdf5',
+            border: '1px solid #a7f3d0',
+            borderRadius: '6px',
+            cursor: 'pointer',
+          }}
+        >
+          + Add Job
+        </button>
+      </div>
+
+      {rowCount > 0 ? (
+        <PaulyTable name="workExperience" columns={['Company', 'Role', '']}>
+          {Array.from({ length: rowCount }).map((_, i) => (
+            <PaulyTableRow key={i} index={i}>
+              <PaulyTableCell field="company">
+                {(path) => (
+                  <FieldWithCounter name={path}>
+                    <PaulyText name={path} label="" placeholder="Company" />
+                  </FieldWithCounter>
+                )}
+              </PaulyTableCell>
+              <PaulyTableCell field="role">
+                {(path) => (
+                  <FieldWithCounter name={path}>
+                    <PaulyText name={path} label="" placeholder="Role" />
+                  </FieldWithCounter>
+                )}
+              </PaulyTableCell>
+              <PaulyTableCell field="_actions">
+                {() => (
+                  <button
+                    type="button"
+                    onClick={() => remove(i)}
+                    style={{
+                      padding: '6px 10px',
+                      fontSize: '0.8125rem',
+                      color: '#ef4444',
+                      backgroundColor: '#fef2f2',
+                      border: '1px solid #fecaca',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    ✕ Remove
+                  </button>
+                )}
+              </PaulyTableCell>
+            </PaulyTableRow>
+          ))}
+        </PaulyTable>
+      ) : (
+        <div
+          style={{
+            padding: '16px',
+            textAlign: 'center',
+            color: '#9ca3af',
+            fontSize: '0.875rem',
+            border: '1.5px dashed #d1d5db',
+            borderRadius: '8px',
+          }}
+        >
+          No work experience added yet.
+        </div>
+      )}
     </div>
   );
 }
@@ -398,6 +519,12 @@ export default function App() {
               label="Scan Promo QR"
             />
           </FieldWithCounter>
+
+          {/* ── Separator ─────────────────────────────────────────── */}
+          <hr style={{ border: 'none', borderTop: '1px solid #e5e7eb', margin: '8px 0 20px' }} />
+
+          {/* ── Work Experience Table (array editing, row isolation) ─ */}
+          <WorkExperienceTable />
 
           {/* ── Submit Button ──────────────────────────────────────── */}
           <button

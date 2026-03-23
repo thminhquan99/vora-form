@@ -1,0 +1,53 @@
+/* ─── PaulyTable ─────────────────────────────────────────────────────────────── */
+
+.wrapper {
+  width: 100%;
+  overflow-x: auto;
+  border: var(--pauly-table-border-width, 1.5px) solid var(--pauly-table-border-color, #d1d5db);
+  border-radius: var(--pauly-table-border-radius, 8px);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--pauly-font-family, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif);
+  font-size: var(--pauly-input-font-size, 0.9375rem);
+}
+
+.th {
+  text-align: left;
+  font-size: var(--pauly-label-font-size, 0.875rem);
+  font-weight: var(--pauly-label-font-weight, 600);
+  color: var(--pauly-label-color, #374151);
+  padding: 10px 12px;
+  background-color: var(--pauly-table-header-bg, #f9fafb);
+  border-bottom: 1px solid var(--pauly-table-border-color, #d1d5db);
+  white-space: nowrap;
+}
+
+.th:not(:last-child) {
+  border-right: 1px solid var(--pauly-table-border-color, #e5e7eb);
+}
+
+.tr {
+  border-bottom: 1px solid var(--pauly-table-row-border-color, #e5e7eb);
+}
+
+.tr:last-child {
+  border-bottom: none;
+}
+
+.td {
+  padding: 6px 8px;
+  vertical-align: top;
+}
+
+.td:not(:last-child) {
+  border-right: 1px solid var(--pauly-table-border-color, #e5e7eb);
+}
+
+/* ── Compact inputs inside table cells ─────────────────────────────────────── */
+/* Remove extra wrapper gaps from PaulyText etc. when inside a table cell */
+.td > div {
+  gap: 0;
+}
