@@ -22,6 +22,7 @@ import { z } from 'zod';
 import { PaulyForm, createZodAdapter } from '@pauly/core';
 import { PaulyText } from '../../../registry/text-input';
 import { PaulyCheckbox, PaulyCheckboxGroup } from '../../../registry/checkbox';
+import { PaulySignature } from '../../../registry/signature';
 
 // ─── Zod Schema ───────────────────────────────────────────────────────────────
 
@@ -46,6 +47,13 @@ const registrationSchema = z.object({
   roles: z
     .array(z.string())
     .min(1, 'Select at least one role'),
+  signature: z
+    .string()
+    .nullable()
+    .refine(
+      (val) => val !== null && val !== '',
+      'Please provide your signature'
+    ),
 });
 
 const roleOptions = [
@@ -285,6 +293,18 @@ export default function App() {
               name="roles"
               label="Select Roles"
               options={roleOptions}
+              required
+            />
+          </FieldWithCounter>
+
+          {/* ── Separator ─────────────────────────────────────────── */}
+          <hr style={{ border: 'none', borderTop: '1px solid #e5e7eb', margin: '8px 0 20px' }} />
+
+          {/* ── Signature Pad (canvas, zero re-renders during draw) ─ */}
+          <FieldWithCounter name="signature">
+            <PaulySignature
+              name="signature"
+              label="Sign Here"
               required
             />
           </FieldWithCounter>

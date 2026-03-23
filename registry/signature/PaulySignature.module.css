@@ -1,0 +1,93 @@
+/* ─── PaulySignature ─────────────────────────────────────────────────────────── */
+/* Themeable via CSS custom properties. Override at :root or container level.     */
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* ── Header (label + clear button) ───────────────────────────────────────────── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+/* ── Clear Button ────────────────────────────────────────────────────────────── */
+.clearBtn {
+  all: unset;
+  cursor: pointer;
+  font-family: var(--pauly-font-family, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--pauly-signature-clear-color, #6b7280);
+  padding: 4px 10px;
+  border-radius: 6px;
+  transition:
+    color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.clearBtn:hover:not(:disabled) {
+  color: var(--pauly-signature-clear-hover-color, #ef4444);
+  background-color: var(--pauly-signature-clear-hover-bg, #fef2f2);
+}
+
+.clearBtn:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 var(--pauly-ring-width, 3px) var(--pauly-ring-shadow-color, rgba(59, 130, 246, 0.15));
+}
+
+.clearBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ── Canvas ──────────────────────────────────────────────────────────────────── */
+.canvas {
+  width: 100%;
+  display: block;
+  border: var(--pauly-signature-border-width, 1.5px) solid var(--pauly-signature-border-color, #d1d5db);
+  border-radius: var(--pauly-signature-border-radius, 8px);
+  background-color: var(--pauly-signature-bg, #fafafa);
+  cursor: crosshair;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+/* ── Focus / Active ──────────────────────────────────────────────────────────── */
+.canvas:focus-visible,
+.canvas:active {
+  outline: none;
+  border-color: var(--pauly-ring-color, #3b82f6);
+  box-shadow:
+    0 0 0 var(--pauly-ring-width, 3px) var(--pauly-ring-shadow-color, rgba(59, 130, 246, 0.15));
+}
+
+/* ── Error State ─────────────────────────────────────────────────────────────── */
+.canvasError {
+  border-color: var(--pauly-error-border-color, #ef4444);
+}
+
+.canvasError:focus-visible,
+.canvasError:active {
+  box-shadow:
+    0 0 0 var(--pauly-ring-width, 3px) var(--pauly-error-ring-color, rgba(239, 68, 68, 0.15));
+  border-color: var(--pauly-error-border-color, #ef4444);
+}
+
+/* ── Hover ───────────────────────────────────────────────────────────────────── */
+.canvas:hover:not(.canvasError):not(.canvasDisabled) {
+  border-color: var(--pauly-signature-hover-border-color, #9ca3af);
+}
+
+/* ── Disabled ────────────────────────────────────────────────────────────────── */
+.canvasDisabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}

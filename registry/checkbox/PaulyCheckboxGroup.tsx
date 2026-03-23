@@ -56,7 +56,7 @@ export function PaulyCheckboxGroup({
 
   /**
    * Toggle a value in the selected array.
-   * Uses `field.onChange(newArray)` — domain value path → store.setValue()
+   * Uses `field.setValue(newArray)` — domain value path → store.setValue()
    * → triggers re-render so checked states update.
    */
   const handleToggle = useCallback(
@@ -64,7 +64,7 @@ export function PaulyCheckboxGroup({
       const next = currentValues.includes(optionValue)
         ? currentValues.filter((v) => v !== optionValue)
         : [...currentValues, optionValue];
-      field.onChange(next as string[] & React.ChangeEvent<HTMLElement>);
+      field.setValue(next);
     },
     [currentValues, field]
   );

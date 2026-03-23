@@ -51,7 +51,8 @@
  * │    getSnapshot = () => store.getError("email")     │
  * │  )                                                 │
  * │                                                    │
- * │  Returns: { value, error, onChange, onBlur, ref }  │
+ * │  Returns: { value, error, onChange, setValue,       │
+ * │            onBlur, ref }                            │
  * └────────────────────────────────────────────────────┘
  * ```
  *
@@ -88,12 +89,19 @@ export interface UsePaulyFieldReturn<TValue> {
   ref: (element: HTMLElement | null) => void;
 
   /**
-   * Change handler — call this when the field value changes.
-   *
-   * For native inputs: pass the React ChangeEvent directly.
-   * For composite widgets: pass the plain domain value.
+   * Native change handler — call this with the React ChangeEvent from
+   * `<input>`, `<textarea>`, or `<select>`. Extracts the DOM value
+   * and syncs it to the store silently (no re-render).
    */
-  onChange: (valueOrEvent: TValue | React.ChangeEvent<HTMLElement>) => void;
+  onChange: (e: React.ChangeEvent<HTMLElement>) => void;
+
+  /**
+   * Domain value setter — use this in composite widgets (Signature,
+   * CheckboxGroup, DatePicker, etc.) to commit a clean domain value
+   * to the store. Unlike `onChange`, this DOES trigger a re-render
+   * via `store.setValue()` → pub/sub notification.
+   */
+  setValue: (value: TValue) => void;
 
   /**
    * Blur handler — triggers single-field validation if a validation
@@ -105,22 +113,7 @@ export interface UsePaulyFieldReturn<TValue> {
   name: string;
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
 
-/**
- * Type guard: checks if the argument is a React SyntheticEvent (ChangeEvent).
- * Used to discriminate between the two `onChange` overloads.
- */
-function isChangeEvent<T>(
-  valueOrEvent: unknown
-): valueOrEvent is React.ChangeEvent<T & HTMLElement> {
-  return (
-    typeof valueOrEvent === 'object' &&
-    valueOrEvent !== null &&
-    'target' in valueOrEvent &&
-    'nativeEvent' in valueOrEvent
-  );
-}
 
 // ─── Hook ─────────────────────────────────────────────────────────────────────
 
@@ -241,35 +234,39 @@ export function usePaulyField<TValue = unknown>(
     [store, name]
   );
 
-  // ── onChange handler ───────────────────────────────────────────────────
+  // ── onChange handler (NATIVE EVENTS ONLY) ──────────────────────────────
   //
-  // Dual-overload: accepts either a React ChangeEvent (native inputs)
-  // or a plain domain value (composite widgets).
+  // Strictly for native `<input>`, `<textarea>`, `<select>` change events.
+  // Extracts the DOM value and syncs it to the store silently.
   //
-  // CRITICAL: Native inputs use `setSilentValue` to avoid triggering
-  // useSyncExternalStore re-renders. The DOM already shows the typed
-  // character — we just silently sync the store so getAllValues() and
-  // onBlur validation have the correct data. Composite widgets use
-  // `setValue` because they need React to re-render their UI (e.g.,
-  // updating the selected date on a calendar).
+  // CRITICAL: Uses `setSilentValue` to avoid triggering useSyncExternalStore
+  // re-renders. The DOM already shows the typed character — we just silently
+  // sync the store so getAllValues() and onBlur validation have the correct data.
 
   const onChange = useCallback(
-    (valueOrEvent: TValue | React.ChangeEvent<HTMLElement>) => {
-      if (isChangeEvent<HTMLElement>(valueOrEvent)) {
-        // Native input — DOM already shows the change, sync store silently
-        const target = valueOrEvent.target as HTMLInputElement;
+    (e: React.ChangeEvent<HTMLElement>) => {
+      const target = e.target as HTMLInputElement;
 
-        if (target.type === 'checkbox') {
-          // Checkbox — use `.checked` (boolean), not `.value`
-          store.setSilentValue(name, target.checked);
-        } else {
-          // Text / email / tel / url / textarea / select — use `.value`
-          store.setSilentValue(name, target.value);
-        }
+      if (target.type === 'checkbox') {
+        // Checkbox — use `.checked` (boolean), not `.value`
+        store.setSilentValue(name, target.checked);
       } else {
-        // Composite widget — needs React re-render to update its UI
-        store.setValue(name, valueOrEvent);
+        // Text / email / tel / url / textarea / select — use `.value`
+        store.setSilentValue(name, target.value);
       }
+    },
+    [store, name]
+  );
+
+  // ── setValue handler (COMPOSITE WIDGETS) ────────────────────────────────
+  //
+  // For composite widgets (Signature, CheckboxGroup, DatePicker, etc.)
+  // that need to commit a clean domain value to the store.
+  // Uses `store.setValue()` which DOES trigger pub/sub → re-render.
+
+  const setValue = useCallback(
+    (val: TValue) => {
+      store.setValue(name, val);
     },
     [store, name]
   );
@@ -301,9 +298,10 @@ export function usePaulyField<TValue = unknown>(
       error,
       ref: fieldRef,
       onChange,
+      setValue,
       onBlur,
       name,
     }),
-    [value, error, fieldRef, onChange, onBlur, name]
+    [value, error, fieldRef, onChange, setValue, onBlur, name]
   );
 }

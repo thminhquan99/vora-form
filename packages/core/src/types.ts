@@ -42,14 +42,12 @@ export interface PaulyFieldProps<
   defaultValue?: TValue;
 
   /**
-   * Dual-overload change handler:
-   * - **Native uncontrolled** (`<input>`, `<textarea>`, `<select>`) →
-   *   receives `React.ChangeEvent<TElement>` (the DOM already holds the
-   *   value; the event is forwarded to the store for sync).
-   * - **Composite controlled** (DatePicker, Signature, etc.) →
-   *   receives `TValue` (the widget commits a clean domain value).
+   * Native change handler — strictly for `<input>`, `<textarea>`, `<select>` events.
+   *
+   * For composite widgets (DatePicker, Signature, CheckboxGroup), use
+   * `setValue()` from the `usePaulyField` hook return instead.
    */
-  onChange?: (valueOrEvent: TValue | ChangeEvent<TElement>) => void;
+  onChange?: (e: ChangeEvent<TElement>) => void;
 
   /** Called when the field loses focus. */
   onBlur?: () => void;
