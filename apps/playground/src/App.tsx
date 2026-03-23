@@ -35,6 +35,8 @@ import {
   PaulyTableCell,
   usePaulyTable,
 } from '../../../registry/table';
+import { PaulySwitch } from '../../../registry/switch';
+import { PaulyDropzone } from '../../../registry/dropzone';
 
 // ─── Zod Schema ───────────────────────────────────────────────────────────────
 
@@ -83,6 +85,12 @@ const registrationSchema = z.object({
       })
     )
     .optional(),
+  marketingEmails: z.boolean().default(false),
+  portfolioFiles: z
+    .array(
+      z.custom<File>((v) => v instanceof File, 'Invalid file')
+    )
+    .min(1, 'Please upload at least one file'),
 });
 
 const roleOptions = [
@@ -525,6 +533,28 @@ export default function App() {
 
           {/* ── Work Experience Table (array editing, row isolation) ─ */}
           <WorkExperienceTable />
+
+          {/* ── Separator ─────────────────────────────────────────── */}
+          <hr style={{ border: 'none', borderTop: '1px solid #e5e7eb', margin: '8px 0 20px' }} />
+
+          {/* ── Switch Toggle ─────────────────────────────────────── */}
+          <FieldWithCounter name="marketingEmails">
+            <PaulySwitch
+              name="marketingEmails"
+              label="Receive marketing emails"
+            />
+          </FieldWithCounter>
+
+          {/* ── Dropzone ──────────────────────────────────────────── */}
+          <FieldWithCounter name="portfolioFiles">
+            <PaulyDropzone
+              name="portfolioFiles"
+              label="Upload Portfolio"
+              accept="image/*,.pdf"
+              maxFiles={3}
+              required
+            />
+          </FieldWithCounter>
 
           {/* ── Submit Button ──────────────────────────────────────── */}
           <button
