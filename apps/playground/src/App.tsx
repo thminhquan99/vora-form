@@ -94,7 +94,7 @@ const registrationSchema = z.object({
     .array(
       z.custom<File>((v) => v instanceof File, 'Invalid file')
     )
-    .min(1, 'Please upload at least one file'),
+    .optional(),
   timezone: z.string().min(1, 'Please select a timezone'),
 });
 
@@ -366,11 +366,13 @@ function WorkExperienceTable() {
 // ─── App ──────────────────────────────────────────────────────────────────────
 
 export default function App() {
-  const handleSubmit = (values: Record<string, unknown>) => {
+  const handleSubmit = (values: Record<string, unknown>, store: import('@pauly/core').FormStore) => {
+    const dirtyValues = store.getDirtyValues();
     console.log('✅ Form submitted successfully!');
-    console.log('📦 Submitted values:', JSON.stringify(values, null, 2));
+    console.log('📦 All values:', values);
+    console.log('✨ Dirty values (changed only):', dirtyValues);
     alert(
-      `Form submitted!\n\n${JSON.stringify(values, null, 2)}`
+      `Form submitted!\n\nDirty Values (changed from initial):\n${JSON.stringify(dirtyValues, null, 2)}`
     );
   };
 

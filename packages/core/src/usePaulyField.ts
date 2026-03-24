@@ -104,10 +104,16 @@ export interface UsePaulyFieldReturn<TValue> {
   setValue: (value: TValue) => void;
 
   /**
-   * Blur handler — triggers single-field validation if a validation
-   * function is configured on the form.
+   * Blur handler — marks the field as touched and triggers single-field
+   * validation if a validation function is configured on the form.
    */
   onBlur: () => void;
+
+  /**
+   * Whether the user has blurred this field at least once.
+   * Useful for deferring error display until after first interaction.
+   */
+  isTouched: boolean;
 
   /** The field path this hook is subscribed to. */
   name: string;
@@ -207,6 +213,30 @@ export function usePaulyField<TValue = unknown>(
     getErrorSnapshot
   );
 
+  // ── Touched subscription via useSyncExternalStore ────────────────────────
+  //
+  // Subscribes to the "touched" topic for this field. A field is
+  // "touched" after the user has blurred it at least once. This
+  // allows UI components to defer showing errors until after first
+  // interaction.
+
+  const subscribeTouched = useCallback(
+    (onStoreChange: () => void) =>
+      store.subscribe(name, onStoreChange, 'touched'),
+    [store, name]
+  );
+
+  const getTouchedSnapshot = useCallback(
+    () => store.isTouched(name),
+    [store, name]
+  );
+
+  const isTouched = useSyncExternalStore(
+    subscribeTouched,
+    getTouchedSnapshot,
+    getTouchedSnapshot
+  );
+
   // ── Ref callback ───────────────────────────────────────────────────────
   //
   // A callback ref (not a ref object) because we need to run registration
@@ -277,6 +307,9 @@ export function usePaulyField<TValue = unknown>(
   // field that lost focus — no other fields are affected.
 
   const onBlur = useCallback(() => {
+    // Mark field as touched on first blur
+    store.setTouched(name);
+
     if (validate) {
       const allValues = store.getAllValues();
       const errors = validate(allValues);
@@ -300,8 +333,9 @@ export function usePaulyField<TValue = unknown>(
       onChange,
       setValue,
       onBlur,
+      isTouched,
       name,
     }),
-    [value, error, fieldRef, onChange, setValue, onBlur, name]
+    [value, error, fieldRef, onChange, setValue, onBlur, isTouched, name]
   );
 }

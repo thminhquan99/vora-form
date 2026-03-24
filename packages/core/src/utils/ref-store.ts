@@ -97,7 +97,7 @@ export type Listener = () => void;
  * The subset of subscriber topics. Allows subscribing to value changes,
  * error changes, or both.
  */
-export type SubscriptionTopic = 'value' | 'error' | 'input';
+export type SubscriptionTopic = 'value' | 'error' | 'input' | 'touched';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -176,6 +176,24 @@ export class FormStore {
   private errors: Map<string, string> = new Map();
 
   /**
+   * Initial values captured at field registration time.
+   *
+   * Used by `getDirtyValues()` to determine which fields have changed
+   * from their original state. Only set once per field path — subsequent
+   * registrations (e.g., StrictMode double-mount) do not overwrite.
+   */
+  private initialValues: Map<string, unknown> = new Map();
+
+  /**
+   * Tracks which fields have been "touched" (blurred at least once).
+   *
+   * Enterprise forms often defer showing errors until a field has been
+   * touched, to avoid overwhelming users with errors before they've
+   * had a chance to fill in the field.
+   */
+  private touched: Set<string> = new Set();
+
+  /**
    * Per-path, per-topic subscriber sets.
    *
    * Structure: `Map<"email:value", Set<Listener>>`
@@ -236,7 +254,20 @@ export class FormStore {
     // unless a value was already set programmatically (e.g., defaultValue
     // was provided before the DOM element mounted).
     if (isNativeFieldElement(element) && !this.values.has(path)) {
-      this.values.set(path, element.value);
+      // Checkboxes use `.checked` (boolean), all others use `.value` (string)
+      if (
+        element instanceof HTMLInputElement &&
+        element.type === 'checkbox'
+      ) {
+        this.values.set(path, element.checked);
+      } else {
+        this.values.set(path, element.value);
+      }
+    }
+
+    // Capture initial value for dirty tracking (only on first registration)
+    if (!this.initialValues.has(path)) {
+      this.initialValues.set(path, this.values.get(path));
     }
 
     return () => this.unregisterField(path);
@@ -260,9 +291,12 @@ export class FormStore {
     this.refs.delete(path);
     this.values.delete(path);
     this.errors.delete(path);
+    this.initialValues.delete(path);
+    this.touched.delete(path);
     this.listeners.delete(this.listenerKey(path, 'value'));
     this.listeners.delete(this.listenerKey(path, 'error'));
     this.listeners.delete(this.listenerKey(path, 'input'));
+    this.listeners.delete(this.listenerKey(path, 'touched'));
   }
 
   // ── Value Access ──────────────────────────────────────────────────────────
@@ -324,7 +358,11 @@ export class FormStore {
     // Sync to DOM for native inputs so the visible value updates immediately
     const ref = this.refs.get(path);
     if (ref && isNativeFieldElement(ref)) {
-      ref.value = String(value ?? '');
+      if (ref instanceof HTMLInputElement && ref.type === 'checkbox') {
+        ref.checked = Boolean(value);
+      } else {
+        ref.value = String(value ?? '');
+      }
     }
 
     this.notify(path, 'value');
@@ -590,7 +628,84 @@ export class FormStore {
     this.refs.clear();
     this.values.clear();
     this.errors.clear();
+    this.initialValues.clear();
+    this.touched.clear();
     this.listeners.clear();
+  }
+
+  // ── Touched & Dirty Tracking ─────────────────────────────────────────────
+
+  /**
+   * Marks a field as "touched" (the user has interacted and blurred it).
+   *
+   * Notifies the `"touched"` topic so subscribers can react (e.g., to
+   * conditionally show errors only after touching).
+   *
+   * @param path - The field path to mark as touched
+   */
+  setTouched(path: string): void {
+    if (!this.touched.has(path)) {
+      this.touched.add(path);
+      this.notify(path, 'touched');
+    }
+  }
+
+  /**
+   * Returns whether a field has been touched (blurred at least once).
+   *
+   * @param path - The field path to check
+   * @returns `true` if the user has blurred this field at least once
+   */
+  isTouched(path: string): boolean {
+    return this.touched.has(path);
+  }
+
+  /**
+   * Returns only the values that have changed from their initial state.
+   *
+   * Compares current values against `initialValues` captured at
+   * registration time. For objects/arrays, uses `JSON.stringify`
+   * comparison. For primitives, uses strict `===`.
+   *
+   * @returns A `Record<string, unknown>` containing only dirty fields
+   *
+   * @example
+   * ```ts
+   * // User changed email but not firstName
+   * store.getDirtyValues();
+   * // { email: 'new@example.com' }
+   * ```
+   */
+  getDirtyValues(): Record<string, unknown> {
+    const result: Record<string, unknown> = {};
+
+    for (const [path, currentValue] of this.values) {
+      const initialValue = this.initialValues.get(path);
+
+      // Fast path: strict equality for primitives (string, number, boolean)
+      if (currentValue === initialValue) continue;
+
+      // Slow path: deep comparison for objects/arrays
+      if (
+        typeof currentValue === 'object' &&
+        currentValue !== null &&
+        typeof initialValue === 'object' &&
+        initialValue !== null
+      ) {
+        try {
+          if (JSON.stringify(currentValue) === JSON.stringify(initialValue)) {
+            continue;
+          }
+        } catch {
+          // If JSON.stringify fails (e.g., circular refs, File objects),
+          // treat as dirty (already !== by reference)
+        }
+      }
+
+      result[path] = currentValue;
+    }
+
+    return result;
   }
 
   /**

@@ -85,6 +85,12 @@ export interface UseFormCoreReturn {
   /** Whether the form currently has validation errors. */
   hasErrors: () => boolean;
 
+  /**
+   * Returns only the values that have changed from their initial state.
+   * Useful for PATCH-style submissions where you only send modified fields.
+   */
+  getDirtyValues: () => Record<string, unknown>;
+
   /** Whether the form is currently submitting. */
   isSubmitting: boolean;
 
@@ -168,6 +174,11 @@ export function useFormCore(): UseFormCoreReturn {
     [store]
   );
 
+  const getDirtyValues = useCallback(
+    () => store.getDirtyValues(),
+    [store]
+  );
+
   return {
     getValue,
     setValue,
@@ -180,6 +191,7 @@ export function useFormCore(): UseFormCoreReturn {
     focusField,
     reset,
     hasErrors,
+    getDirtyValues,
     isSubmitting,
     store,
   };

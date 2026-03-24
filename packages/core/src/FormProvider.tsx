@@ -93,8 +93,11 @@ export interface PaulyFormProps {
   /**
    * Called with the serialized form values when validation passes.
    * May be async — the form will show a submitting state while awaiting.
+   *
+   * @param values - All current form values as a plain object
+   * @param store  - The raw FormStore for advanced operations (e.g., `getDirtyValues()`)
    */
-  onSubmit: (values: Record<string, unknown>) => void | Promise<void>;
+  onSubmit: (values: Record<string, unknown>, store: FormStore) => void | Promise<void>;
 
   /**
    * Optional validation function — typically produced by `createZodAdapter()`.
@@ -179,7 +182,7 @@ export function PaulyForm({
       // No errors — call the developer's onSubmit
       setIsSubmitting(true);
       try {
-        await onSubmit(values);
+        await onSubmit(values, store);
       } finally {
         setIsSubmitting(false);
       }
