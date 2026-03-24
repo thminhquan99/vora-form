@@ -19,7 +19,7 @@
 
 import React, { useRef } from 'react';
 import { z } from 'zod';
-import { PaulyForm, createZodAdapter, useAsyncValidation } from '@pauly/core';
+import { PaulyForm, createZodAdapter, useAsyncValidation, useFormCore, usePaulyField } from '@pauly/core';
 import { PaulyText } from '../../../registry/text-input';
 import { PaulyTextarea } from '../../../registry/textarea';
 import { PaulySelect } from '../../../registry/select';
@@ -61,6 +61,7 @@ const registrationSchema = z.object({
     .email('Please enter a valid email address'),
   bio: z.string().max(500, 'Bio must be 500 characters or less').optional(),
   country: z.string().min(1, 'Please select a country'),
+  city: z.string().min(1, 'Please select a city'),
   plan: z.enum(['free', 'pro', 'enterprise'], {
     errorMap: () => ({ message: 'Please select a plan' }),
   }),
@@ -105,6 +106,29 @@ const roleOptions = [
 ];
 
 const validate = createZodAdapter(registrationSchema);
+
+// ─── Cascading Data ───────────────────────────────────────────────────────────
+
+const countryOptions = [
+  { label: 'USA', value: 'us' },
+  { label: 'Vietnam', value: 'vn' },
+  { label: 'UK', value: 'uk' },
+];
+
+const citiesByCountry: Record<string, { label: string; value: string }[]> = {
+  us: [
+    { label: 'New York', value: 'ny' },
+    { label: 'Los Angeles', value: 'la' },
+  ],
+  vn: [
+    { label: 'Hanoi', value: 'hn' },
+    { label: 'Ho Chi Minh', value: 'hcm' },
+  ],
+  uk: [
+    { label: 'London', value: 'ldn' },
+    { label: 'Manchester', value: 'man' },
+  ],
+};
 
 // ─── RenderCounter ────────────────────────────────────────────────────────────
 const planOptions = [
@@ -253,6 +277,85 @@ function UsernameField() {
       placeholder="Pick a username"
       required
     />
+  );
+}
+
+// ─── CountryCityGroup (cascading dependent fields) ────────────────────────────
+
+/**
+ * Demonstrates how to handle cascading dropdowns (Country → City)
+ * under the zero-re-render architecture.
+ *
+ * ### How It Works
+ *
+ * 1. `usePaulyField<string>('country')` subscribes to the country value.
+ *    When the user picks a country, ONLY this component re-renders — not
+ *    the text fields above or the checkboxes below.
+ *
+ * 2. `useFormCore().setValue('city', '')` programmatically clears the
+ *    child field whenever the parent changes, via a `useEffect`.
+ *
+ * 3. The City `<PaulySelect>` receives its options from `citiesByCountry`
+ *    based on the current country value. If no country is selected,
+ *    the city dropdown is disabled.
+ *
+ * ### Re-render Contract
+ *
+ * | Event                      | Country counter | City counter | Siblings |
+ * |---------------------------|----------------|-------------|----------|
+ * | Select a country           | +1 (value sub) | +1 (cleared) | 0        |
+ * | Select a city              | 0              | 0 (silent)   | 0        |
+ * | Type in firstName/email    | 0              | 0            | 0        |
+ */
+function CountryCityGroup() {
+  const countryField = usePaulyField<string>('country');
+  const { setValue } = useFormCore();
+
+  // Track the previous country so we can detect actual changes vs initial mount
+  const prevCountryRef = React.useRef<string | undefined>(countryField.value);
+
+  // When country changes, clear the city selection
+  React.useEffect(() => {
+    if (prevCountryRef.current !== countryField.value) {
+      // Only clear city if country actually changed (not on initial mount)
+      if (prevCountryRef.current !== undefined) {
+        setValue('city', '');
+      }
+      prevCountryRef.current = countryField.value;
+    }
+  }, [countryField.value, setValue]);
+
+  const cityOptions = countryField.value
+    ? citiesByCountry[countryField.value] ?? []
+    : [];
+
+  return (
+    <>
+      <FieldWithCounter name="country">
+        <PaulySelect
+          name="country"
+          label="Country"
+          placeholder="Select a country..."
+          options={countryOptions}
+          required
+        />
+      </FieldWithCounter>
+
+      <FieldWithCounter name="city">
+        <PaulySelect
+          name="city"
+          label="City"
+          placeholder={
+            countryField.value
+              ? 'Select a city...'
+              : 'Select a country first'
+          }
+          options={cityOptions}
+          disabled={!countryField.value}
+          required
+        />
+      </FieldWithCounter>
+    </>
   );
 }
 
@@ -499,19 +602,8 @@ export default function App() {
             />
           </FieldWithCounter>
 
-          <FieldWithCounter name="country">
-            <PaulySelect
-              name="country"
-              label="Country"
-              placeholder="Select a country..."
-              options={[
-                { label: 'USA', value: 'us' },
-                { label: 'Vietnam', value: 'vn' },
-                { label: 'UK', value: 'uk' },
-              ]}
-              required
-            />
-          </FieldWithCounter>
+          {/* ── Cascading Country → City ──────────────────────── */}
+          <CountryCityGroup />
 
           <FieldWithCounter name="timezone">
             <PaulyCombobox
