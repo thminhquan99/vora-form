@@ -1,20 +1,20 @@
 {
   "name": "slider",
-  "displayName": "PaulySlider",
+  "displayName": "VRSlider",
   "description": "Native range slider with zero-re-render DOM value display. Stores values as JavaScript numbers. Supports min/max/step constraints.",
   "category": "input",
   "files": [
-    "PaulySlider.tsx",
-    "PaulySlider.module.css",
+    "VRSlider.tsx",
+    "VRSlider.module.css",
     "types.ts",
     "index.ts"
   ],
   "dependencies": {
     "internal": ["label", "field-error"],
-    "external": ["@pauly/core"]
+    "external": ["@vora/core"]
   },
   "exports": {
-    "components": ["PaulySlider"],
-    "types": ["PaulySliderProps"]
+    "components": ["VRSlider"],
+    "types": ["VRSliderProps"]
   }
 }

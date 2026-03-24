@@ -1,14 +1,14 @@
-import type { PaulyFieldProps } from '@pauly/core';
+import type { VRFieldProps } from '@vora/core';
 
 /**
- * Props for the `<PaulyCamera>` capture component.
+ * Props for the `<VRCamera>` capture component.
  *
  * The field value is `string | null`:
  * - `null` → no photo captured / retaken
  * - `string` → base64 data URL (`image/png`)
  */
-export interface PaulyCameraProps
-  extends PaulyFieldProps<string | null, HTMLDivElement> {
+export interface VRCameraProps
+  extends VRFieldProps<string | null, HTMLDivElement> {
   /** Label text displayed above the camera. */
   label: string;
 

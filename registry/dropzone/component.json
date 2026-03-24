@@ -1,12 +1,12 @@
 {
   "name": "dropzone",
   "category": "input",
-  "files": ["PaulyDropzone.tsx", "PaulyDropzone.module.css", "types.ts", "index.ts"],
+  "files": ["VRDropzone.tsx", "VRDropzone.module.css", "types.ts", "index.ts"],
   "npmDependencies": {},
-  "peerDependencies": { "react": ">=18.0.0", "@pauly/core": ">=0.1.0" },
+  "peerDependencies": { "react": ">=18.0.0", "@vora/core": ">=0.1.0" },
   "registryDependencies": ["label", "field-error"],
   "versionRange": ">=0.1.0",
   "browserOnly": true,
   "tags": ["dropzone", "upload", "file", "drag-and-drop", "form"],
-  "exports": ["PaulyDropzone", "PaulyDropzoneProps"]
+  "exports": ["VRDropzone", "VRDropzoneProps"]
 }

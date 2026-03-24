@@ -2,22 +2,22 @@
   "name": "table",
   "category": "layout",
   "files": [
-    "PaulyTable.tsx",
-    "PaulyTable.module.css",
-    "usePaulyTable.ts",
+    "VRTable.tsx",
+    "VRTable.module.css",
+    "useVoraTable.ts",
     "types.ts",
     "index.ts"
   ],
   "npmDependencies": {},
-  "peerDependencies": { "react": ">=18.0.0", "@pauly/core": ">=0.1.0" },
+  "peerDependencies": { "react": ">=18.0.0", "@vora/core": ">=0.1.0" },
   "registryDependencies": [],
   "versionRange": ">=0.1.0",
   "browserOnly": false,
   "tags": ["table", "array", "repeatable", "data-grid", "form"],
   "exports": [
-    "PaulyTable",
-    "PaulyTableRow",
-    "PaulyTableCell",
-    "usePaulyTable"
+    "VRTable",
+    "VRTableRow",
+    "VRTableCell",
+    "useVoraTable"
   ]
 }

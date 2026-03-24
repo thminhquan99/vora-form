@@ -1,2 +1,2 @@
-export { PaulyCodeEditor } from './PaulyCodeEditor';
-export type { PaulyCodeEditorProps } from './types';
+export { VRCodeEditor } from './VRCodeEditor';
+export type { VRCodeEditorProps } from './types';

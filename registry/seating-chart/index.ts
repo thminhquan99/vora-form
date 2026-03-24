@@ -1,2 +1,2 @@
-export * from './PaulySeatingChart';
+export * from './VRSeatingChart';
 export * from './types';

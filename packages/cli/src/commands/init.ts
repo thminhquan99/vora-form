@@ -28,7 +28,7 @@ import prompts from 'prompts';
 /**
  * Shape of `pauly.config.json`.
  */
-export interface PaulyConfig {
+export interface VRConfig {
   /** JSON schema URL for IDE autocompletion. */
   $schema?: string;
   /** Directory where components are installed (relative to project root). */
@@ -38,7 +38,7 @@ export interface PaulyConfig {
 }
 
 /** Default config values. */
-export const DEFAULT_CONFIG: PaulyConfig = {
+export const DEFAULT_CONFIG: VRConfig = {
   $schema: 'https://paulyform.dev/schema/config.json',
   componentDir: './src/components/pauly',
   importAlias: '@/components/pauly',
@@ -53,7 +53,7 @@ export const CONFIG_FILENAME = 'pauly.config.json';
  * Reads `pauly.config.json` from cwd.
  * Returns `null` if the file does not exist.
  */
-export async function readConfig(): Promise<PaulyConfig | null> {
+export async function readConfig(): Promise<VRConfig | null> {
   const configPath = path.resolve(process.cwd(), CONFIG_FILENAME);
 
   if (!(await fs.pathExists(configPath))) {
@@ -61,7 +61,7 @@ export async function readConfig(): Promise<PaulyConfig | null> {
   }
 
   try {
-    return (await fs.readJson(configPath)) as PaulyConfig;
+    return (await fs.readJson(configPath)) as VRConfig;
   } catch {
     return null;
   }
@@ -72,7 +72,7 @@ export async function readConfig(): Promise<PaulyConfig | null> {
 export function initCommand(program: Command): void {
   program
     .command('init')
-    .description('Initialize PaulyForm configuration in your project')
+    .description('Initialize VoraForm configuration in your project')
     .option(
       '-y, --yes',
       'Accept all defaults without prompting',
@@ -83,7 +83,7 @@ export function initCommand(program: Command): void {
 
       console.log();
       console.log(
-        pc.bold('🎨 PaulyForm CLI') +
+        pc.bold('🎨 VoraForm CLI') +
         pc.dim(' — initializing project')
       );
 
@@ -135,7 +135,7 @@ export function initCommand(program: Command): void {
       }
 
       // ── Write config ──────────────────────────────────────────────
-      const config: PaulyConfig = {
+      const config: VRConfig = {
         $schema: DEFAULT_CONFIG.$schema,
         componentDir,
         importAlias,

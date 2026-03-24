@@ -1,11 +1,11 @@
-import type { PaulyFieldProps } from '@pauly/core';
+import type { VRFieldProps } from '@vora/core';
 
 /**
- * Props for the single `<PaulyCheckbox>` component.
+ * Props for the single `<VRCheckbox>` component.
  * Represents a boolean toggle (e.g., "Accept Terms").
  */
-export interface PaulyCheckboxProps
-  extends PaulyFieldProps<boolean, HTMLInputElement> {
+export interface VRCheckboxProps
+  extends VRFieldProps<boolean, HTMLInputElement> {
   /** Label text shown next to the checkbox. */
   label: string;
 
@@ -14,7 +14,7 @@ export interface PaulyCheckboxProps
 }
 
 /**
- * A single option within a `<PaulyCheckboxGroup>`.
+ * A single option within a `<VRCheckboxGroup>`.
  */
 export interface CheckboxOption {
   /** Visible label text. */
@@ -26,11 +26,11 @@ export interface CheckboxOption {
 }
 
 /**
- * Props for the `<PaulyCheckboxGroup>` component.
+ * Props for the `<VRCheckboxGroup>` component.
  * Manages an array of selected string values.
  */
-export interface PaulyCheckboxGroupProps
-  extends PaulyFieldProps<string[], HTMLDivElement> {
+export interface VRCheckboxGroupProps
+  extends VRFieldProps<string[], HTMLDivElement> {
   /** Group label displayed above the options. */
   label?: string;
 

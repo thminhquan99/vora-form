@@ -5,12 +5,12 @@ Dynamic layout controller that conditionally mounts/unmounts form
 fields based on another field's value. Not a form input.
 
 ## Exports
-- PaulyConditional (React.FC\<PaulyConditionalProps\>)
-- PaulyConditionalProps (interface)
+- VRConditional (React.FC\<VRConditionalProps\>)
+- VRConditionalProps (interface)
 
 ## Architecture
 ```
-usePaulyField(watch) → field.value
+useVoraField(watch) → field.value
   ↓
 condition(field.value)
   ↓
@@ -19,7 +19,7 @@ false → null (unmounts children)
 ```
 
 ## Re-render contract
-| Event | PaulyConditional re-renders? |
+| Event | VRConditional re-renders? |
 |---|---|
 | Watched field changes | ✅ Yes (to evaluate condition) |
 | Child field typing | ❌ No |
@@ -31,4 +31,4 @@ false → null (unmounts children)
 - Does NOT attach `ref`, `onChange`, `setValue`, or `onBlur`.
 
 ## Dependencies
-- packages/core — usePaulyField (for value subscription)
+- packages/core — useVoraField (for value subscription)

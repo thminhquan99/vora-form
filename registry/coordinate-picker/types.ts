@@ -1,8 +1,8 @@
-import type { PaulyFieldProps } from '@pauly/core';
+import type { VRFieldProps } from '@vora/core';
 
 export type Coordinate = { x: number; y: number };
 
-export interface PaulyCoordinatePickerProps extends PaulyFieldProps<Coordinate | null, HTMLDivElement> {
+export interface VRCoordinatePickerProps extends VRFieldProps<Coordinate | null, HTMLDivElement> {
   label?: string;
   height?: number;
   id?: string;

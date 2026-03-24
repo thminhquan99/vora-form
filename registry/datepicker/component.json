@@ -1,20 +1,20 @@
 {
   "name": "datepicker",
-  "displayName": "PaulyDatePicker",
+  "displayName": "VRDatePicker",
   "description": "Native date picker (<input type=\"date\">) wrapped in zero-re-render architecture. Stores dates as ISO YYYY-MM-DD strings. Supports min/max constraints.",
   "category": "input",
   "files": [
-    "PaulyDatePicker.tsx",
-    "PaulyDatePicker.module.css",
+    "VRDatePicker.tsx",
+    "VRDatePicker.module.css",
     "types.ts",
     "index.ts"
   ],
   "dependencies": {
     "internal": ["label", "field-error"],
-    "external": ["@pauly/core"]
+    "external": ["@vora/core"]
   },
   "exports": {
-    "components": ["PaulyDatePicker"],
-    "types": ["PaulyDatePickerProps"]
+    "components": ["VRDatePicker"],
+    "types": ["VRDatePickerProps"]
   }
 }

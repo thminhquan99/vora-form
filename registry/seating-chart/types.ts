@@ -1,6 +1,6 @@
-import { PaulyFieldProps } from '@pauly/core';
+import { VRFieldProps } from '@vora/core';
 
-export interface PaulySeatingChartProps extends PaulyFieldProps<string[], HTMLDivElement> {
+export interface VRSeatingChartProps extends VRFieldProps<string[], HTMLDivElement> {
   label?: string;
   required?: boolean;
   className?: string;

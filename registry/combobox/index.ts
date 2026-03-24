@@ -1,2 +1,2 @@
-export { PaulyCombobox } from './PaulyCombobox';
-export type { PaulyComboboxProps, ComboboxOption } from './types';
+export { VRCombobox } from './VRCombobox';
+export type { VRComboboxProps, ComboboxOption } from './types';

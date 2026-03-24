@@ -1,4 +1,4 @@
-import { PaulyFieldProps } from '@pauly/core';
+import { VRFieldProps } from '@vora/core';
 
 export interface Node {
   id: string;
@@ -18,7 +18,7 @@ export interface GraphData {
   edges: Edge[];
 }
 
-export interface PaulyNodeGraphProps extends PaulyFieldProps<GraphData, HTMLDivElement> {
+export interface VRNodeGraphProps extends VRFieldProps<GraphData, HTMLDivElement> {
   label?: string;
   required?: boolean;
   className?: string;

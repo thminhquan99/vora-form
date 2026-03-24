@@ -1,20 +1,20 @@
 {
   "name": "widget-builder",
-  "displayName": "PaulyWidgetBuilder",
+  "displayName": "VRWidgetBuilder",
   "description": "A recursive drag and drop builder layout using zero re-render logic.",
   "category": "input",
   "files": [
-    "PaulyWidgetBuilder.tsx",
-    "PaulyWidgetBuilder.module.css",
+    "VRWidgetBuilder.tsx",
+    "VRWidgetBuilder.module.css",
     "types.ts",
     "index.ts"
   ],
   "dependencies": {
     "internal": ["label", "field-error"],
-    "external": ["@pauly/core"]
+    "external": ["@vora/core"]
   },
   "exports": {
-    "components": ["PaulyWidgetBuilder"],
-    "types": ["PaulyWidgetBuilderProps", "WidgetNode"]
+    "components": ["VRWidgetBuilder"],
+    "types": ["VRWidgetBuilderProps", "WidgetNode"]
   }
 }

@@ -1,7 +1,7 @@
-import type { PaulyFieldProps } from '@pauly/core';
+import type { VRFieldProps } from '@vora/core';
 
-export interface PaulyPasswordInputProps
-  extends PaulyFieldProps<string, HTMLInputElement> {
+export interface VRPasswordInputProps
+  extends VRFieldProps<string, HTMLInputElement> {
   label?: string;
   placeholder?: string;
   showStrengthMeter?: boolean;

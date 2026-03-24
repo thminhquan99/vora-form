@@ -1,14 +1,14 @@
-import type { PaulyFieldProps } from '@pauly/core';
+import type { VRFieldProps } from '@vora/core';
 
 /**
- * Props for the `<PaulySlider>` component.
+ * Props for the `<VRSlider>` component.
  *
- * Extends `PaulyFieldProps<number, HTMLInputElement>` — the store value
- * is a JavaScript `number`, not a string. The `usePaulyField` onChange
+ * Extends `VRFieldProps<number, HTMLInputElement>` — the store value
+ * is a JavaScript `number`, not a string. The `useVoraField` onChange
  * handler automatically converts `input[type="range"]` values to numbers.
  */
-export interface PaulySliderProps
-  extends PaulyFieldProps<number, HTMLInputElement> {
+export interface VRSliderProps
+  extends VRFieldProps<number, HTMLInputElement> {
   /** Visible label text. If omitted, no label is rendered. */
   label?: string;
 

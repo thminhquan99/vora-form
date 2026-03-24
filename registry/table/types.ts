@@ -1,14 +1,14 @@
 /**
- * Types for the PaulyTable composition components.
+ * Types for the VRTable composition components.
  *
  * ### Architecture
  *
  * ```
- * <PaulyTable name="items">          → TableContext { name, items[] }
- *   <PaulyTableRow index={0}>        → RowContext  { prefix: "items.0" }
- *     <PaulyTableCell field="qty">   → renders <PaulyText name="items.0.qty" />
- *   </PaulyTableRow>
- * </PaulyTable>
+ * <VRTable name="items">          → TableContext { name, items[] }
+ *   <VRTableRow index={0}>        → RowContext  { prefix: "items.0" }
+ *     <VRTableCell field="qty">   → renders <VRText name="items.0.qty" />
+ *   </VRTableRow>
+ * </VRTable>
  * ```
  *
  * Each cell subscribes to its own flat path (`items.0.qty`) in the
@@ -17,7 +17,7 @@
 
 // ─── Context Values ──────────────────────────────────────────────────────────
 
-/** Provided by `<PaulyTable>` to its children. */
+/** Provided by `<VRTable>` to its children. */
 export interface TableContextValue {
   /** The array field name (e.g., "items"). */
   name: string;
@@ -25,7 +25,7 @@ export interface TableContextValue {
   rowCount: number;
 }
 
-/** Provided by `<PaulyTableRow>` to its children. */
+/** Provided by `<VRTableRow>` to its children. */
 export interface RowContextValue {
   /** Full path prefix for this row (e.g., "items.0"). */
   prefix: string;
@@ -35,27 +35,27 @@ export interface RowContextValue {
 
 // ─── Component Props ─────────────────────────────────────────────────────────
 
-export interface PaulyTableProps {
+export interface VRTableProps {
   /** The array field path in the store (e.g., "items"). */
   name: string;
   /** Column headers. */
   columns: string[];
-  /** Table content (`<PaulyTableRow>` elements). */
+  /** Table content (`<VRTableRow>` elements). */
   children: React.ReactNode;
   /** Additional CSS class. */
   className?: string;
 }
 
-export interface PaulyTableRowProps {
+export interface VRTableRowProps {
   /** The row index within the array. */
   index: number;
-  /** Row content (`<PaulyTableCell>` elements). */
+  /** Row content (`<VRTableCell>` elements). */
   children: React.ReactNode;
   /** Additional CSS class. */
   className?: string;
 }
 
-export interface PaulyTableCellProps {
+export interface VRTableCellProps {
   /** The field key within the row object (e.g., "company"). */
   field: string;
   /**
@@ -64,9 +64,9 @@ export interface PaulyTableCellProps {
    *
    * @example
    * ```tsx
-   * <PaulyTableCell field="company">
-   *   {(path) => <PaulyText name={path} label="" />}
-   * </PaulyTableCell>
+   * <VRTableCell field="company">
+   *   {(path) => <VRText name={path} label="" />}
+   * </VRTableCell>
    * ```
    */
   children: (fullPath: string) => React.ReactNode;
@@ -76,7 +76,7 @@ export interface PaulyTableCellProps {
 
 // ─── Hook Return ─────────────────────────────────────────────────────────────
 
-export interface UsePaulyTableReturn {
+export interface UseVRTableReturn {
   /** Append a new row to the array. */
   append: (item: Record<string, unknown>) => void;
   /** Remove a row by index. */

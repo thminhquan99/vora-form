@@ -1,2 +1,2 @@
-export { PaulyLabel } from './PaulyLabel';
-export type { PaulyLabelProps } from './types';
+export { VRLabel } from './VRLabel';
+export type { VRLabelProps } from './types';

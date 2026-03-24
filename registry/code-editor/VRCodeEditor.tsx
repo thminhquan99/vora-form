@@ -1,0 +1,80 @@
+'use client';
+
+import React, { useRef } from 'react';
+import { useVoraField } from '@vora/core';
+import { VRLabel } from '../label';
+import { VRFieldError } from '../field-error';
+import type { VRCodeEditorProps } from './types';
+import styles from './VRCodeEditor.module.css';
+
+export function VRCodeEditor({
+  name,
+  label,
+  required = false,
+  className,
+  id,
+  language = 'text',
+  placeholder = 'Write code here...',
+  rows = 8,
+}: VRCodeEditorProps): React.JSX.Element {
+  const field = useVoraField<string>(name);
+  const inputId = id ?? name;
+  const localRef = useRef<HTMLTextAreaElement | null>(null);
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      const target = e.currentTarget;
+      const start = target.selectionStart;
+      const end = target.selectionEnd;
+      const value = target.value;
+
+      // Insert 2 spaces at cursor position
+      const newValue = value.substring(0, start) + '  ' + value.substring(end);
+      target.value = newValue;
+      
+      // Move cursor forward
+      target.selectionStart = target.selectionEnd = start + 2;
+
+      // Update FormStore (Zero Re-render from the store side)
+      field.setValue(newValue);
+    }
+  };
+
+  return (
+    <div className={`${styles.wrapper} ${className ?? ''}`}>
+      {label && <VRLabel htmlFor={inputId} required={required}>{label}</VRLabel>}
+      
+      <div className={styles.editorContainer}>
+        <div className={styles.header}>
+          <span>{inputId}</span>
+          <span className={styles.languageBadge}>{language}</span>
+        </div>
+        <textarea
+          id={inputId}
+          ref={(el) => {
+            if (typeof field.ref === 'function') {
+              field.ref(el);
+            } else if (field.ref) {
+              (field.ref as React.MutableRefObject<HTMLTextAreaElement | null>).current = el;
+            }
+            if (localRef) localRef.current = el;
+          }}
+          className={styles.textarea}
+          placeholder={placeholder}
+          defaultValue={field.value ?? ''}
+          onChange={field.onChange}
+          onBlur={field.onBlur}
+          onKeyDown={handleKeyDown}
+          rows={rows}
+          spellCheck={false}
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="off"
+        />
+      </div>
+
+      <VRFieldError name={name} />
+    </div>
+  );
+}

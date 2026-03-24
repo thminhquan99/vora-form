@@ -1,2 +1,2 @@
-export { PaulyWidgetBuilder } from './PaulyWidgetBuilder';
-export type { PaulyWidgetBuilderProps, WidgetNode } from './types';
+export { VRWidgetBuilder } from './VRWidgetBuilder';
+export type { VRWidgetBuilderProps, WidgetNode } from './types';

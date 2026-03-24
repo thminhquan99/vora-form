@@ -1,14 +1,14 @@
-import type { PaulyFieldProps } from '@pauly/core';
+import type { VRFieldProps } from '@vora/core';
 
 /**
- * Props for the `<PaulyQRScanner>` component.
+ * Props for the `<VRQRScanner>` component.
  *
  * The field value is `string | null`:
  * - `null` → no QR/barcode detected yet
  * - `string` → the decoded text from the QR/barcode
  */
-export interface PaulyQRScannerProps
-  extends PaulyFieldProps<string | null, HTMLDivElement> {
+export interface VRQRScannerProps
+  extends VRFieldProps<string | null, HTMLDivElement> {
   /** Label text displayed above the scanner. */
   label: string;
 

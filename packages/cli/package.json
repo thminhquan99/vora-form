@@ -1,7 +1,7 @@
 {
-  "name": "@pauly/cli",
+  "name": "@vora/cli",
   "version": "0.1.0",
-  "description": "CLI for PaulyForm — copy registry components into your project",
+  "description": "CLI for VoraForm — copy registry components into your project",
   "license": "MIT",
   "type": "module",
   "bin": {

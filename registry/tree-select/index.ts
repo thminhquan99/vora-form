@@ -1,2 +1,2 @@
-export { PaulyTreeSelect } from './PaulyTreeSelect';
-export type { PaulyTreeSelectProps, TreeNode } from './types';
+export { VRTreeSelect } from './VRTreeSelect';
+export type { VRTreeSelectProps, TreeNode } from './types';

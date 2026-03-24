@@ -1,12 +1,12 @@
 {
   "name": "textarea",
   "category": "input",
-  "files": ["PaulyTextarea.tsx", "PaulyTextarea.module.css", "types.ts", "index.ts"],
+  "files": ["VRTextarea.tsx", "VRTextarea.module.css", "types.ts", "index.ts"],
   "npmDependencies": {},
-  "peerDependencies": { "react": ">=18.0.0", "@pauly/core": ">=0.1.0" },
+  "peerDependencies": { "react": ">=18.0.0", "@vora/core": ">=0.1.0" },
   "registryDependencies": ["label", "field-error"],
   "versionRange": ">=0.1.0",
   "browserOnly": false,
   "tags": ["textarea", "text", "multiline", "form"],
-  "exports": ["PaulyTextarea", "PaulyTextareaProps"]
+  "exports": ["VRTextarea", "VRTextareaProps"]
 }

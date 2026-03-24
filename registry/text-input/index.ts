@@ -1,2 +1,2 @@
-export { PaulyText } from './PaulyText';
-export type { PaulyTextProps } from './types';
+export { VRText } from './VRText';
+export type { VRTextProps } from './types';

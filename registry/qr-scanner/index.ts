@@ -1,2 +1,2 @@
-export { PaulyQRScanner } from './PaulyQRScanner';
-export type { PaulyQRScannerProps } from './types';
+export { VRQRScanner } from './VRQRScanner';
+export type { VRQRScannerProps } from './types';

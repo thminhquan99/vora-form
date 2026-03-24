@@ -1,11 +1,11 @@
-import type { PaulyFieldProps } from '@pauly/core';
+import type { VRFieldProps } from '@vora/core';
 
 export interface FormulaVariable {
   label: string;
   value: string;
 }
 
-export interface PaulyFormulaProps extends PaulyFieldProps<string, HTMLDivElement> {
+export interface VoraFormulaProps extends VRFieldProps<string, HTMLDivElement> {
   label?: string;
   id?: string;
   required?: boolean;

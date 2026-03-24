@@ -1,2 +1,2 @@
-export { PaulyConditional } from './PaulyConditional';
-export type { PaulyConditionalProps } from './types';
+export { VRConditional } from './VRConditional';
+export type { VRConditionalProps } from './types';

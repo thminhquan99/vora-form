@@ -1,20 +1,20 @@
 {
   "name": "code-editor",
-  "displayName": "PaulyCodeEditor",
+  "displayName": "VRCodeEditor",
   "description": "A monospace textarea capable of intercepting Tabs to auto-indent, powered by zero re-render.",
   "category": "input",
   "files": [
-    "PaulyCodeEditor.tsx",
-    "PaulyCodeEditor.module.css",
+    "VRCodeEditor.tsx",
+    "VRCodeEditor.module.css",
     "types.ts",
     "index.ts"
   ],
   "dependencies": {
     "internal": ["label", "field-error"],
-    "external": ["@pauly/core"]
+    "external": ["@vora/core"]
   },
   "exports": {
-    "components": ["PaulyCodeEditor"],
-    "types": ["PaulyCodeEditorProps"]
+    "components": ["VRCodeEditor"],
+    "types": ["VRCodeEditorProps"]
   }
 }

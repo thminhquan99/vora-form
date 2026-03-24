@@ -1,14 +1,14 @@
-import type { PaulyFieldProps } from '@pauly/core';
+import type { VRFieldProps } from '@vora/core';
 
 /**
- * Props for the `<PaulySignature>` canvas component.
+ * Props for the `<VRSignature>` canvas component.
  *
  * The field value is `string | null`:
  * - `null` → empty / cleared canvas
  * - `string` → base64 data URL (`image/png`)
  */
-export interface PaulySignatureProps
-  extends PaulyFieldProps<string | null, HTMLCanvasElement> {
+export interface VRSignatureProps
+  extends VRFieldProps<string | null, HTMLCanvasElement> {
   /** Label text displayed above the canvas. */
   label: string;
 

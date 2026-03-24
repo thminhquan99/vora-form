@@ -1,5 +1,5 @@
 {
-  "name": "@pauly/core",
+  "name": "@vora/core",
   "version": "0.1.0",
   "description": "Headless form engine — ref-based state, Zod validation, zero re-renders",
   "type": "module",

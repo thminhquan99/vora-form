@@ -1,4 +1,4 @@
-import type { PaulyFieldProps } from '@pauly/core';
+import type { VRFieldProps } from '@vora/core';
 
 export type WidgetNode = {
   id: string;
@@ -7,8 +7,8 @@ export type WidgetNode = {
   children?: WidgetNode[];
 };
 
-export interface PaulyWidgetBuilderProps
-  extends PaulyFieldProps<WidgetNode[], HTMLDivElement> {
+export interface VRWidgetBuilderProps
+  extends VRFieldProps<WidgetNode[], HTMLDivElement> {
   label?: string;
   id?: string;
 }

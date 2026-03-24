@@ -1,14 +1,14 @@
-import type { PaulyFieldProps } from '@pauly/core';
+import type { VRFieldProps } from '@vora/core';
 
 /**
- * Props for the `<PaulyMaskedInput>` component.
+ * Props for the `<VRMaskedInput>` component.
  *
- * Extends `PaulyFieldProps<string, HTMLInputElement>` with a `formatter`
+ * Extends `VRFieldProps<string, HTMLInputElement>` with a `formatter`
  * function that transforms raw input into a formatted display string
  * (e.g., adding commas to currency: 1000000 → 1,000,000).
  */
-export interface PaulyMaskedInputProps
-  extends PaulyFieldProps<string, HTMLInputElement> {
+export interface VRMaskedInputProps
+  extends VRFieldProps<string, HTMLInputElement> {
   /** Visible label text. If omitted, no label is rendered. */
   label?: string;
 

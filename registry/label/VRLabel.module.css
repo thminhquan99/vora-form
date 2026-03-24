@@ -1,0 +1,20 @@
+/* ─── VRLabel ─────────────────────────────────────────────────────────── */
+/* Themeable via CSS custom properties. Override at :root or container level. */
+
+.label {
+  display: block;
+  margin-bottom: var(--vora-label-gap, 6px);
+  font-family: var(--vora-font-family, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif);
+  font-size: var(--vora-label-font-size, 0.875rem);
+  font-weight: var(--vora-label-font-weight, 500);
+  line-height: var(--vora-label-line-height, 1.4);
+  color: var(--vora-label-color, #374151);
+  letter-spacing: var(--vora-label-letter-spacing, 0.01em);
+  user-select: none;
+}
+
+.required {
+  margin-left: 2px;
+  color: var(--vora-required-color, #ef4444);
+  font-weight: 600;
+}

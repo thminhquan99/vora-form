@@ -1,10 +1,10 @@
-export { PaulyTable, PaulyTableRow, PaulyTableCell } from './PaulyTable';
-export { usePaulyTable } from './usePaulyTable';
+export { VRTable, VRTableRow, VRTableCell } from './VRTable';
+export { useVoraTable } from './useVoraTable';
 export type {
-  PaulyTableProps,
-  PaulyTableRowProps,
-  PaulyTableCellProps,
+  VRTableProps,
+  VRTableRowProps,
+  VRTableCellProps,
   TableContextValue,
   RowContextValue,
-  UsePaulyTableReturn,
+  UseVRTableReturn,
 } from './types';

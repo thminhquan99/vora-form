@@ -1,0 +1,162 @@
+/* ─── VRQRScanner ─────────────────────────────────────────────────────────── */
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+/* ── Action Button ───────────────────────────────────────────────────────────── */
+.actionBtn {
+  all: unset;
+  cursor: pointer;
+  font-family: var(--vora-font-family, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--vora-qr-action-color, #6b7280);
+  padding: 4px 10px;
+  border-radius: 6px;
+  transition:
+    color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.actionBtn:hover:not(:disabled) {
+  color: var(--vora-ring-color, #3b82f6);
+  background-color: var(--vora-qr-action-hover-bg, #eff6ff);
+}
+
+.actionBtn:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 var(--vora-ring-width, 3px) var(--vora-ring-shadow-color, rgba(59, 130, 246, 0.15));
+}
+
+.actionBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ── Viewport ────────────────────────────────────────────────────────────────── */
+.viewport {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border: var(--vora-qr-border-width, 1.5px) solid var(--vora-qr-border-color, #d1d5db);
+  border-radius: var(--vora-qr-border-radius, 8px);
+  background-color: var(--vora-qr-bg, #111827);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.viewportError {
+  border-color: var(--vora-error-border-color, #ef4444);
+}
+
+/* ── Video ───────────────────────────────────────────────────────────────────── */
+.video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ── Scan Overlay ────────────────────────────────────────────────────────────── */
+.scanOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.scanLine {
+  width: 70%;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(59, 130, 246, 0.8) 20%,
+    rgba(59, 130, 246, 1) 50%,
+    rgba(59, 130, 246, 0.8) 80%,
+    transparent 100%
+  );
+  animation: scanMove 2s ease-in-out infinite;
+  border-radius: 1px;
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.4);
+}
+
+@keyframes scanMove {
+  0%, 100% { transform: translateY(-60px); }
+  50%      { transform: translateY(60px); }
+}
+
+/* ── Detected State ──────────────────────────────────────────────────────────── */
+.detected {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 24px;
+  text-align: center;
+}
+
+.detectedIcon {
+  font-size: 2rem;
+}
+
+.detectedLabel {
+  font-family: var(--vora-font-family, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #e5e7eb;
+  margin: 0;
+}
+
+.detectedValue {
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-size: 0.8125rem;
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.1);
+  padding: 6px 12px;
+  border-radius: 6px;
+  word-break: break-all;
+  max-width: 100%;
+}
+
+/* ── Fallback ────────────────────────────────────────────────────────────────── */
+.fallback {
+  padding: 24px;
+  border: 1.5px dashed #d1d5db;
+  border-radius: 8px;
+  background: #fafafa;
+  text-align: center;
+}
+
+.fallbackTitle {
+  font-family: var(--vora-font-family, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #92400e;
+  margin: 0 0 6px;
+}
+
+.fallbackText {
+  font-family: var(--vora-font-family, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif);
+  font-size: 0.8125rem;
+  color: #6b7280;
+  margin: 0;
+}

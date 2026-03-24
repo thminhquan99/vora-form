@@ -2,11 +2,11 @@
 
 ## Purpose
 Freehand signature pad that captures drawing as a base64 PNG data URL.
-Ultimate stress test of PaulyForm's "Zero Re-render" architecture.
+Ultimate stress test of VoraForm's "Zero Re-render" architecture.
 
 ## Exports
-- PaulySignature (React.FC\<PaulySignatureProps\>)
-- PaulySignatureProps (interface)
+- VRSignature (React.FC\<VRSignatureProps\>)
+- VRSignatureProps (interface)
 
 ## Field contract
 - **value**: `string | null` — base64 `image/png` data URL or `null`
@@ -43,6 +43,6 @@ Canvas Events → refs only (isDrawing, ctxRef)
 Wrap with dynamic import or `Suspense` in Next.js.
 
 ## Dependencies
-- packages/core — usePaulyField
-- registry/label — PaulyLabel
-- registry/field-error — PaulyFieldError
+- packages/core — useVoraField
+- registry/label — VRLabel
+- registry/field-error — VRFieldError

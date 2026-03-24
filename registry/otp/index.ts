@@ -1,2 +1,2 @@
-export { PaulyOTPInput } from './PaulyOTPInput';
-export type { PaulyOTPInputProps } from './types';
+export { VROTPInput } from './VROTPInput';
+export type { VROTPInputProps } from './types';

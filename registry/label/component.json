@@ -2,8 +2,8 @@
   "name": "label",
   "category": "display",
   "files": [
-    "PaulyLabel.tsx",
-    "PaulyLabel.module.css",
+    "VRLabel.tsx",
+    "VRLabel.module.css",
     "types.ts",
     "index.ts"
   ],
@@ -16,5 +16,5 @@
   "versionRange": ">=0.1.0",
   "browserOnly": false,
   "tags": ["label", "form", "accessibility"],
-  "exports": ["PaulyLabel", "PaulyLabelProps"]
+  "exports": ["VRLabel", "VRLabelProps"]
 }

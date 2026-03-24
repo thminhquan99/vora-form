@@ -1,20 +1,20 @@
 {
   "name": "tree-select",
-  "displayName": "PaulyTreeSelect",
+  "displayName": "VRTreeSelect",
   "description": "A recursive multi-select tree that automatically manages deeply nested parent/child checkbox states.",
   "category": "input",
   "files": [
-    "PaulyTreeSelect.tsx",
-    "PaulyTreeSelect.module.css",
+    "VRTreeSelect.tsx",
+    "VRTreeSelect.module.css",
     "types.ts",
     "index.ts"
   ],
   "dependencies": {
     "internal": ["label", "field-error"],
-    "external": ["@pauly/core"]
+    "external": ["@vora/core"]
   },
   "exports": {
-    "components": ["PaulyTreeSelect"],
-    "types": ["PaulyTreeSelectProps", "TreeNode"]
+    "components": ["VRTreeSelect"],
+    "types": ["VRTreeSelectProps", "TreeNode"]
   }
 }

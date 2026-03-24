@@ -1,9 +1,9 @@
 {
   "name": "formula",
-  "dependencies": ["@pauly/core"],
+  "dependencies": ["@vora/core"],
   "files": [
-    "PaulyFormula.tsx",
-    "PaulyFormula.module.css",
+    "VoraFormula.tsx",
+    "VoraFormula.module.css",
     "types.ts",
     "index.ts"
   ]

@@ -1,4 +1,4 @@
-import type { PaulyFieldProps } from '@pauly/core';
+import type { VRFieldProps } from '@vora/core';
 
 export interface SelectOption {
   label: string;
@@ -6,8 +6,8 @@ export interface SelectOption {
   disabled?: boolean;
 }
 
-export interface PaulySelectProps
-  extends PaulyFieldProps<string, HTMLSelectElement> {
+export interface VRSelectProps
+  extends VRFieldProps<string, HTMLSelectElement> {
   /** Label text displayed above the select. */
   label: string;
   /** Available options. */

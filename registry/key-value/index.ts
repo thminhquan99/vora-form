@@ -1,2 +1,2 @@
-export { PaulyKeyValue } from './PaulyKeyValue';
-export type { PaulyKeyValueProps } from './types';
+export { VRKeyValue } from './VRKeyValue';
+export type { VRKeyValueProps } from './types';

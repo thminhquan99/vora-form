@@ -1,30 +1,30 @@
 /**
- * @module @pauly/core
+ * @module @vora/core
  * @description
- * Public API barrel export for @pauly/core.
+ * Public API barrel export for @vora/core.
  *
  * Registry components import from this package:
  * ```ts
- * import { usePaulyField, useFormCore, PaulyForm } from '@pauly/core';
+ * import { useVoraField, useFormCore, VoraForm } from '@vora/core';
  * ```
  */
 
 // ── Form Provider ─────────────────────────────────────────────────────────────
-export { PaulyForm, useFormContext } from './FormProvider';
-export type { PaulyFormProps, FormContextValue } from './FormProvider';
+export { VoraForm, useFormContext } from './FormProvider';
+export type { VoraFormProps, FormContextValue } from './FormProvider';
 
 // ── Hooks ─────────────────────────────────────────────────────────────────────
 export { useFormCore } from './useFormCore';
 export type { UseFormCoreReturn } from './useFormCore';
 
-export { usePaulyField } from './usePaulyField';
-export type { UsePaulyFieldReturn } from './usePaulyField';
+export { useVoraField } from './useVoraField';
+export type { UseVRFieldReturn } from './useVoraField';
 
 export { useAsyncValidation } from './useAsyncValidation';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 export type {
-  PaulyFieldProps,
+  VRFieldProps,
   ValidateFunction,
   ValidationErrors,
 } from './types';

@@ -15,7 +15,7 @@
     "jsx": "react-jsx",
     "baseUrl": ".",
     "paths": {
-      "@pauly/core": ["../packages/core/src/index.ts"]
+      "@vora/core": ["../packages/core/src/index.ts"]
     },
     "typeRoots": [
       "../node_modules/@types",

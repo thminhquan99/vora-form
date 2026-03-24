@@ -1,7 +1,7 @@
 /**
- * Props for the `<PaulyLabel>` component.
+ * Props for the `<VRLabel>` component.
  */
-export interface PaulyLabelProps {
+export interface VRLabelProps {
   /** The field name this label is associated with (used for `htmlFor`). */
   htmlFor: string;
 

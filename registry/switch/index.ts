@@ -1,2 +1,2 @@
-export { PaulySwitch } from './PaulySwitch';
-export type { PaulySwitchProps } from './types';
+export { VRSwitch } from './VRSwitch';
+export type { VRSwitchProps } from './types';

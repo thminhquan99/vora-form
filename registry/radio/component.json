@@ -1,12 +1,12 @@
 {
   "name": "radio",
   "category": "input",
-  "files": ["PaulyRadioGroup.tsx", "PaulyRadioGroup.module.css", "types.ts", "index.ts"],
+  "files": ["VRRadioGroup.tsx", "VRRadioGroup.module.css", "types.ts", "index.ts"],
   "npmDependencies": {},
-  "peerDependencies": { "react": ">=18.0.0", "@pauly/core": ">=0.1.0" },
+  "peerDependencies": { "react": ">=18.0.0", "@vora/core": ">=0.1.0" },
   "registryDependencies": ["field-error"],
   "versionRange": ">=0.1.0",
   "browserOnly": false,
   "tags": ["radio", "radiogroup", "selection", "form"],
-  "exports": ["PaulyRadioGroup", "PaulyRadioGroupProps", "RadioOption"]
+  "exports": ["VRRadioGroup", "VRRadioGroupProps", "RadioOption"]
 }

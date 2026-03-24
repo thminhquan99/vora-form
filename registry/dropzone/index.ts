@@ -1,2 +1,2 @@
-export { PaulyDropzone } from './PaulyDropzone';
-export type { PaulyDropzoneProps } from './types';
+export { VRDropzone } from './VRDropzone';
+export type { VRDropzoneProps } from './types';

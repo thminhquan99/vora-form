@@ -1,2 +1,2 @@
-export { PaulyRadioGroup } from './PaulyRadioGroup';
-export type { PaulyRadioGroupProps, RadioOption } from './types';
+export { VRRadioGroup } from './VRRadioGroup';
+export type { VRRadioGroupProps, RadioOption } from './types';

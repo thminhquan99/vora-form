@@ -1,2 +1,2 @@
-export { PaulyPasswordInput } from './PaulyPasswordInput';
-export type { PaulyPasswordInputProps } from './types';
+export { VRPasswordInput } from './VRPasswordInput';
+export type { VRPasswordInputProps } from './types';

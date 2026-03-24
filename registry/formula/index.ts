@@ -1,2 +1,2 @@
-export * from './PaulyFormula';
+export * from './VRFormula';
 export * from './types';

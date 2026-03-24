@@ -204,7 +204,7 @@ async function copyComponent(
 export function addCommand(program: Command): void {
   program
     .command('add')
-    .description('Add a PaulyForm component to your project')
+    .description('Add a VoraForm component to your project')
     .argument('<components...>', 'Component name(s) to add (e.g., text-input checkbox)')
     .option(
       '-d, --dest <path>',
@@ -276,7 +276,7 @@ export function addCommand(program: Command): void {
       // ── Banner ────────────────────────────────────────────────────
       console.log();
       console.log(
-        pc.bold('🎨 PaulyForm CLI') +
+        pc.bold('🎨 VoraForm CLI') +
         pc.dim(' — adding components')
       );
       console.log(pc.dim(`   Registry:    ${registryPath}`));
@@ -314,7 +314,7 @@ export function addCommand(program: Command): void {
       // Peer deps reminder (always needed)
       console.log();
       console.log(pc.dim('📦 Ensure these peer dependencies are installed:'));
-      console.log(pc.dim('  pnpm add react react-dom @pauly/core'));
+      console.log(pc.dim('  pnpm add react react-dom @vora/core'));
       console.log();
     });
 }

@@ -1,13 +1,13 @@
-import type { PaulyFieldProps } from '@pauly/core';
+import type { VRFieldProps } from '@vora/core';
 
 /**
- * Props for the `<PaulyDatePicker>` component.
+ * Props for the `<VRDatePicker>` component.
  *
- * Extends `PaulyFieldProps<string, HTMLInputElement>` and stores the
+ * Extends `VRFieldProps<string, HTMLInputElement>` and stores the
  * selected date as an ISO date string (`YYYY-MM-DD`) in the form store.
  */
-export interface PaulyDatePickerProps
-  extends PaulyFieldProps<string, HTMLInputElement> {
+export interface VRDatePickerProps
+  extends VRFieldProps<string, HTMLInputElement> {
   /** Visible label text. If omitted, no label is rendered. */
   label?: string;
 

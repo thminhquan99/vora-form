@@ -1,2 +1,2 @@
-export { PaulyImageCropper } from './PaulyImageCropper';
-export type { PaulyImageCropperProps, ImageCropData } from './types';
+export { VRImageCropper } from './VRImageCropper';
+export type { VRImageCropperProps, ImageCropData } from './types';

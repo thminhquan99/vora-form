@@ -1,0 +1,80 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.inputContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  padding: 8px 12px;
+  border: var(--vora-input-border-width, 1.5px) solid var(--vora-input-border-color, #d1d5db);
+  border-radius: var(--vora-input-border-radius, 8px);
+  background: var(--vora-input-bg, #ffffff);
+  min-height: 42px;
+  cursor: text;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.inputContainerFocus {
+  border-color: var(--vora-ring-color, #3b82f6);
+  box-shadow: 0 0 0 var(--vora-ring-width, 3px) var(--vora-ring-shadow-color, rgba(59, 130, 246, 0.15));
+}
+
+.inputContainerError {
+  border-color: var(--vora-error-border-color, #ef4444);
+}
+
+.inputContainerError.inputContainerFocus {
+  box-shadow: 0 0 0 var(--vora-ring-width, 3px) var(--vora-error-ring-color, rgba(239, 68, 68, 0.15));
+}
+
+.tag {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #f3f4f6;
+  color: #374151;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.875rem;
+  font-family: var(--vora-font-family, system-ui, -apple-system, sans-serif);
+}
+
+.removeButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 0;
+}
+
+.removeButton:hover {
+  background: #e5e7eb;
+  color: #111827;
+}
+
+.input {
+  flex: 1;
+  min-width: 120px;
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  font-family: inherit;
+  font-size: 0.9375rem;
+  color: var(--vora-input-color, #111827);
+}
+
+.input::placeholder {
+  color: var(--vora-input-placeholder-color, #9ca3af);
+}

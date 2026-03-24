@@ -1,0 +1,56 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.keyInput, .valueInput {
+  flex: 1;
+}
+
+.removeButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background-color: var(--vora-input-bg, #ffffff);
+  border: var(--vora-input-border-width, 1.5px) solid #ef4444;
+  color: #ef4444;
+  border-radius: var(--vora-input-border-radius, 8px);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.removeButton:hover {
+  background-color: #fef2f2;
+}
+
+.removeButton:focus {
+  outline: none;
+  box-shadow: 0 0 0 var(--vora-ring-width, 3px) rgba(239, 68, 68, 0.15);
+}
+
+.addButton {
+  align-self: flex-start;
+  padding: 8px 16px;
+  background-color: #f3f4f6;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  color: #374151;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.addButton:hover {
+  background-color: #e5e7eb;
+}

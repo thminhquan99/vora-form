@@ -1,14 +1,14 @@
-import type { PaulyFieldProps } from '@pauly/core';
+import type { VRFieldProps } from '@vora/core';
 
 /**
- * Props for the `<PaulyOTPInput>` component.
+ * Props for the `<VROTPInput>` component.
  *
  * Stores the entire OTP string (e.g., "123456") under a single field
  * name, NOT as individual fields. Renders `length` individual boxes
  * with automatic focus management.
  */
-export interface PaulyOTPInputProps
-  extends PaulyFieldProps<string, HTMLDivElement> {
+export interface VROTPInputProps
+  extends VRFieldProps<string, HTMLDivElement> {
   /** Visible label text. If omitted, no label is rendered. */
   label?: string;
 

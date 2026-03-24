@@ -1,2 +1,2 @@
-export { PaulySelect } from './PaulySelect';
-export type { PaulySelectProps, SelectOption } from './types';
+export { VRSelect } from './VRSelect';
+export type { VRSelectProps, SelectOption } from './types';

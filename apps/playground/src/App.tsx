@@ -1,5 +1,5 @@
 /**
- * PaulyForm Playground — Zero Re-render Architecture Proof
+ * VoraForm Playground — Zero Re-render Architecture Proof
  *
  * HOW TO VERIFY:
  *
@@ -19,47 +19,47 @@
 
 import React, { useRef, useState } from 'react';
 import { z } from 'zod';
-import { PaulyForm, createZodAdapter, useAsyncValidation, useFormCore, usePaulyField } from '@pauly/core';
-import { PaulyText } from '../../../registry/text-input';
-import { PaulyTextarea } from '../../../registry/textarea';
-import { PaulySelect } from '../../../registry/select';
-import { PaulyRadioGroup } from '../../../registry/radio';
-import { PaulyCheckbox, PaulyCheckboxGroup } from '../../../registry/checkbox';
-import { PaulySignature } from '../../../registry/signature';
-import { PaulyConditional } from '../../../registry/conditional';
-import { PaulyCamera } from '../../../registry/camera';
-import { PaulyQRScanner } from '../../../registry/qr-scanner';
+import { VoraForm, createZodAdapter, useAsyncValidation, useFormCore, useVoraField } from '@vora/core';
+import { VRText } from '../../../registry/text-input';
+import { VRTextarea } from '../../../registry/textarea';
+import { VRSelect } from '../../../registry/select';
+import { VRRadioGroup } from '../../../registry/radio';
+import { VRCheckbox, VRCheckboxGroup } from '../../../registry/checkbox';
+import { VRSignature } from '../../../registry/signature';
+import { VRConditional } from '../../../registry/conditional';
+import { VRCamera } from '../../../registry/camera';
+import { VRQRScanner } from '../../../registry/qr-scanner';
 import {
-  PaulyTable,
-  PaulyTableRow,
-  PaulyTableCell,
-  usePaulyTable,
+  VRTable,
+  VRTableRow,
+  VRTableCell,
+  useVoraTable,
 } from '../../../registry/table';
-import { PaulySwitch } from '../../../registry/switch';
-import { PaulyDropzone } from '../../../registry/dropzone';
-import { PaulyCombobox } from '../../../registry/combobox';
-import { PaulyMaskedInput } from '../../../registry/masked-input';
-import { PaulyDatePicker } from '../../../registry/datepicker';
-import { PaulySlider } from '../../../registry/slider';
-import { PaulyOTPInput } from '../../../registry/otp';
-import { PaulyRating } from '../../../registry/rating';
-import { PaulyTagInput } from '../../../registry/tag-input';
-import { PaulyPasswordInput } from '../../../registry/password-input';
-import { PaulyTransferList } from '../../../registry/transfer-list';
-import { PaulyKeyValue } from '../../../registry/key-value';
-import { PaulyTreeSelect } from '../../../registry/tree-select';
-import { PaulyCreditCard } from '../../../registry/credit-card';
-import { PaulyMentions } from '../../../registry/mentions';
-import { PaulyWidgetBuilder } from '../../../registry/widget-builder';
-import { PaulyCodeEditor } from '../../../registry/code-editor';
-import { PaulyPatternLock } from '../../../registry/pattern-lock';
-import { PaulyCoordinatePicker } from '../../../registry/coordinate-picker';
-import { PaulyImageCropper } from '../../../registry/image-cropper';
-import { PaulySpreadsheet } from '../../../registry/spreadsheet';
-import { PaulyFormula } from '../../../registry/formula/PaulyFormula';
-import { PaulyNodeGraph } from '../../../registry/node-graph';
-import { PaulySeatingChart } from '../../../registry/seating-chart';
-import { PaulyGanttTimeline } from '../../../registry/gantt-timeline';
+import { VRSwitch } from '../../../registry/switch';
+import { VRDropzone } from '../../../registry/dropzone';
+import { VRCombobox } from '../../../registry/combobox';
+import { VRMaskedInput } from '../../../registry/masked-input';
+import { VRDatePicker } from '../../../registry/datepicker';
+import { VRSlider } from '../../../registry/slider';
+import { VROTPInput } from '../../../registry/otp';
+import { VRRating } from '../../../registry/rating';
+import { VRTagInput } from '../../../registry/tag-input';
+import { VRPasswordInput } from '../../../registry/password-input';
+import { VRTransferList } from '../../../registry/transfer-list';
+import { VRKeyValue } from '../../../registry/key-value';
+import { VRTreeSelect } from '../../../registry/tree-select';
+import { VRCreditCard } from '../../../registry/credit-card';
+import { VRMentions } from '../../../registry/mentions';
+import { VRWidgetBuilder } from '../../../registry/widget-builder';
+import { VRCodeEditor } from '../../../registry/code-editor';
+import { VRPatternLock } from '../../../registry/pattern-lock';
+import { VRCoordinatePicker } from '../../../registry/coordinate-picker';
+import { VRImageCropper } from '../../../registry/image-cropper';
+import { VRSpreadsheet } from '../../../registry/spreadsheet';
+import { VRFormula } from '../../../registry/formula';
+import { VRNodeGraph } from '../../../registry/node-graph';
+import { VRSeatingChart } from '../../../registry/seating-chart';
+import { VRGanttTimeline } from '../../../registry/gantt-timeline';
 
 // ─── Zod Schema ───────────────────────────────────────────────────────────────
 
@@ -296,7 +296,7 @@ const timezoneOptions = [
  *
  * ### Why This Proves Zero Re-renders
  *
- * If PaulyText re-rendered on every keystroke, this counter would
+ * If VRText re-rendered on every keystroke, this counter would
  * rapidly increment as you type. Instead, it should:
  *
  * - Show `1` after initial mount (2 in StrictMode dev — React
@@ -345,7 +345,7 @@ function RenderCounter({ label }: { label: string }) {
 // ─── FieldWithCounter ─────────────────────────────────────────────────────────
 
 /**
- * Generic wrapper that wraps ANY PaulyForm field with a RenderCounter.
+ * Generic wrapper that wraps ANY VoraForm field with a RenderCounter.
  * The counter counts renders of THIS wrapper component.
  */
 function FieldWithCounter({
@@ -380,11 +380,11 @@ function FieldWithCounter({
 /**
  * Wrapper component that demonstrates `useAsyncValidation`.
  *
- * MUST be rendered inside a `<PaulyForm>` because the hook calls
+ * MUST be rendered inside a `<VoraForm>` because the hook calls
  * `useFormContext()`. The hook subscribes directly to the store's
  * pub/sub — typing does NOT trigger React re-renders. Only when the
  * debounced validator sets/clears an error does the error subscriber
- * (`<PaulyFieldError>`) re-render.
+ * (`<VRFieldError>`) re-render.
  */
 function UsernameField() {
   useAsyncValidation<string>(
@@ -402,7 +402,7 @@ function UsernameField() {
   );
 
   return (
-    <PaulyText
+    <VRText
       name="username"
       label="Username"
       placeholder="Pick a username"
@@ -419,14 +419,14 @@ function UsernameField() {
  *
  * ### How It Works
  *
- * 1. `usePaulyField<string>('country')` subscribes to the country value.
+ * 1. `useVoraField<string>('country')` subscribes to the country value.
  *    When the user picks a country, ONLY this component re-renders — not
  *    the text fields above or the checkboxes below.
  *
  * 2. `useFormCore().setValue('city', '')` programmatically clears the
  *    child field whenever the parent changes, via a `useEffect`.
  *
- * 3. The City `<PaulySelect>` receives its options from `citiesByCountry`
+ * 3. The City `<VRSelect>` receives its options from `citiesByCountry`
  *    based on the current country value. If no country is selected,
  *    the city dropdown is disabled.
  *
@@ -439,7 +439,7 @@ function UsernameField() {
  * | Type in firstName/email    | 0              | 0            | 0        |
  */
 function CountryCityGroup() {
-  const countryField = usePaulyField<string>('country');
+  const countryField = useVoraField<string>('country');
   const { setValue } = useFormCore();
 
   // Track the previous country so we can detect actual changes vs initial mount
@@ -463,7 +463,7 @@ function CountryCityGroup() {
   return (
     <>
       <FieldWithCounter name="country">
-        <PaulySelect
+        <VRSelect
           name="country"
           label="Country"
           placeholder="Select a country..."
@@ -473,7 +473,7 @@ function CountryCityGroup() {
       </FieldWithCounter>
 
       <FieldWithCounter name="city">
-        <PaulySelect
+        <VRSelect
           name="city"
           label="City"
           placeholder={
@@ -493,13 +493,13 @@ function CountryCityGroup() {
 // ─── Work Experience Table ────────────────────────────────────────────────────
 
 /**
- * Demonstrates the PaulyTable composition pattern for array editing.
+ * Demonstrates the VRTable composition pattern for array editing.
  *
  * Typing in Row 1's Company does NOT re-render Row 2's Role.
  * Only append/remove triggers the table wrapper re-render.
  */
 function WorkExperienceTable() {
-  const { append, remove, rowCount } = usePaulyTable('workExperience');
+  const { append, remove, rowCount } = useVoraTable('workExperience');
 
   return (
     <div style={{ marginBottom: '20px' }}>
@@ -539,24 +539,24 @@ function WorkExperienceTable() {
       </div>
 
       {rowCount > 0 ? (
-        <PaulyTable name="workExperience" columns={['Company', 'Role', '']}>
+        <VRTable name="workExperience" columns={['Company', 'Role', '']}>
           {Array.from({ length: rowCount }).map((_, i) => (
-            <PaulyTableRow key={i} index={i}>
-              <PaulyTableCell field="company">
+            <VRTableRow key={i} index={i}>
+              <VRTableCell field="company">
                 {(path) => (
                   <FieldWithCounter name={path}>
-                    <PaulyText name={path} label="" placeholder="Company" />
+                    <VRText name={path} label="" placeholder="Company" />
                   </FieldWithCounter>
                 )}
-              </PaulyTableCell>
-              <PaulyTableCell field="role">
+              </VRTableCell>
+              <VRTableCell field="role">
                 {(path) => (
                   <FieldWithCounter name={path}>
-                    <PaulyText name={path} label="" placeholder="Role" />
+                    <VRText name={path} label="" placeholder="Role" />
                   </FieldWithCounter>
                 )}
-              </PaulyTableCell>
-              <PaulyTableCell field="_actions">
+              </VRTableCell>
+              <VRTableCell field="_actions">
                 {() => (
                   <button
                     type="button"
@@ -575,10 +575,10 @@ function WorkExperienceTable() {
                     ✕ Remove
                   </button>
                 )}
-              </PaulyTableCell>
-            </PaulyTableRow>
+              </VRTableCell>
+            </VRTableRow>
           ))}
-        </PaulyTable>
+        </VRTable>
       ) : (
         <div
           style={{
@@ -602,7 +602,7 @@ function WorkExperienceTable() {
 export default function App() {
   const [step, setStep] = useState(1);
 
-  const handleSubmit = (values: Record<string, unknown>, store: import('@pauly/core').FormStore) => {
+  const handleSubmit = (values: Record<string, unknown>, store: import('@vora/core').FormStore) => {
     const dirtyValues = store.getDirtyValues();
     console.log('✅ Form submitted successfully!');
     console.log('📦 All values:', values);
@@ -750,7 +750,7 @@ export default function App() {
         </div>
 
         {/* ── Form ───────────────────────────────────────────────────── */}
-        <PaulyForm
+        <VoraForm
           validate={validate}
           onSubmit={handleSubmit}
           initialValues={{
@@ -765,7 +765,7 @@ export default function App() {
           {step === 1 && (
             <>
               <FieldWithCounter name="firstName">
-                <PaulyText
+                <VRText
                   name="firstName"
                   label="First Name"
                   placeholder="John"
@@ -774,7 +774,7 @@ export default function App() {
               </FieldWithCounter>
 
               <FieldWithCounter name="lastName">
-                <PaulyText
+                <VRText
                   name="lastName"
                   label="Last Name"
                   placeholder="Doe"
@@ -787,7 +787,7 @@ export default function App() {
               </FieldWithCounter>
 
               <FieldWithCounter name="email">
-                <PaulyText
+                <VRText
                   name="email"
                   label="Email"
                   placeholder="john@example.com"
@@ -797,7 +797,7 @@ export default function App() {
               </FieldWithCounter>
 
               <FieldWithCounter name="password">
-                <PaulyPasswordInput
+                <VRPasswordInput
                   name="password"
                   label="Password"
                   showStrengthMeter
@@ -806,7 +806,7 @@ export default function App() {
               </FieldWithCounter>
 
               <FieldWithCounter name="skills">
-                <PaulyTagInput
+                <VRTagInput
                   name="skills"
                   label="Skills"
                   placeholder="Type a skill and press Enter"
@@ -814,7 +814,7 @@ export default function App() {
               </FieldWithCounter>
 
               <FieldWithCounter name="dateOfBirth">
-                <PaulyDatePicker
+                <VRDatePicker
                   name="dateOfBirth"
                   label="Date of Birth"
                   max="2008-01-01"
@@ -823,7 +823,7 @@ export default function App() {
               </FieldWithCounter>
 
               <FieldWithCounter name="bio">
-                <PaulyTextarea
+                <VRTextarea
                   name="bio"
                   label="Biography"
                   placeholder="Tell us about yourself..."
@@ -832,7 +832,7 @@ export default function App() {
               </FieldWithCounter>
 
               <FieldWithCounter name="expectedSalary">
-                <PaulyMaskedInput
+                <VRMaskedInput
                   name="expectedSalary"
                   label="Expected Salary (VND)"
                   formatter={formatCurrency}
@@ -844,7 +844,7 @@ export default function App() {
               <CountryCityGroup />
 
               <FieldWithCounter name="timezone">
-                <PaulyCombobox
+                <VRCombobox
                   name="timezone"
                   label="Timezone"
                   options={timezoneOptions}
@@ -862,7 +862,7 @@ export default function App() {
             <>
               {/* ── Satisfaction Slider ─────────────────────────── */}
               <FieldWithCounter name="satisfaction">
-                <PaulySlider
+                <VRSlider
                   name="satisfaction"
                   label="Expected Satisfaction (0–100)"
                   min={0}
@@ -873,7 +873,7 @@ export default function App() {
 
               {/* ── OTP Input ─────────────────────────────────── */}
               <FieldWithCounter name="otpCode">
-                <PaulyOTPInput
+                <VROTPInput
                   name="otpCode"
                   label="Verification Code (OTP)"
                   length={6}
@@ -882,14 +882,14 @@ export default function App() {
 
               {/* ── Star Rating ───────────────────────────────── */}
               <FieldWithCounter name="appRating">
-                <PaulyRating
+                <VRRating
                   name="appRating"
                   label="Rate our App"
                   max={5}
                 />
               </FieldWithCounter>
               <FieldWithCounter name="plan">
-                <PaulyRadioGroup
+                <VRRadioGroup
                   name="plan"
                   label="Subscription Plan"
                   options={[
@@ -902,7 +902,7 @@ export default function App() {
               </FieldWithCounter>
 
               <FieldWithCounter name="permissions">
-                <PaulyTransferList
+                <VRTransferList
                   name="permissions"
                   label="Assign Permissions"
                   options={permissionOptions}
@@ -910,14 +910,14 @@ export default function App() {
               </FieldWithCounter>
 
               <FieldWithCounter name="envVars">
-                <PaulyKeyValue
+                <VRKeyValue
                   name="envVars"
                   label="Environment Variables"
                 />
               </FieldWithCounter>
 
               <FieldWithCounter name="productCategories">
-                <PaulyTreeSelect
+                <VRTreeSelect
                   name="productCategories"
                   label="Product Categories"
                   data={categoryTreeOptions}
@@ -925,14 +925,14 @@ export default function App() {
               </FieldWithCounter>
 
               <FieldWithCounter name="creditCard">
-                <PaulyCreditCard
+                <VRCreditCard
                   name="creditCard"
                   label="Payment Method"
                 />
               </FieldWithCounter>
 
               <FieldWithCounter name="feedback">
-                <PaulyMentions
+                <VRMentions
                   name="feedback"
                   label="Feedback with @mentions"
                   users={mentionUsers}
@@ -940,7 +940,7 @@ export default function App() {
               </FieldWithCounter>
 
               <FieldWithCounter name="customLayout">
-                <PaulyWidgetBuilder
+                <VRWidgetBuilder
                   name="customLayout"
                   label="Custom Dashboard Layout"
                 />
@@ -949,7 +949,7 @@ export default function App() {
               <hr style={{ border: 'none', borderTop: '1px solid #e5e7eb', margin: '8px 0 20px' }} />
 
               <FieldWithCounter name="customJsonConfig">
-                <PaulyCodeEditor
+                <VRCodeEditor
                   name="customJsonConfig"
                   label="JSON Configuration"
                   language="json"
@@ -958,21 +958,21 @@ export default function App() {
               </FieldWithCounter>
 
               <FieldWithCounter name="securityPattern">
-                <PaulyPatternLock
+                <VRPatternLock
                   name="securityPattern"
                   label="App Security Pattern"
                 />
               </FieldWithCounter>
 
               <FieldWithCounter name="deliveryLocation">
-                <PaulyCoordinatePicker
+                <VRCoordinatePicker
                   name="deliveryLocation"
                   label="Pin Delivery Location"
                 />
               </FieldWithCounter>
 
               <FieldWithCounter name="profileCroppedPicture">
-                <PaulyImageCropper
+                <VRImageCropper
                   name="profileCroppedPicture"
                   label="Profile Picture (Crop & Zoom)"
                   aspectRatio={1}
@@ -980,7 +980,7 @@ export default function App() {
               </FieldWithCounter>
 
               <FieldWithCounter name="financialData">
-                <PaulySpreadsheet
+                <VRSpreadsheet
                   name="financialData"
                   label="Financial Projections (Paste from Excel)"
                   rows={5}
@@ -989,7 +989,7 @@ export default function App() {
               </FieldWithCounter>
 
               <FieldWithCounter name="emailTemplate">
-                <PaulyFormula
+                <VRFormula
                   name="emailTemplate"
                   label="Automated Email Subject"
                   variables={mockVariables}
@@ -997,14 +997,14 @@ export default function App() {
               </FieldWithCounter>
 
               <FieldWithCounter name="workflow">
-                <PaulyNodeGraph
+                <VRNodeGraph
                   name="workflow"
                   label="Execution Workflow"
                 />
               </FieldWithCounter>
 
               <FieldWithCounter name="seats">
-                <PaulySeatingChart
+                <VRSeatingChart
                   name="seats"
                   label="Select Theater Seats"
                   svgContent={theaterMapSVG}
@@ -1012,7 +1012,7 @@ export default function App() {
               </FieldWithCounter>
 
               <FieldWithCounter name="projectTimeline">
-                <PaulyGanttTimeline
+                <VRGanttTimeline
                   name="projectTimeline"
                   label="Project Timeline"
                   startDate="2024-01-01"
@@ -1023,7 +1023,7 @@ export default function App() {
               <hr style={{ border: 'none', borderTop: '1px solid #e5e7eb', margin: '8px 0 20px' }} />
 
               <FieldWithCounter name="acceptTerms">
-                <PaulyCheckbox
+                <VRCheckbox
                   name="acceptTerms"
                   label="I accept the terms and conditions"
                   required
@@ -1031,7 +1031,7 @@ export default function App() {
               </FieldWithCounter>
 
               <FieldWithCounter name="roles">
-                <PaulyCheckboxGroup
+                <VRCheckboxGroup
                   name="roles"
                   label="Select Roles"
                   options={roleOptions}
@@ -1040,28 +1040,28 @@ export default function App() {
               </FieldWithCounter>
 
               <FieldWithCounter name="hasReason">
-                <PaulyCheckbox
+                <VRCheckbox
                   name="hasReason"
                   label="I have a specific reason"
                 />
               </FieldWithCounter>
 
-              <PaulyConditional
+              <VRConditional
                 watch="hasReason"
                 condition={(val) => val === true}
               >
                 <FieldWithCounter name="reason">
-                  <PaulyText
+                  <VRText
                     name="reason"
                     label="Why?"
                   />
                 </FieldWithCounter>
-              </PaulyConditional>
+              </VRConditional>
 
               <hr style={{ border: 'none', borderTop: '1px solid #e5e7eb', margin: '8px 0 20px' }} />
 
               <FieldWithCounter name="signature">
-                <PaulySignature
+                <VRSignature
                   name="signature"
                   label="Sign Here"
                   required
@@ -1071,14 +1071,14 @@ export default function App() {
               <hr style={{ border: 'none', borderTop: '1px solid #e5e7eb', margin: '8px 0 20px' }} />
 
               <FieldWithCounter name="avatar">
-                <PaulyCamera
+                <VRCamera
                   name="avatar"
                   label="Take a Selfie"
                 />
               </FieldWithCounter>
 
               <FieldWithCounter name="promoCodeQR">
-                <PaulyQRScanner
+                <VRQRScanner
                   name="promoCodeQR"
                   label="Scan Promo QR"
                 />
@@ -1091,14 +1091,14 @@ export default function App() {
               <hr style={{ border: 'none', borderTop: '1px solid #e5e7eb', margin: '8px 0 20px' }} />
 
               <FieldWithCounter name="marketingEmails">
-                <PaulySwitch
+                <VRSwitch
                   name="marketingEmails"
                   label="Receive marketing emails"
                 />
               </FieldWithCounter>
 
               <FieldWithCounter name="portfolioFiles">
-                <PaulyDropzone
+                <VRDropzone
                   name="portfolioFiles"
                   label="Upload Portfolio"
                   accept="image/*,.pdf"
@@ -1193,7 +1193,7 @@ export default function App() {
               </button>
             )}
           </div>
-        </PaulyForm>
+        </VoraForm>
 
         {/* ── Legend ──────────────────────────────────────────────────── */}
         <div

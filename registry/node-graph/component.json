@@ -1,4 +1,4 @@
 {
   "name": "node-graph",
-  "dependencies": ["@pauly/core"]
+  "dependencies": ["@vora/core"]
 }

@@ -1,4 +1,4 @@
-import type { PaulyFieldProps } from '@pauly/core';
+import type { VRFieldProps } from '@vora/core';
 
 export interface RadioOption {
   label: string;
@@ -6,8 +6,8 @@ export interface RadioOption {
   disabled?: boolean;
 }
 
-export interface PaulyRadioGroupProps
-  extends PaulyFieldProps<string, HTMLFieldSetElement> {
+export interface VRRadioGroupProps
+  extends VRFieldProps<string, HTMLFieldSetElement> {
   /** Group label rendered as a `<legend>`. */
   label: string;
   /** Available radio options. */

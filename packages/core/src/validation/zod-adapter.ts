@@ -1,12 +1,12 @@
 /**
  * @module zod-adapter
  * @description
- * Adapter that converts a Zod schema into PaulyForm's `ValidateFunction`
+ * Adapter that converts a Zod schema into VoraForm's `ValidateFunction`
  * contract.
  *
  * ### Design Intent
  *
- * PaulyForm's validation engine is **schema-agnostic**. The core only knows
+ * VoraForm's validation engine is **schema-agnostic**. The core only knows
  * about `ValidateFunction`:
  *
  * ```ts
@@ -32,7 +32,7 @@ import type { ValidateFunction, ValidationErrors } from '../types';
  * Minimal Zod schema shape — just enough to call `.safeParse()`.
  *
  * We define this locally instead of importing `zod` to avoid adding Zod
- * as a hard dependency of `@pauly/core`. Zod is a **peer dependency** —
+ * as a hard dependency of `@vora/core`. Zod is a **peer dependency** —
  * the developer's project provides it.
  *
  * This interface matches `z.ZodType<any>` without importing the library.
@@ -66,15 +66,15 @@ export interface ZodLikeSchema {
  *
  * Zod issues provide `path` as an array like `["address", "city"]`.
  * We join these with `"."` to produce `"address.city"`, which matches
- * PaulyForm's dot-notation field paths.
+ * VoraForm's dot-notation field paths.
  *
  * @param schema - A Zod schema (e.g., `z.object({ email: z.string().email() })`)
- * @returns A `ValidateFunction` compatible with `<PaulyForm validate={…}>`
+ * @returns A `ValidateFunction` compatible with `<VoraForm validate={…}>`
  *
  * @example
  * ```ts
  * import { z } from 'zod';
- * import { createZodAdapter } from '@pauly/core';
+ * import { createZodAdapter } from '@vora/core';
  *
  * const schema = z.object({
  *   email: z.string().email('Invalid email'),
@@ -84,9 +84,9 @@ export interface ZodLikeSchema {
  * const validate = createZodAdapter(schema);
  *
  * // In the form:
- * <PaulyForm validate={validate} onSubmit={handleSubmit}>
+ * <VoraForm validate={validate} onSubmit={handleSubmit}>
  *   ...
- * </PaulyForm>
+ * </VoraForm>
  * ```
  */
 export function createZodAdapter(schema: ZodLikeSchema): ValidateFunction {

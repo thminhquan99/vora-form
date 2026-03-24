@@ -1,20 +1,20 @@
 {
   "name": "tag-input",
-  "displayName": "PaulyTagInput",
+  "displayName": "VRTagInput",
   "description": "Tag input component with local UI typing state. Stores array of tags silently to prevent re-renders on keystroke.",
   "category": "input",
   "files": [
-    "PaulyTagInput.tsx",
-    "PaulyTagInput.module.css",
+    "VRTagInput.tsx",
+    "VRTagInput.module.css",
     "types.ts",
     "index.ts"
   ],
   "dependencies": {
     "internal": ["label", "field-error"],
-    "external": ["@pauly/core"]
+    "external": ["@vora/core"]
   },
   "exports": {
-    "components": ["PaulyTagInput"],
-    "types": ["PaulyTagInputProps"]
+    "components": ["VRTagInput"],
+    "types": ["VRTagInputProps"]
   }
 }

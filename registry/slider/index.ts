@@ -1,2 +1,2 @@
-export { PaulySlider } from './PaulySlider';
-export type { PaulySliderProps } from './types';
+export { VRSlider } from './VRSlider';
+export type { VRSliderProps } from './types';

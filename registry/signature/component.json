@@ -2,8 +2,8 @@
   "name": "signature",
   "category": "input",
   "files": [
-    "PaulySignature.tsx",
-    "PaulySignature.module.css",
+    "VRSignature.tsx",
+    "VRSignature.module.css",
     "types.ts",
     "index.ts"
   ],
@@ -11,7 +11,7 @@
   "peerDependencies": {
     "react": ">=18.0.0",
     "react-dom": ">=18.0.0",
-    "@pauly/core": ">=0.1.0"
+    "@vora/core": ">=0.1.0"
   },
   "registryDependencies": [
     "label",
@@ -20,5 +20,5 @@
   "versionRange": ">=0.1.0",
   "browserOnly": true,
   "tags": ["signature", "canvas", "drawing", "form", "advanced"],
-  "exports": ["PaulySignature", "PaulySignatureProps"]
+  "exports": ["VRSignature", "VRSignatureProps"]
 }

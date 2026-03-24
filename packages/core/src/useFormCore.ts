@@ -7,14 +7,14 @@
  *
  * This hook is consumed at the **form level** (by the developer in their
  * page component), not by individual field components. Fields use
- * `usePaulyField` instead.
+ * `useVoraField` instead.
  *
- * ### Difference from `usePaulyField`
+ * ### Difference from `useVoraField`
  *
  * | Hook | Scope | Re-renders |
  * |---|---|---|
  * | `useFormCore` | Form-wide — access to all fields | Never (returns stable store methods) |
- * | `usePaulyField` | Single field — subscribes to one path | Only when that field's value or error changes |
+ * | `useVoraField` | Single field — subscribes to one path | Only when that field's value or error changes |
  *
  * @example
  * ```tsx
@@ -27,11 +27,11 @@
  *   };
  *
  *   return (
- *     <PaulyForm onSubmit={handleSubmit}>
+ *     <VoraForm onSubmit={handleSubmit}>
  *       <button type="button" onClick={handlePopulate}>Populate</button>
- *       <PaulyText name="email" />
- *       <PaulyText name="password" />
- *     </PaulyForm>
+ *       <VRText name="email" />
+ *       <VRText name="password" />
+ *     </VoraForm>
  *   );
  * }
  * ```
@@ -106,14 +106,14 @@ export interface UseFormCoreReturn {
 /**
  * Form-level hook providing direct access to `FormStore` methods.
  *
- * **Must be called inside a `<PaulyForm>` provider.**
+ * **Must be called inside a `<VoraForm>` provider.**
  *
  * All returned functions are referentially stable — they never change
  * between renders, so they won't cause unnecessary re-renders when
  * passed as props.
  *
  * @returns A `UseFormCoreReturn` object with all store methods
- * @throws Error if used outside `<PaulyForm>`
+ * @throws Error if used outside `<VoraForm>`
  */
 export function useFormCore(): UseFormCoreReturn {
   const { store, isSubmitting } = useFormContext();

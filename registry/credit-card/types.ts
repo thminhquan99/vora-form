@@ -1,7 +1,7 @@
-import type { PaulyFieldProps } from '@pauly/core';
+import type { VRFieldProps } from '@vora/core';
 
-export interface PaulyCreditCardProps
-  extends PaulyFieldProps<string, HTMLInputElement> {
+export interface VRCreditCardProps
+  extends VRFieldProps<string, HTMLInputElement> {
   label?: string;
   placeholder?: string;
   id?: string;

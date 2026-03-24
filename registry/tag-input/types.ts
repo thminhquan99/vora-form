@@ -1,7 +1,7 @@
-import type { PaulyFieldProps } from '@pauly/core';
+import type { VRFieldProps } from '@vora/core';
 
-export interface PaulyTagInputProps
-  extends PaulyFieldProps<string[], HTMLDivElement> {
+export interface VRTagInputProps
+  extends VRFieldProps<string[], HTMLDivElement> {
   label?: string;
   placeholder?: string;
   id?: string;

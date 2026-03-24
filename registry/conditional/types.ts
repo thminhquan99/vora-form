@@ -1,10 +1,10 @@
 /**
- * Props for the `<PaulyConditional>` layout component.
+ * Props for the `<VRConditional>` layout component.
  *
  * This is NOT a form input — it's a layout controller that
  * conditionally renders children based on another field's value.
  */
-export interface PaulyConditionalProps {
+export interface VRConditionalProps {
   /** The field path to subscribe to (e.g., "hasReason"). */
   watch: string;
 

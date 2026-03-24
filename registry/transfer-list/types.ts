@@ -1,13 +1,13 @@
-import type { PaulyFieldProps } from '@pauly/core';
+import type { VRFieldProps } from '@vora/core';
 
-export interface PaulyTransferListOption {
+export interface VRTransferListOption {
   value: string;
   label: string;
 }
 
-export interface PaulyTransferListProps
-  extends PaulyFieldProps<string[], HTMLDivElement> {
-  options: PaulyTransferListOption[];
+export interface VRTransferListProps
+  extends VRFieldProps<string[], HTMLDivElement> {
+  options: VRTransferListOption[];
   leftTitle?: string;
   rightTitle?: string;
   label?: string;

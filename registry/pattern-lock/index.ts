@@ -1,2 +1,2 @@
-export { PaulyPatternLock } from './PaulyPatternLock';
-export type { PaulyPatternLockProps } from './types';
+export { VRPatternLock } from './VRPatternLock';
+export type { VRPatternLockProps } from './types';

@@ -1,10 +1,10 @@
 /**
  * @module types
  * @description
- * Shared TypeScript types for `@pauly/core`.
+ * Shared TypeScript types for `@vora/core`.
  *
- * The centrepiece is `PaulyFieldProps<TValue>` — the **universal field
- * contract** that every PaulyForm component must implement. This single
+ * The centrepiece is `VRFieldProps<TValue>` — the **universal field
+ * contract** that every VoraForm component must implement. This single
  * interface is what makes the entire library consistent: whether the
  * component renders a plain `<input>` or a `<canvas>` signature pad,
  * it integrates with the form through the same props shape.
@@ -15,12 +15,12 @@ import type { ChangeEvent, Ref } from 'react';
 // ─── Universal Field Contract ─────────────────────────────────────────────────
 
 /**
- * The contract every PaulyForm field component MUST implement.
+ * The contract every VoraForm field component MUST implement.
  *
  * @typeParam TValue   - The domain value type (e.g., `string`, `string | null`, `Date`)
  * @typeParam TElement - The underlying DOM element type (defaults to `HTMLElement`)
  */
-export interface PaulyFieldProps<
+export interface VRFieldProps<
   TValue = unknown,
   TElement extends HTMLElement = HTMLElement,
 > {
@@ -45,14 +45,14 @@ export interface PaulyFieldProps<
    * Native change handler — strictly for `<input>`, `<textarea>`, `<select>` events.
    *
    * For composite widgets (DatePicker, Signature, CheckboxGroup), use
-   * `setValue()` from the `usePaulyField` hook return instead.
+   * `setValue()` from the `useVoraField` hook return instead.
    */
   onChange?: (e: ChangeEvent<TElement>) => void;
 
   /** Called when the field loses focus. */
   onBlur?: () => void;
 
-  /** Validation error message (auto-provided by PaulyForm context). */
+  /** Validation error message (auto-provided by VoraForm context). */
   error?: string;
 
   /** Whether the field is disabled. */

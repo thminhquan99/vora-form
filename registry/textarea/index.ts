@@ -1,2 +1,2 @@
-export { PaulyTextarea } from './PaulyTextarea';
-export type { PaulyTextareaProps } from './types';
+export { VRTextarea } from './VRTextarea';
+export type { VRTextareaProps } from './types';

@@ -1,20 +1,20 @@
 {
   "name": "coordinate-picker",
-  "displayName": "PaulyCoordinatePicker",
+  "displayName": "VRCoordinatePicker",
   "description": "A visual coordinate map picker that converts clicks into X/Y percentages.",
   "category": "input",
   "files": [
-    "PaulyCoordinatePicker.tsx",
-    "PaulyCoordinatePicker.module.css",
+    "VRCoordinatePicker.tsx",
+    "VRCoordinatePicker.module.css",
     "types.ts",
     "index.ts"
   ],
   "dependencies": {
     "internal": ["label", "field-error"],
-    "external": ["@pauly/core"]
+    "external": ["@vora/core"]
   },
   "exports": {
-    "components": ["PaulyCoordinatePicker"],
-    "types": ["PaulyCoordinatePickerProps", "Coordinate"]
+    "components": ["VRCoordinatePicker"],
+    "types": ["VRCoordinatePickerProps", "Coordinate"]
   }
 }

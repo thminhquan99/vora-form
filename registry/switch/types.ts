@@ -1,7 +1,7 @@
-import type { PaulyFieldProps } from '@pauly/core';
+import type { VRFieldProps } from '@vora/core';
 
-export interface PaulySwitchProps
-  extends PaulyFieldProps<boolean, HTMLButtonElement> {
+export interface VRSwitchProps
+  extends VRFieldProps<boolean, HTMLButtonElement> {
   /** Label text displayed beside the switch. */
   label: string;
 

@@ -1,4 +1,4 @@
-import { PaulyFieldProps } from '@pauly/core';
+import { VRFieldProps } from '@vora/core';
 
 export interface GanttTask {
   id: string;
@@ -7,7 +7,7 @@ export interface GanttTask {
   end: string;
 }
 
-export interface PaulyGanttTimelineProps extends PaulyFieldProps<GanttTask[], HTMLDivElement> {
+export interface VRGanttTimelineProps extends VRFieldProps<GanttTask[], HTMLDivElement> {
   label?: string;
   required?: boolean;
   className?: string;

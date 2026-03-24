@@ -2,9 +2,9 @@
   "name": "checkbox",
   "category": "selection",
   "files": [
-    "PaulyCheckbox.tsx",
-    "PaulyCheckboxGroup.tsx",
-    "PaulyCheckbox.module.css",
+    "VRCheckbox.tsx",
+    "VRCheckboxGroup.tsx",
+    "VRCheckbox.module.css",
     "types.ts",
     "index.ts"
   ],
@@ -12,7 +12,7 @@
   "peerDependencies": {
     "react": ">=18.0.0",
     "react-dom": ">=18.0.0",
-    "@pauly/core": ">=0.1.0"
+    "@vora/core": ">=0.1.0"
   },
   "registryDependencies": [
     "label",
@@ -22,10 +22,10 @@
   "browserOnly": false,
   "tags": ["checkbox", "boolean", "toggle", "multi-select", "form"],
   "exports": [
-    "PaulyCheckbox",
-    "PaulyCheckboxProps",
-    "PaulyCheckboxGroup",
-    "PaulyCheckboxGroupProps",
+    "VRCheckbox",
+    "VRCheckboxProps",
+    "VRCheckboxGroup",
+    "VRCheckboxGroupProps",
     "CheckboxOption"
   ]
 }

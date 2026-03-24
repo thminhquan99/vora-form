@@ -16,7 +16,7 @@
  *
  * Field components subscribe to the store's pub/sub system instead,
  * and only re-render when their specific path changes — via
- * `useSyncExternalStore` in the `usePaulyField` hook.
+ * `useSyncExternalStore` in the `useVoraField` hook.
  */
 
 import React, { createContext, useContext, useRef } from 'react';
@@ -53,40 +53,40 @@ export interface FormContextValue {
  * React Context for the form store.
  *
  * Initialised to `null` so that field components can detect when they
- * are rendered outside a `<PaulyForm>` ancestor and throw a clear error.
+ * are rendered outside a `<VoraForm>` ancestor and throw a clear error.
  */
 const FormContext = createContext<FormContextValue | null>(null);
-FormContext.displayName = 'PaulyFormContext';
+FormContext.displayName = 'VoraFormContext';
 
 // ─── useFormContext Hook ──────────────────────────────────────────────────────
 
 /**
  * Consumes the `FormContext` and returns the `FormContextValue`.
  *
- * Throws a descriptive error if called outside of a `<PaulyForm>` provider,
+ * Throws a descriptive error if called outside of a `<VoraForm>` provider,
  * catching misconfiguration at dev-time rather than producing mysterious
  * `undefined` errors.
  *
  * @returns The current `FormContextValue`
- * @throws Error if no `<PaulyForm>` ancestor is found
+ * @throws Error if no `<VoraForm>` ancestor is found
  */
 export function useFormContext(): FormContextValue {
   const ctx = useContext(FormContext);
   if (!ctx) {
     throw new Error(
-      '[PaulyForm] useFormContext must be used within a <PaulyForm> provider. ' +
-        'Wrap your field components in <PaulyForm>.'
+      '[VoraForm] useFormContext must be used within a <VoraForm> provider. ' +
+        'Wrap your field components in <VoraForm>.'
     );
   }
   return ctx;
 }
 
-// ─── PaulyForm Provider Component ─────────────────────────────────────────────
+// ─── VoraForm Provider Component ─────────────────────────────────────────────
 
 /**
- * Props for the `<PaulyForm>` provider component.
+ * Props for the `<VoraForm>` provider component.
  */
-export interface PaulyFormProps {
+export interface VoraFormProps {
   /** Field components rendered inside the form. */
   children: React.ReactNode;
 
@@ -132,26 +132,26 @@ export interface PaulyFormProps {
  * @example
  * ```tsx
  * import { z } from 'zod';
- * import { PaulyForm, createZodAdapter } from '@pauly/core';
+ * import { VoraForm, createZodAdapter } from '@vora/core';
  *
  * const schema = z.object({ email: z.string().email() });
  *
- * <PaulyForm
+ * <VoraForm
  *   validate={createZodAdapter(schema)}
  *   onSubmit={(data) => console.log(data)}
  * >
- *   <PaulyText name="email" />
- *   <PaulySubmit />
- * </PaulyForm>
+ *   <VRText name="email" />
+ *   <VRSubmit />
+ * </VoraForm>
  * ```
  */
-export function PaulyForm({
+export function VoraForm({
   children,
   onSubmit,
   validate,
   className,
   initialValues,
-}: PaulyFormProps): React.JSX.Element {
+}: VoraFormProps): React.JSX.Element {
   // ── Stable store instance (never changes after mount) ───────────────────
   const storeRef = useRef<FormStore | null>(null);
   if (storeRef.current === null) {
@@ -199,7 +199,7 @@ export function PaulyForm({
 
   // ── Context value (referentially stable except for isSubmitting) ─────────
   // We intentionally recreate this object only when isSubmitting changes.
-  // Field components do NOT read isSubmitting — only <PaulySubmit> does,
+  // Field components do NOT read isSubmitting — only <VRSubmit> does,
   // so this re-render is scoped to the submit button only.
   const contextValue = React.useMemo<FormContextValue>(
     () => ({ store, validate, isSubmitting }),

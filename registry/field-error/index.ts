@@ -1,2 +1,2 @@
-export { PaulyFieldError } from './PaulyFieldError';
-export type { PaulyFieldErrorProps } from './types';
+export { VRFieldError } from './VRFieldError';
+export type { VRFieldErrorProps } from './types';

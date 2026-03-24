@@ -1,7 +1,7 @@
 /**
  * @module useAsyncValidation
  * @description
- * Debounced async field validation hook for PaulyForm.
+ * Debounced async field validation hook for VoraForm.
  *
  * ### Why Not `useSyncExternalStore`?
  *
@@ -14,7 +14,7 @@
  * The callback runs **outside React's rendering cycle** — it reads
  * the latest value, debounces, and then calls `store.setError()` or
  * `store.clearError()` to push validation results. Only the error
- * change triggers a re-render (via `<PaulyFieldError>`'s own
+ * change triggers a re-render (via `<VRFieldError>`'s own
  * `useSyncExternalStore` subscription on the `"error"` topic).
  *
  * ### Re-render Contract
@@ -37,7 +37,7 @@
  *     return taken ? 'Username is already taken.' : undefined;
  *   }, 600);
  *
- *   return <PaulyText name="username" label="Username" />;
+ *   return <VRText name="username" label="Username" />;
  * }
  * ```
  */

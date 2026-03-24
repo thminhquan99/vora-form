@@ -1,0 +1,86 @@
+/* ─── VRSwitch ────────────────────────────────────────────────────────────── */
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ── Track ────────────────────────────────────────────────────────────────────── */
+.track {
+  /* Reset button defaults without collapsing display */
+  appearance: none;
+  -webkit-appearance: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  background: none;
+
+  /* Layout */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 44px;
+  height: 24px;
+  border-radius: 12px;
+  background-color: var(--vora-switch-off-bg, #d1d5db);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition:
+    background-color 0.2s ease,
+    box-shadow 0.15s ease;
+}
+
+.trackOn {
+  background-color: var(--vora-switch-on-bg, #3b82f6);
+}
+
+.track:hover:not(:disabled) {
+  box-shadow: 0 0 0 3px var(--vora-ring-shadow-color, rgba(59, 130, 246, 0.1));
+}
+
+.track:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 var(--vora-ring-width, 3px) var(--vora-ring-shadow-color, rgba(59, 130, 246, 0.15));
+}
+
+.trackError {
+  background-color: var(--vora-switch-error-bg, #fca5a5);
+}
+
+.trackError.trackOn {
+  background-color: var(--vora-error-border-color, #ef4444);
+}
+
+.track:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Knob ─────────────────────────────────────────────────────────────────────── */
+.knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: var(--vora-switch-knob-color, #ffffff);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+
+.trackOn .knob {
+  transform: translateX(20px);
+}

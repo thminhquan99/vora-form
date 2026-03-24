@@ -1,20 +1,20 @@
 {
   "name": "transfer-list",
-  "displayName": "PaulyTransferList",
+  "displayName": "VRTransferList",
   "description": "A dual-column transfer list for assigning multi-select values (permissions, etc).",
   "category": "input",
   "files": [
-    "PaulyTransferList.tsx",
-    "PaulyTransferList.module.css",
+    "VRTransferList.tsx",
+    "VRTransferList.module.css",
     "types.ts",
     "index.ts"
   ],
   "dependencies": {
     "internal": ["label", "field-error"],
-    "external": ["@pauly/core"]
+    "external": ["@vora/core"]
   },
   "exports": {
-    "components": ["PaulyTransferList"],
-    "types": ["PaulyTransferListProps", "PaulyTransferListOption"]
+    "components": ["VRTransferList"],
+    "types": ["VRTransferListProps", "VRTransferListOption"]
   }
 }

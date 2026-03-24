@@ -1,0 +1,88 @@
+/* ─── VRDatePicker ───────────────────────────────────────────────────── */
+/* Wraps native <input type="date"> with consistent styling.               */
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.input {
+  /* Layout */
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  padding: var(--vora-input-padding-y, 10px) var(--vora-input-padding-x, 12px);
+
+  /* Typography */
+  font-family: var(--vora-font-family, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif);
+  font-size: var(--vora-input-font-size, 0.9375rem);
+  line-height: var(--vora-input-line-height, 1.5);
+  color: var(--vora-input-color, #111827);
+
+  /* Border & Shape */
+  border: var(--vora-input-border-width, 1px) solid var(--vora-input-border-color, #d1d5db);
+  border-radius: var(--vora-input-border-radius, 8px);
+  background-color: var(--vora-input-bg, #ffffff);
+
+  /* Transitions */
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    background-color 0.15s ease;
+
+  outline: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+/* ── Calendar Icon (WebKit / Blink) ────────────────────────────────────── */
+.input::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.15s ease;
+  padding: 2px;
+  border-radius: 4px;
+}
+
+.input::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+  background-color: var(--vora-input-hover-bg, rgba(0, 0, 0, 0.04));
+}
+
+/* ── Placeholder-like state (no date selected) ─────────────────────────── */
+.input:invalid {
+  color: var(--vora-input-placeholder-color, #9ca3af);
+}
+
+/* ── Focus Ring ─────────────────────────────────────────────────────────── */
+.input:focus {
+  border-color: var(--vora-ring-color, #3b82f6);
+  box-shadow:
+    0 0 0 var(--vora-ring-width, 3px) var(--vora-ring-shadow-color, rgba(59, 130, 246, 0.15));
+}
+
+/* ── Error State ────────────────────────────────────────────────────────── */
+.inputError {
+  border-color: var(--vora-error-border-color, #ef4444);
+}
+
+.inputError:focus {
+  border-color: var(--vora-error-border-color, #ef4444);
+  box-shadow:
+    0 0 0 var(--vora-ring-width, 3px) var(--vora-error-ring-color, rgba(239, 68, 68, 0.15));
+}
+
+/* ── Disabled State ─────────────────────────────────────────────────────── */
+.input:disabled {
+  background-color: var(--vora-input-disabled-bg, #f9fafb);
+  color: var(--vora-input-disabled-color, #9ca3af);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* ── Hover State ────────────────────────────────────────────────────────── */
+.input:hover:not(:focus):not(:disabled):not(.inputError) {
+  border-color: var(--vora-input-hover-border-color, #9ca3af);
+}

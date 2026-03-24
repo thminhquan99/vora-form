@@ -1,4 +1,4 @@
-import type { PaulyFieldProps } from '@pauly/core';
+import type { VRFieldProps } from '@vora/core';
 
 export interface TreeNode {
   label: string;
@@ -6,8 +6,8 @@ export interface TreeNode {
   children?: TreeNode[];
 }
 
-export interface PaulyTreeSelectProps
-  extends PaulyFieldProps<string[], HTMLDivElement> {
+export interface VRTreeSelectProps
+  extends VRFieldProps<string[], HTMLDivElement> {
   data: TreeNode[];
   label?: string;
   placeholder?: string;

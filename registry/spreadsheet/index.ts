@@ -1,2 +1,2 @@
-export * from './PaulySpreadsheet';
+export * from './VRSpreadsheet';
 export * from './types';

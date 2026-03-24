@@ -1,13 +1,13 @@
-import type { PaulyFieldProps } from '@pauly/core';
+import type { VRFieldProps } from '@vora/core';
 
 /**
- * Props for the `<PaulyText>` component.
+ * Props for the `<VRText>` component.
  *
- * Extends `PaulyFieldProps<string>` with text-input-specific props.
+ * Extends `VRFieldProps<string>` with text-input-specific props.
  * All standard HTML input attributes are forwarded to the native `<input>`.
  */
-export interface PaulyTextProps
-  extends PaulyFieldProps<string, HTMLInputElement> {
+export interface VRTextProps
+  extends VRFieldProps<string, HTMLInputElement> {
   /** Visible label text. If omitted, no label is rendered. */
   label?: string;
 

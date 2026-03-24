@@ -2,8 +2,8 @@
   "name": "field-error",
   "category": "display",
   "files": [
-    "PaulyFieldError.tsx",
-    "PaulyFieldError.module.css",
+    "VRFieldError.tsx",
+    "VRFieldError.module.css",
     "types.ts",
     "index.ts"
   ],
@@ -11,11 +11,11 @@
   "peerDependencies": {
     "react": ">=18.0.0",
     "react-dom": ">=18.0.0",
-    "@pauly/core": ">=0.1.0"
+    "@vora/core": ">=0.1.0"
   },
   "registryDependencies": [],
   "versionRange": ">=0.1.0",
   "browserOnly": false,
   "tags": ["error", "validation", "form", "accessibility"],
-  "exports": ["PaulyFieldError", "PaulyFieldErrorProps"]
+  "exports": ["VRFieldError", "VRFieldErrorProps"]
 }

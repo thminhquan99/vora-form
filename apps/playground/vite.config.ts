@@ -6,8 +6,8 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      // Resolve @pauly/core to the local source for development
-      '@pauly/core': path.resolve(__dirname, '../../packages/core/src/index.ts'),
+      // Resolve @vora/core to the local source for development
+      '@vora/core': path.resolve(__dirname, '../../packages/core/src/index.ts'),
     },
   },
   css: {

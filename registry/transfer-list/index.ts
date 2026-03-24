@@ -1,2 +1,2 @@
-export { PaulyTransferList } from './PaulyTransferList';
-export type { PaulyTransferListProps, PaulyTransferListOption } from './types';
+export { VRTransferList } from './VRTransferList';
+export type { VRTransferListProps, VRTransferListOption } from './types';

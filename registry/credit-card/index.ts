@@ -1,2 +1,2 @@
-export { PaulyCreditCard } from './PaulyCreditCard';
-export type { PaulyCreditCardProps } from './types';
+export { VRCreditCard } from './VRCreditCard';
+export type { VRCreditCardProps } from './types';

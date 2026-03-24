@@ -1,2 +1,2 @@
-export { PaulyRating } from './PaulyRating';
-export type { PaulyRatingProps } from './types';
+export { VRRating } from './VRRating';
+export type { VRRatingProps } from './types';

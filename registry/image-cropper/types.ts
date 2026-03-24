@@ -1,4 +1,4 @@
-import type { PaulyFieldProps } from '@pauly/core';
+import type { VRFieldProps } from '@vora/core';
 
 export type ImageCropData = {
   originalUrl: string;
@@ -6,7 +6,7 @@ export type ImageCropData = {
   crop: { x: number; y: number; width: number; height: number };
 };
 
-export interface PaulyImageCropperProps extends PaulyFieldProps<ImageCropData | null, HTMLDivElement> {
+export interface VRImageCropperProps extends VRFieldProps<ImageCropData | null, HTMLDivElement> {
   label?: string;
   aspectRatio?: number;
   id?: string;

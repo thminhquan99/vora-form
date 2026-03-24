@@ -1,2 +1,2 @@
-export * from './PaulyNodeGraph';
+export * from './VRNodeGraph';
 export * from './types';

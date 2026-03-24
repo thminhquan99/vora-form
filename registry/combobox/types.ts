@@ -1,4 +1,4 @@
-import type { PaulyFieldProps } from '@pauly/core';
+import type { VRFieldProps } from '@vora/core';
 
 export interface ComboboxOption {
   /** Display text shown in the dropdown. */
@@ -7,8 +7,8 @@ export interface ComboboxOption {
   value: string;
 }
 
-export interface PaulyComboboxProps
-  extends PaulyFieldProps<string, HTMLDivElement> {
+export interface VRComboboxProps
+  extends VRFieldProps<string, HTMLDivElement> {
   /** Label text displayed above the combobox. */
   label: string;
 

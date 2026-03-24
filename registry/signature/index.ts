@@ -1,2 +1,2 @@
-export { PaulySignature } from './PaulySignature';
-export type { PaulySignatureProps } from './types';
+export { VRSignature } from './VRSignature';
+export type { VRSignatureProps } from './types';

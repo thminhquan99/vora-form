@@ -1,2 +1,2 @@
-export * from './PaulyGanttTimeline';
+export * from './VRGanttTimeline';
 export * from './types';

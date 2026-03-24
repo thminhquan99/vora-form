@@ -1,2 +1,2 @@
-export { PaulyTagInput } from './PaulyTagInput';
-export type { PaulyTagInputProps } from './types';
+export { VRTagInput } from './VRTagInput';
+export type { VRTagInputProps } from './types';

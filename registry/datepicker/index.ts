@@ -1,2 +1,2 @@
-export { PaulyDatePicker } from './PaulyDatePicker';
-export type { PaulyDatePickerProps } from './types';
+export { VRDatePicker } from './VRDatePicker';
+export type { VRDatePickerProps } from './types';

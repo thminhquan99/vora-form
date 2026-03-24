@@ -1,9 +1,9 @@
 {
   "name": "spreadsheet",
-  "dependencies": ["@pauly/core"],
+  "dependencies": ["@vora/core"],
   "files": [
-    "PaulySpreadsheet.tsx",
-    "PaulySpreadsheet.module.css",
+    "VRSpreadsheet.tsx",
+    "VRSpreadsheet.module.css",
     "types.ts",
     "index.ts"
   ]

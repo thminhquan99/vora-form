@@ -1,7 +1,7 @@
-import type { PaulyFieldProps } from '@pauly/core';
+import type { VRFieldProps } from '@vora/core';
 
-export interface PaulyDropzoneProps
-  extends PaulyFieldProps<File[], HTMLDivElement> {
+export interface VRDropzoneProps
+  extends VRFieldProps<File[], HTMLDivElement> {
   /** Label text displayed above the dropzone. */
   label: string;
 

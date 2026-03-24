@@ -1,20 +1,20 @@
 {
   "name": "credit-card",
-  "displayName": "PaulyCreditCard",
+  "displayName": "VRCreditCard",
   "description": "A masked input specifically formatted for credit card numbers with Amex support.",
   "category": "input",
   "files": [
-    "PaulyCreditCard.tsx",
-    "PaulyCreditCard.module.css",
+    "VRCreditCard.tsx",
+    "VRCreditCard.module.css",
     "types.ts",
     "index.ts"
   ],
   "dependencies": {
     "internal": ["label", "field-error"],
-    "external": ["@pauly/core"]
+    "external": ["@vora/core"]
   },
   "exports": {
-    "components": ["PaulyCreditCard"],
-    "types": ["PaulyCreditCardProps"]
+    "components": ["VRCreditCard"],
+    "types": ["VRCreditCardProps"]
   }
 }

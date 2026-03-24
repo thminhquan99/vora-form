@@ -1,7 +1,7 @@
-import type { PaulyFieldProps } from '@pauly/core';
+import type { VRFieldProps } from '@vora/core';
 
-export interface PaulyTextareaProps
-  extends PaulyFieldProps<string, HTMLTextAreaElement> {
+export interface VRTextareaProps
+  extends VRFieldProps<string, HTMLTextAreaElement> {
   /** Label text displayed above the textarea. */
   label: string;
   /** Number of visible text rows. Default: `3`. */

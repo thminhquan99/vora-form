@@ -1,2 +1,2 @@
-export { PaulyMentions } from './PaulyMentions';
-export type { PaulyMentionsProps, PaulyMentionUser } from './types';
+export { VRMentions } from './VRMentions';
+export type { VRMentionsProps, VRMentionUser } from './types';

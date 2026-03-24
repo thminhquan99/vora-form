@@ -1,20 +1,20 @@
 {
   "name": "otp",
-  "displayName": "PaulyOTPInput",
+  "displayName": "VROTPInput",
   "description": "OTP (One-Time-Password) input with auto-focus management, paste handling, and single-field store binding. Renders individual digit boxes.",
   "category": "input",
   "files": [
-    "PaulyOTPInput.tsx",
-    "PaulyOTPInput.module.css",
+    "VROTPInput.tsx",
+    "VROTPInput.module.css",
     "types.ts",
     "index.ts"
   ],
   "dependencies": {
     "internal": ["label", "field-error"],
-    "external": ["@pauly/core"]
+    "external": ["@vora/core"]
   },
   "exports": {
-    "components": ["PaulyOTPInput"],
-    "types": ["PaulyOTPInputProps"]
+    "components": ["VROTPInput"],
+    "types": ["VROTPInputProps"]
   }
 }

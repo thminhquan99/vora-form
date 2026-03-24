@@ -1,4 +1,4 @@
-export interface PaulyKeyValueProps {
+export interface VRKeyValueProps {
   name: string;
   label?: string;
   keyPlaceholder?: string;

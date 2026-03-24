@@ -1,20 +1,20 @@
 {
   "name": "password-input",
-  "displayName": "PaulyPasswordInput",
+  "displayName": "VRPasswordInput",
   "description": "Password input with toggle visibility and zero re-render strength meter.",
   "category": "input",
   "files": [
-    "PaulyPasswordInput.tsx",
-    "PaulyPasswordInput.module.css",
+    "VRPasswordInput.tsx",
+    "VRPasswordInput.module.css",
     "types.ts",
     "index.ts"
   ],
   "dependencies": {
     "internal": ["label", "field-error"],
-    "external": ["@pauly/core"]
+    "external": ["@vora/core"]
   },
   "exports": {
-    "components": ["PaulyPasswordInput"],
-    "types": ["PaulyPasswordInputProps"]
+    "components": ["VRPasswordInput"],
+    "types": ["VRPasswordInputProps"]
   }
 }

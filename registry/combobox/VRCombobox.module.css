@@ -1,0 +1,195 @@
+/* ─── VRCombobox ──────────────────────────────────────────────────────────── */
+
+.wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* ── Trigger Button ──────────────────────────────────────────────────────────── */
+.trigger {
+  appearance: none;
+  -webkit-appearance: none;
+  border: 1px solid var(--vora-input-border-color, #d1d5db);
+  border-radius: var(--vora-input-border-radius, 8px);
+  padding: 10px 14px;
+  font-family: var(--vora-font-family, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--vora-input-color, #1f2937);
+  background-color: var(--vora-input-bg, #ffffff);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+  outline: none;
+}
+
+.trigger:hover:not(:disabled) {
+  border-color: var(--vora-input-hover-border, #9ca3af);
+}
+
+.trigger:focus-visible {
+  border-color: var(--vora-ring-color, #3b82f6);
+  box-shadow:
+    0 0 0 var(--vora-ring-width, 3px)
+    var(--vora-ring-shadow-color, rgba(59, 130, 246, 0.15));
+}
+
+.triggerOpen {
+  border-color: var(--vora-ring-color, #3b82f6);
+  box-shadow:
+    0 0 0 var(--vora-ring-width, 3px)
+    var(--vora-ring-shadow-color, rgba(59, 130, 246, 0.15));
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.triggerError {
+  border-color: var(--vora-error-border-color, #ef4444);
+}
+
+.trigger:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.selectedText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.placeholder {
+  color: var(--vora-input-placeholder-color, #9ca3af);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chevron {
+  font-size: 0.75rem;
+  color: var(--vora-input-placeholder-color, #9ca3af);
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+/* ── Dropdown ────────────────────────────────────────────────────────────────── */
+.dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  background-color: var(--vora-input-bg, #ffffff);
+  border: 1px solid var(--vora-ring-color, #3b82f6);
+  border-top: none;
+  border-bottom-left-radius: var(--vora-input-border-radius, 8px);
+  border-bottom-right-radius: var(--vora-input-border-radius, 8px);
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.08),
+    0 1px 3px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  animation: comboboxSlideDown 0.15s ease-out;
+}
+
+@keyframes comboboxSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Search Input ────────────────────────────────────────────────────────────── */
+.searchWrap {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--vora-input-border-color, #e5e7eb);
+}
+
+.searchInput {
+  width: 100%;
+  border: 1px solid var(--vora-input-border-color, #d1d5db);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-family: var(--vora-font-family, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif);
+  font-size: 0.8125rem;
+  color: var(--vora-input-color, #1f2937);
+  background-color: var(--vora-input-bg, #ffffff);
+  outline: none;
+  transition: border-color 0.15s ease;
+  box-sizing: border-box;
+}
+
+.searchInput:focus {
+  border-color: var(--vora-ring-color, #3b82f6);
+}
+
+.searchInput::placeholder {
+  color: var(--vora-input-placeholder-color, #9ca3af);
+}
+
+/* ── Options List ────────────────────────────────────────────────────────────── */
+.optionsList {
+  list-style: none;
+  margin: 0;
+  padding: 4px 0;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  font-family: var(--vora-font-family, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif);
+  font-size: 0.875rem;
+  color: var(--vora-input-color, #1f2937);
+  cursor: pointer;
+  transition:
+    background-color 0.1s ease,
+    color 0.1s ease;
+}
+
+.option:hover,
+.optionHighlighted {
+  background-color: var(--vora-combobox-highlight-bg, #eff6ff);
+}
+
+.optionSelected {
+  font-weight: 500;
+  color: var(--vora-ring-color, #3b82f6);
+}
+
+.optionSelected:hover,
+.optionSelected.optionHighlighted {
+  background-color: var(--vora-combobox-selected-hover-bg, #dbeafe);
+}
+
+.check {
+  font-size: 0.75rem;
+  color: var(--vora-ring-color, #3b82f6);
+  flex-shrink: 0;
+}
+
+.empty {
+  padding: 16px 14px;
+  font-family: var(--vora-font-family, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif);
+  font-size: 0.8125rem;
+  color: var(--vora-input-placeholder-color, #9ca3af);
+  text-align: center;
+}

@@ -1,0 +1,86 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+
+.lockContainer {
+  position: relative;
+  width: 240px;
+  height: 240px;
+  background-color: #111827;
+  border-radius: 16px;
+  padding: 24px;
+  touch-action: none; /* Prevent scroll on mobile during drag */
+  user-select: none;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 20px;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  z-index: 10;
+}
+
+.dotWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.dot {
+  width: 16px;
+  height: 16px;
+  background-color: #4b5563;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  pointer-events: none; /* Let the wrapper catch the events easily */
+}
+
+.dot.active {
+  background-color: var(--vora-ring-color, #3b82f6);
+  transform: scale(1.5);
+  box-shadow: 0 0 0 8px rgba(59, 130, 246, 0.2);
+}
+
+.svgOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.svgLine {
+  stroke: var(--vora-ring-color, #3b82f6);
+  stroke-width: 4;
+  stroke-linecap: round;
+  opacity: 0.6;
+}
+
+.clearBtn {
+  margin-top: 8px;
+  padding: 6px 12px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #6b7280;
+  background: none;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.clearBtn:hover {
+  background-color: #f3f4f6;
+  color: #374151;
+}

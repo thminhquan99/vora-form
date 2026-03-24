@@ -1,2 +1,2 @@
-export { PaulyCoordinatePicker } from './PaulyCoordinatePicker';
-export type { PaulyCoordinatePickerProps, Coordinate } from './types';
+export { VRCoordinatePicker } from './VRCoordinatePicker';
+export type { VRCoordinatePickerProps, Coordinate } from './types';

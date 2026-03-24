@@ -1,2 +1,2 @@
-export { PaulyCamera } from './PaulyCamera';
-export type { PaulyCameraProps } from './types';
+export { VRCamera } from './VRCamera';
+export type { VRCameraProps } from './types';

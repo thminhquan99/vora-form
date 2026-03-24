@@ -1,20 +1,20 @@
 {
   "name": "masked-input",
-  "displayName": "PaulyMaskedInput",
+  "displayName": "VRMaskedInput",
   "description": "Formatted text input with native DOM cursor management. Applies a formatter function on every keystroke while preserving cursor position — zero re-renders.",
   "category": "input",
   "files": [
-    "PaulyMaskedInput.tsx",
-    "PaulyMaskedInput.module.css",
+    "VRMaskedInput.tsx",
+    "VRMaskedInput.module.css",
     "types.ts",
     "index.ts"
   ],
   "dependencies": {
     "internal": ["label", "field-error"],
-    "external": ["@pauly/core"]
+    "external": ["@vora/core"]
   },
   "exports": {
-    "components": ["PaulyMaskedInput"],
-    "types": ["PaulyMaskedInputProps"]
+    "components": ["VRMaskedInput"],
+    "types": ["VRMaskedInputProps"]
   }
 }

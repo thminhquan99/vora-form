@@ -1,4 +1,4 @@
 {
   "name": "seating-chart",
-  "dependencies": ["@pauly/core"]
+  "dependencies": ["@vora/core"]
 }

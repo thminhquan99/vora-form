@@ -1,7 +1,7 @@
 /**
  * @module ref-store
  * @description
- * Vanilla TypeScript Form Store — the engine behind PaulyForm's
+ * Vanilla TypeScript Form Store — the engine behind VoraForm's
  * "Zero Re-render" architecture.
  *
  * ### Architectural Overview
@@ -44,7 +44,7 @@
  * manually, we bypass React's reconciliation entirely for value changes.
  *
  * Error state is the **one exception** that is allowed to trigger targeted
- * re-renders — but only on the specific `<PaulyFieldError>` component bound
+ * re-renders — but only on the specific `<VRFieldError>` component bound
  * to that field, never the entire form tree.
  *
  * @example
@@ -171,7 +171,7 @@ export class FormStore {
    * Validation error messages keyed by field path.
    *
    * Only error state changes trigger re-renders, and only on the specific
-   * `<PaulyFieldError>` component bound to that field path.
+   * `<VRFieldError>` component bound to that field path.
    */
   private errors: Map<string, string> = new Map();
 
@@ -467,7 +467,7 @@ export class FormStore {
    * Sets a validation error for a field and notifies error subscribers.
    *
    * This is the **only** operation that is expected to trigger a targeted
-   * React re-render — specifically, the `<PaulyFieldError>` component
+   * React re-render — specifically, the `<VRFieldError>` component
    * bound to this field path. No other field or component re-renders.
    *
    * @param path    - The field path to set the error on
@@ -642,7 +642,7 @@ export class FormStore {
    * Resets the entire store to its initial empty state.
    *
    * Clears all refs, values, errors, and listeners. Used for form reset or
-   * when the `<PaulyForm>` component unmounts.
+   * when the `<VoraForm>` component unmounts.
    */
   reset(): void {
     this.refs.clear();
