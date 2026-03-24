@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useEffect, useCallback } from 'react';
-import { useVoraField } from '@vora/core';
+import { useVoraField, useInitialSnapshot } from '@vora/core';
 import { VRLabel } from '../label';
 import { VRFieldError } from '../field-error';
 import type { VRNodeGraphProps, GraphData, Node as GraphNode } from './types';
@@ -27,12 +27,12 @@ export function VRNodeGraph({
 
   // Validate initialization
   const fallbackValues = typeof field.value === 'object' && field.value !== null && 'nodes' in field.value ? field.value : DEFAULT_DATA;
-  const initialValueRef = useRef<GraphData>(fallbackValues);
+  const initialValue = useInitialSnapshot<GraphData>(fallbackValues);
 
   // Local mutable domain state bridging bypasses React rendering entirely
   const dataRef = useRef<GraphData>({
-    nodes: [...initialValueRef.current.nodes],
-    edges: [...initialValueRef.current.edges]
+    nodes: [...initialValue.nodes],
+    edges: [...initialValue.edges]
   });
 
   const stateRef = useRef({

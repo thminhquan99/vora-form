@@ -21,6 +21,7 @@ export { useVoraField } from './useVoraField';
 export type { UseVRFieldReturn } from './useVoraField';
 
 export { useAsyncValidation } from './useAsyncValidation';
+export { useInitialSnapshot } from './hooks/useInitialSnapshot';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 export type {

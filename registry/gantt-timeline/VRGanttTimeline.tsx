@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useEffect, useCallback, useMemo } from 'react';
-import { useVoraField } from '@vora/core';
+import { useVoraField, useInitialSnapshot } from '@vora/core';
 import { VRLabel } from '../label';
 import { VRFieldError } from '../field-error';
 import type { VRGanttTimelineProps, GanttTask } from './types';
@@ -30,8 +30,8 @@ export function VRGanttTimeline({
   const pxPerMs = timelineWidth / (endTs - startTs);
 
   // Snapshot Pattern
-  const initialValueRef = useRef(field.value || []);
-  const dataRef = useRef<GanttTask[]>(Array.isArray(initialValueRef.current) ? [...initialValueRef.current] : []);
+  const initialValue = useInitialSnapshot(field.value || []);
+  const dataRef = useRef<GanttTask[]>(Array.isArray(initialValue) ? [...initialValue] : []);
 
   const stateRef = useRef({
     draggingId: null as string | null,

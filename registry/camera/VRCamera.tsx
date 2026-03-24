@@ -80,12 +80,18 @@ export function VRCamera({
   }, [field.ref]);
 
   // ── Start/stop camera stream ──────────────────────────────────────
-  const startStream = useCallback(async () => {
+  const startStream = useCallback(async (isCancelled: () => boolean) => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode },
         audio: false,
       });
+      
+      if (isCancelled()) {
+        stream.getTracks().forEach((t) => t.stop());
+        return;
+      }
+
       streamRef.current = stream;
 
       if (videoRef.current) {
@@ -111,12 +117,14 @@ export function VRCamera({
     }
   }, []);
 
-  // ── Auto-start stream when in streaming mode ──────────────────────
   useEffect(() => {
+    let isCancelled = false;
+    
     if (mode === 'streaming' && !disabled) {
-      startStream();
+      startStream(() => isCancelled);
     }
     return () => {
+      isCancelled = true;
       stopStream();
     };
   }, [mode, disabled, startStream, stopStream]);

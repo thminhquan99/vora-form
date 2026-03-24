@@ -14,14 +14,14 @@
 - [ ] **Store Desync Assertions:** Automated tests must rigorously assert that the raw, native mathematical pixel offsets flawlessly translate and synchronize into the underlying `FormStore` state without reconciliation delay.
 
 ### Memory Management & React 18 StrictMode
-- [ ] **Hardware Track Disposal:** While `VRImageCropper` successfully handles `URL.revokeObjectURL`, a repository-wide lifecycle audit is mandated to ensure that WebRTC streams (`VRCamera`), polling intervals (`VRQRScanner`), and complex `AudioContext` structures (`VRAudioRecorder`) are explicitly destroyed upon aggressive component unmounting.
-- [ ] **Double-Mount Safety:** Ensure all asynchronous `requestAnimationFrame` polling loops and hardware initializations are idempotent and safely handle React 18 StrictMode double-invocation paradigms.
+- [x] **Hardware Track Disposal:** While `VRImageCropper` successfully handles `URL.revokeObjectURL`, a repository-wide lifecycle audit is mandated to ensure that WebRTC streams (`VRCamera`), polling intervals (`VRQRScanner`), and complex `AudioContext` structures (`VRAudioRecorder`) are explicitly destroyed upon aggressive component unmounting.
+- [x] **Double-Mount Safety:** Ensure all asynchronous `requestAnimationFrame` polling loops and hardware initializations are idempotent and safely handle React 18 StrictMode double-invocation paradigms.
 
 
 ## 2. 🟡 MODERATE (Architecture & Refactoring)
 
 ### Snapshot Pattern Refactoring
-- [ ] **`useInitialSnapshot` Extraction:** Advanced DOM-driven components rigidly bypass exhaustive dependency arrays using `const initialValueRef = useRef(field.value)`. This repetitive pattern must be explicitly abstracted into a core registry hook (e.g., `useInitialSnapshot`) to aggressively DRY the source code.
+- [x] **`useInitialSnapshot` Extraction:** Advanced DOM-driven components rigidly bypass exhaustive dependency arrays using `const initialValueRef = useRef(field.value)`. This repetitive pattern must be explicitly abstracted into a core registry hook (e.g., `useInitialSnapshot`) to aggressively DRY the source code.
 
 ### Deep Equal Optimization
 - [ ] **`isDeepEqual` Hardening:** The internal deep equality utility driving the `FormStore` dirty-tracking matrix remains unproven at scale. It must be rigorously execution-tested against extreme cyclic self-referencing objects and ultra-massive, deeply nested `File` arrays to categorically prevent "Maximum call stack size exceeded" exceptions on submission.

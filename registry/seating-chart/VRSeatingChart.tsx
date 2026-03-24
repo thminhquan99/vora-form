@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useEffect, useCallback } from 'react';
-import { useVoraField } from '@vora/core';
+import { useVoraField, useInitialSnapshot } from '@vora/core';
 import { VRLabel } from '../label';
 import { VRFieldError } from '../field-error';
 import type { VRSeatingChartProps } from './types';
@@ -23,10 +23,10 @@ export function VRSeatingChart({
   const mapRef = useRef<HTMLDivElement>(null);
 
   // Snapshot initialization ensuring we don't trap stale closures
-  const initialValueRef = useRef(field.value);
+  const initialValue = useInitialSnapshot(field.value);
 
   // Track selected IDs without triggering React state
-  const selectedRef = useRef<string[]>(Array.isArray(initialValueRef.current) ? [...initialValueRef.current] : []);
+  const selectedRef = useRef<string[]>(Array.isArray(initialValue) ? [...initialValue] : []);
 
   // Pan / Zoom Native State
   const transformRef = useRef({ x: 0, y: 0, scale: 1 });

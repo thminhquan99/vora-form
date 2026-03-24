@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useEffect, useCallback } from 'react';
-import { useVoraField } from '@vora/core';
+import { useVoraField, useInitialSnapshot } from '@vora/core';
 import { VRLabel } from '../label';
 import { VRFieldError } from '../field-error';
 import type { VRImageCropperProps, ImageCropData } from './types';
@@ -145,11 +145,11 @@ export function VRImageCropper({
   }, [redraw]);
 
   // Snapshot Pattern to prevent triggering on every commitToStore
-  const initialValueRef = useRef(field.value);
+  const initialValue = useInitialSnapshot(field.value);
 
   // Load image heavily based on field.value init
   useEffect(() => {
-    const initVal = initialValueRef.current;
+    const initVal = initialValue;
     if (initVal?.originalUrl && !imgRef.current) {
       const loadImg = new Image();
       loadImg.crossOrigin = 'anonymous'; // Prevent Tainted Canvas / CORS

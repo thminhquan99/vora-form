@@ -127,7 +127,7 @@ export function VRQRScanner({
     }
   }, []);
 
-  const startScan = useCallback(async () => {
+  const startScan = useCallback(async (isCancelled: () => boolean) => {
     if (!isSupported || !detectorRef.current) return;
 
     try {
@@ -135,6 +135,12 @@ export function VRQRScanner({
         video: { facingMode },
         audio: false,
       });
+      
+      if (isCancelled()) {
+        stream.getTracks().forEach((t) => t.stop());
+        return;
+      }
+
       streamRef.current = stream;
 
       const video = videoRef.current;
@@ -148,11 +154,15 @@ export function VRQRScanner({
         if (err.name === 'AbortError') return;
         throw err;
       }
+      
+      if (isCancelled()) return;
 
       // ── Detection loop (rAF — zero React) ───────────────────────
       const detector = detectorRef.current;
 
       const scan = async () => {
+        if (isCancelled()) return;
+
         if (!video || video.readyState < 2) {
           rafRef.current = requestAnimationFrame(scan);
           return;
@@ -172,7 +182,9 @@ export function VRQRScanner({
           // Detection failed for this frame — continue scanning
         }
 
-        rafRef.current = requestAnimationFrame(scan);
+        if (!isCancelled()) {
+          rafRef.current = requestAnimationFrame(scan);
+        }
       };
 
       rafRef.current = requestAnimationFrame(scan);
@@ -181,12 +193,14 @@ export function VRQRScanner({
     }
   }, [facingMode, isSupported, field, stopStream]);
 
-  // ── Auto-start scan when in scanning mode ─────────────────────────
   useEffect(() => {
+    let isCancelled = false;
+    
     if (mode === 'scanning' && !disabled && isSupported) {
-      startScan();
+      startScan(() => isCancelled);
     }
     return () => {
+      isCancelled = true;
       stopStream();
     };
   }, [mode, disabled, isSupported, startScan, stopStream]);

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useState, useEffect, useCallback } from 'react';
-import { useVoraField } from '@vora/core';
+import { useVoraField, useInitialSnapshot } from '@vora/core';
 import { VRLabel } from '../label';
 import { VRFieldError } from '../field-error';
 import type { VoraFormulaProps, FormulaVariable } from './types';
@@ -28,11 +28,11 @@ export function VRFormula({
   const savedRange = useRef<Range | null>(null);
 
   // Snapshot Pattern: Initialize exactly once
-  const initialValueRef = useRef(field.value);
+  const initialValue = useInitialSnapshot(field.value);
 
   useEffect(() => {
-    if (editorRef.current && initialValueRef.current) {
-      editorRef.current.innerHTML = initialValueRef.current;
+    if (editorRef.current && initialValue) {
+      editorRef.current.innerHTML = initialValue;
     }
   }, []);
 

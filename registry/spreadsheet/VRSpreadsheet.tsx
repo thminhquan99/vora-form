@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useEffect, useCallback } from 'react';
-import { useVoraField } from '@vora/core';
+import { useVoraField, useInitialSnapshot } from '@vora/core';
 import { VRLabel } from '../label';
 import { VRFieldError } from '../field-error';
 import type { VRSpreadsheetProps } from './types';
@@ -20,14 +20,14 @@ export function VRSpreadsheet({
   const inputId = id ?? name;
 
   // Snapshot Pattern: Initialize exactly once
-  const initialValueRef = useRef(field.value);
+  const initialValue = useInitialSnapshot(field.value);
 
   // Local mutable domain state bridging bypasses React rendering entirely
   const matrixRef = useRef<string[][]>(Array.from({ length: rows }, () => Array(cols).fill('')));
 
   // Read snapshot exactly once on mount
   useEffect(() => {
-    const initData = initialValueRef.current;
+    const initData = initialValue;
     if (initData && Array.isArray(initData)) {
       for (let r = 0; r < Math.min(rows, initData.length); r++) {
         if (!initData[r]) continue;
@@ -136,7 +136,7 @@ export function VRSpreadsheet({
                   onKeyDown={(e) => handleKeyDown(e, r, c)}
                   onPaste={(e) => handlePaste(e, r, c)}
                   // Uncontrolled natively
-                  defaultValue={initialValueRef.current?.[r]?.[c] || ''}
+                  defaultValue={initialValue?.[r]?.[c] || ''}
                   aria-label={`Cell ${r}, ${c}`}
                 />
               </div>
