@@ -73,6 +73,8 @@
  * ```
  */
 
+import { isDeepEqual } from './is-equal';
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 /**
@@ -702,27 +704,9 @@ export class FormStore {
     for (const [path, currentValue] of this.values) {
       const initialValue = this.initialValues.get(path);
 
-      // Fast path: strict equality for primitives (string, number, boolean)
-      if (currentValue === initialValue) continue;
-
-      // Slow path: deep comparison for objects/arrays
-      if (
-        typeof currentValue === 'object' &&
-        currentValue !== null &&
-        typeof initialValue === 'object' &&
-        initialValue !== null
-      ) {
-        try {
-          if (JSON.stringify(currentValue) === JSON.stringify(initialValue)) {
-            continue;
-          }
-        } catch {
-          // If JSON.stringify fails (e.g., circular refs, File objects),
-          // treat as dirty (already !== by reference)
-        }
+      if (!isDeepEqual(currentValue, initialValue)) {
+        result[path] = currentValue;
       }
-
-      result[path] = currentValue;
     }
 
     return result;
