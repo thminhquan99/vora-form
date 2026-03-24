@@ -43,6 +43,8 @@ import { PaulyDatePicker } from '../../../registry/datepicker';
 import { PaulySlider } from '../../../registry/slider';
 import { PaulyOTPInput } from '../../../registry/otp';
 import { PaulyRating } from '../../../registry/rating';
+import { PaulyTagInput } from '../../../registry/tag-input';
+import { PaulyPasswordInput } from '../../../registry/password-input';
 
 // ─── Zod Schema ───────────────────────────────────────────────────────────────
 
@@ -103,6 +105,8 @@ const registrationSchema = z.object({
     .optional(),
   timezone: z.string().min(1, 'Please select a timezone'),
   expectedSalary: z.string().min(1, 'Salary is required'),
+  password: z.string().min(8, 'Password must be at least 8 characters'),
+  skills: z.array(z.string()).min(1, 'Add at least one skill').optional(),
   dateOfBirth: z
     .string()
     .min(1, 'Date of birth is required')
@@ -681,6 +685,23 @@ export default function App() {
                   placeholder="john@example.com"
                   type="email"
                   required
+                />
+              </FieldWithCounter>
+
+              <FieldWithCounter name="password">
+                <PaulyPasswordInput
+                  name="password"
+                  label="Password"
+                  showStrengthMeter
+                  required
+                />
+              </FieldWithCounter>
+
+              <FieldWithCounter name="skills">
+                <PaulyTagInput
+                  name="skills"
+                  label="Skills"
+                  placeholder="Type a skill and press Enter"
                 />
               </FieldWithCounter>
 

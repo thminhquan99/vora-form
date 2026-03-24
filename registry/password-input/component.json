@@ -1,0 +1,20 @@
+{
+  "name": "password-input",
+  "displayName": "PaulyPasswordInput",
+  "description": "Password input with toggle visibility and zero re-render strength meter.",
+  "category": "input",
+  "files": [
+    "PaulyPasswordInput.tsx",
+    "PaulyPasswordInput.module.css",
+    "types.ts",
+    "index.ts"
+  ],
+  "dependencies": {
+    "internal": ["label", "field-error"],
+    "external": ["@pauly/core"]
+  },
+  "exports": {
+    "components": ["PaulyPasswordInput"],
+    "types": ["PaulyPasswordInputProps"]
+  }
+}
