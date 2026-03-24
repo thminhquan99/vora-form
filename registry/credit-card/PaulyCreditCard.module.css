@@ -1,0 +1,52 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.icon {
+  position: absolute;
+  left: 12px;
+  color: #9ca3af;
+  pointer-events: none;
+}
+
+.input {
+  width: 100%;
+  padding: 10px 14px 10px 40px;
+  border: var(--pauly-input-border-width, 1.5px) solid var(--pauly-input-border-color, #d1d5db);
+  border-radius: var(--pauly-input-border-radius, 8px);
+  background-color: var(--pauly-input-bg, #ffffff);
+  color: var(--pauly-input-text, #111827);
+  font-family: monospace;
+  font-size: 1rem;
+  letter-spacing: 0.5px;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.input:focus {
+  border-color: var(--pauly-ring-color, #3b82f6);
+  box-shadow: 0 0 0 var(--pauly-ring-width, 3px) rgba(59, 130, 246, 0.15);
+}
+
+.inputError {
+  border-color: var(--pauly-error-color, #ef4444);
+}
+
+.inputError:focus {
+  border-color: var(--pauly-error-color, #ef4444);
+  box-shadow: 0 0 0 var(--pauly-ring-width, 3px) rgba(239, 68, 68, 0.15);
+}
+
+.input:disabled {
+  background-color: var(--pauly-input-disabled-bg, #f9fafb);
+  cursor: not-allowed;
+  opacity: 0.7;
+}

@@ -47,6 +47,9 @@ import { PaulyTagInput } from '../../../registry/tag-input';
 import { PaulyPasswordInput } from '../../../registry/password-input';
 import { PaulyTransferList } from '../../../registry/transfer-list';
 import { PaulyKeyValue } from '../../../registry/key-value';
+import { PaulyTreeSelect } from '../../../registry/tree-select';
+import { PaulyCreditCard } from '../../../registry/credit-card';
+import { PaulyMentions } from '../../../registry/mentions';
 
 // ─── Zod Schema ───────────────────────────────────────────────────────────────
 
@@ -123,7 +126,37 @@ const registrationSchema = z.object({
   appRating: z.number().min(1, 'Please rate us').max(5).optional(),
   permissions: z.array(z.string()).optional(),
   envVars: z.array(z.object({ key: z.string(), value: z.string() })).optional(),
+  productCategories: z.array(z.string()).optional(),
+  creditCard: z.string().optional(),
+  feedback: z.string().optional(),
 });
+
+const categoryTreeOptions = [
+  {
+    label: 'Clothing',
+    value: 'clothing',
+    children: [
+      { label: 'Mens', value: 'mens' },
+      { label: 'Womens', value: 'womens' },
+      { label: 'Kids', value: 'kids' },
+    ],
+  },
+  {
+    label: 'Electronics',
+    value: 'electronics',
+    children: [
+      { label: 'Phones', value: 'phones' },
+      { label: 'Laptops', value: 'laptops' },
+    ],
+  },
+];
+
+const mentionUsers = [
+  { id: '1', name: 'Alice' },
+  { id: '2', name: 'Bob' },
+  { id: '3', name: 'Charlie' },
+  { id: '4', name: 'David' },
+];
 
 const permissionOptions = [
   { label: 'Read Users', value: 'users:read' },
@@ -819,6 +852,29 @@ export default function App() {
                 <PaulyKeyValue
                   name="envVars"
                   label="Environment Variables"
+                />
+              </FieldWithCounter>
+
+              <FieldWithCounter name="productCategories">
+                <PaulyTreeSelect
+                  name="productCategories"
+                  label="Product Categories"
+                  data={categoryTreeOptions}
+                />
+              </FieldWithCounter>
+
+              <FieldWithCounter name="creditCard">
+                <PaulyCreditCard
+                  name="creditCard"
+                  label="Payment Method"
+                />
+              </FieldWithCounter>
+
+              <FieldWithCounter name="feedback">
+                <PaulyMentions
+                  name="feedback"
+                  label="Feedback with @mentions"
+                  users={mentionUsers}
                 />
               </FieldWithCounter>
 

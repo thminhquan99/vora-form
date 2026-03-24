@@ -1,0 +1,80 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.treeContainer {
+  border: var(--pauly-input-border-width, 1.5px) solid var(--pauly-input-border-color, #d1d5db);
+  border-radius: var(--pauly-input-border-radius, 8px);
+  background-color: var(--pauly-input-bg, #ffffff);
+  padding: 12px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.treeNode {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.nodeContent {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  user-select: none;
+}
+
+.nodeContent:hover {
+  background-color: #f3f4f6;
+}
+
+.disabled {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.checkbox {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--pauly-ring-color, #3b82f6);
+  cursor: pointer;
+}
+
+.label {
+  font-size: 0.875rem;
+  color: #111827;
+}
+
+.childrenGroup {
+  margin-left: 24px;
+  border-left: 1px dashed #e5e7eb;
+  padding-left: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.expandIcon {
+  width: 16px;
+  height: 16px;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+.expanded {
+  transform: rotate(90deg);
+}
+
+.spacer {
+  width: 16px;
+  height: 16px;
+}

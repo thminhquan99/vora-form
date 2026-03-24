@@ -1,0 +1,20 @@
+{
+  "name": "credit-card",
+  "displayName": "PaulyCreditCard",
+  "description": "A masked input specifically formatted for credit card numbers with Amex support.",
+  "category": "input",
+  "files": [
+    "PaulyCreditCard.tsx",
+    "PaulyCreditCard.module.css",
+    "types.ts",
+    "index.ts"
+  ],
+  "dependencies": {
+    "internal": ["label", "field-error"],
+    "external": ["@pauly/core"]
+  },
+  "exports": {
+    "components": ["PaulyCreditCard"],
+    "types": ["PaulyCreditCardProps"]
+  }
+}

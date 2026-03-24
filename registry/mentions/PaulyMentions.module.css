@@ -1,0 +1,60 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+}
+
+.textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 12px;
+  border: var(--pauly-input-border-width, 1.5px) solid var(--pauly-input-border-color, #d1d5db);
+  border-radius: var(--pauly-input-border-radius, 8px);
+  background-color: var(--pauly-input-bg, #ffffff);
+  color: var(--pauly-input-text, #111827);
+  font-family: inherit;
+  font-size: 0.875rem;
+  resize: vertical;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.textarea:focus {
+  border-color: var(--pauly-ring-color, #3b82f6);
+  box-shadow: 0 0 0 var(--pauly-ring-width, 3px) rgba(59, 130, 246, 0.15);
+}
+
+.dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  max-width: 300px;
+  max-height: 200px;
+  overflow-y: auto;
+  background-color: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  z-index: 50;
+  margin-top: 4px;
+  display: flex;
+  flex-direction: column;
+}
+
+.dropdownItem {
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: #111827;
+  transition: background-color 0.15s ease;
+  text-align: left;
+  background: transparent;
+  border: none;
+}
+
+.dropdownItem:hover, .dropdownItem:focus {
+  background-color: #f3f4f6;
+  outline: none;
+}

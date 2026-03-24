@@ -1,0 +1,20 @@
+{
+  "name": "mentions",
+  "displayName": "PaulyMentions",
+  "description": "A lightweight textarea that supports Twitter-style @mentions with a dropdown.",
+  "category": "input",
+  "files": [
+    "PaulyMentions.tsx",
+    "PaulyMentions.module.css",
+    "types.ts",
+    "index.ts"
+  ],
+  "dependencies": {
+    "internal": ["label", "field-error"],
+    "external": ["@pauly/core"]
+  },
+  "exports": {
+    "components": ["PaulyMentions"],
+    "types": ["PaulyMentionsProps", "PaulyMentionUser"]
+  }
+}
