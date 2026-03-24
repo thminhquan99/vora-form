@@ -50,6 +50,7 @@ import { PaulyKeyValue } from '../../../registry/key-value';
 import { PaulyTreeSelect } from '../../../registry/tree-select';
 import { PaulyCreditCard } from '../../../registry/credit-card';
 import { PaulyMentions } from '../../../registry/mentions';
+import { PaulyWidgetBuilder } from '../../../registry/widget-builder';
 
 // ─── Zod Schema ───────────────────────────────────────────────────────────────
 
@@ -129,6 +130,7 @@ const registrationSchema = z.object({
   productCategories: z.array(z.string()).optional(),
   creditCard: z.string().optional(),
   feedback: z.string().optional(),
+  customLayout: z.any().optional(),
 });
 
 const categoryTreeOptions = [
@@ -549,7 +551,7 @@ function WorkExperienceTable() {
 // ─── App ──────────────────────────────────────────────────────────────────────
 
 export default function App() {
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(2);
 
   const handleSubmit = (values: Record<string, unknown>, store: import('@pauly/core').FormStore) => {
     const dirtyValues = store.getDirtyValues();
@@ -875,6 +877,13 @@ export default function App() {
                   name="feedback"
                   label="Feedback with @mentions"
                   users={mentionUsers}
+                />
+              </FieldWithCounter>
+
+              <FieldWithCounter name="customLayout">
+                <PaulyWidgetBuilder
+                  name="customLayout"
+                  label="Custom Dashboard Layout"
                 />
               </FieldWithCounter>
 
