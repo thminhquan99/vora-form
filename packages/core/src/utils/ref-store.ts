@@ -260,6 +260,12 @@ export class FormStore {
         element.type === 'checkbox'
       ) {
         this.values.set(path, element.checked);
+      } else if (
+        element instanceof HTMLInputElement &&
+        (element.type === 'range' || element.type === 'number')
+      ) {
+        // Range / Number inputs — store as JavaScript number, not string
+        this.values.set(path, Number(element.value));
       } else {
         this.values.set(path, element.value);
       }
@@ -280,19 +286,22 @@ export class FormStore {
    * - DOM ref from `refs`
    * - Domain value from `values`
    * - Error message from `errors`
-   * - All listeners (value + error) for the field path
+   * - All listeners (value + error + input + touched) for the field path
    *
-   * Called automatically by the cleanup function returned from
-   * `registerField()`, or manually if needed.
+   * **IMPORTANT**: Values, errors, initialValues, and touched state are
+   * intentionally PRESERVED. This allows multi-step forms to unmount
+   * fields without losing their data. When the field re-mounts (e.g.,
+   * user navigates back to a previous step), `registerField` will
+   * re-attach the ref and the existing store data will be used as
+   * `defaultValue`.
    *
    * @param path - The field path to unregister
    */
   unregisterField(path: string): void {
+    // Only remove the DOM ref — data stays in the store
     this.refs.delete(path);
-    this.values.delete(path);
-    this.errors.delete(path);
-    this.initialValues.delete(path);
-    this.touched.delete(path);
+
+    // Remove listeners to prevent stale subscriptions
     this.listeners.delete(this.listenerKey(path, 'value'));
     this.listeners.delete(this.listenerKey(path, 'error'));
     this.listeners.delete(this.listenerKey(path, 'input'));

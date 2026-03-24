@@ -17,7 +17,7 @@
  * for array state). Cross-field isolation is always maintained.
  */
 
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { z } from 'zod';
 import { PaulyForm, createZodAdapter, useAsyncValidation, useFormCore, usePaulyField } from '@pauly/core';
 import { PaulyText } from '../../../registry/text-input';
@@ -40,6 +40,7 @@ import { PaulyDropzone } from '../../../registry/dropzone';
 import { PaulyCombobox } from '../../../registry/combobox';
 import { PaulyMaskedInput } from '../../../registry/masked-input';
 import { PaulyDatePicker } from '../../../registry/datepicker';
+import { PaulySlider } from '../../../registry/slider';
 
 // ─── Zod Schema ───────────────────────────────────────────────────────────────
 
@@ -109,6 +110,7 @@ const registrationSchema = z.object({
         new Date(new Date().setFullYear(new Date().getFullYear() - 18)),
       'Must be at least 18 years old'
     ),
+  satisfaction: z.number().min(0).max(100).default(50),
 });
 
 const roleOptions = [
@@ -492,6 +494,8 @@ function WorkExperienceTable() {
 // ─── App ──────────────────────────────────────────────────────────────────────
 
 export default function App() {
+  const [step, setStep] = useState(1);
+
   const handleSubmit = (values: Record<string, unknown>, store: import('@pauly/core').FormStore) => {
     const dirtyValues = store.getDirtyValues();
     console.log('✅ Form submitted successfully!');
@@ -580,225 +584,346 @@ export default function App() {
           re-render (counter increments by 1).
         </div>
 
+        {/* ── Step Indicator ──────────────────────────────────────────── */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '12px',
+            marginBottom: '24px',
+          }}
+        >
+          {[1, 2].map((s) => (
+            <div
+              key={s}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+              }}
+            >
+              <div
+                style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: 700,
+                  fontSize: '0.875rem',
+                  backgroundColor: step >= s ? '#3b82f6' : '#e5e7eb',
+                  color: step >= s ? '#fff' : '#9ca3af',
+                  transition: 'all 0.2s ease',
+                }}
+              >
+                {s}
+              </div>
+              <span
+                style={{
+                  fontSize: '0.8rem',
+                  fontWeight: step === s ? 600 : 400,
+                  color: step === s ? '#111827' : '#9ca3af',
+                }}
+              >
+                {s === 1 ? 'Personal Info' : 'Preferences'}
+              </span>
+              {s < 2 && (
+                <div
+                  style={{
+                    width: 40,
+                    height: 2,
+                    backgroundColor: step > 1 ? '#3b82f6' : '#e5e7eb',
+                    transition: 'background-color 0.2s ease',
+                  }}
+                />
+              )}
+            </div>
+          ))}
+        </div>
+
         {/* ── Form ───────────────────────────────────────────────────── */}
         <PaulyForm validate={validate} onSubmit={handleSubmit}>
-          {/* ── Text Inputs (uncontrolled, zero re-renders) ─────── */}
-          <FieldWithCounter name="firstName">
-            <PaulyText
-              name="firstName"
-              label="First Name"
-              placeholder="John"
-              required
-            />
-          </FieldWithCounter>
+          {/* ══════════════ STEP 1: Personal Info ══════════════ */}
+          {step === 1 && (
+            <>
+              <FieldWithCounter name="firstName">
+                <PaulyText
+                  name="firstName"
+                  label="First Name"
+                  placeholder="John"
+                  required
+                />
+              </FieldWithCounter>
 
-          <FieldWithCounter name="lastName">
-            <PaulyText
-              name="lastName"
-              label="Last Name"
-              placeholder="Doe"
-              required
-            />
-          </FieldWithCounter>
+              <FieldWithCounter name="lastName">
+                <PaulyText
+                  name="lastName"
+                  label="Last Name"
+                  placeholder="Doe"
+                  required
+                />
+              </FieldWithCounter>
 
-          {/* ── Username (debounced async validation) ───────────── */}
-          <FieldWithCounter name="username">
-            <UsernameField />
-          </FieldWithCounter>
+              <FieldWithCounter name="username">
+                <UsernameField />
+              </FieldWithCounter>
 
-          <FieldWithCounter name="email">
-            <PaulyText
-              name="email"
-              label="Email"
-              placeholder="john@example.com"
-              type="email"
-              required
-            />
-          </FieldWithCounter>
+              <FieldWithCounter name="email">
+                <PaulyText
+                  name="email"
+                  label="Email"
+                  placeholder="john@example.com"
+                  type="email"
+                  required
+                />
+              </FieldWithCounter>
 
-          {/* ── Date of Birth (native date picker) ────────────── */}
-          <FieldWithCounter name="dateOfBirth">
-            <PaulyDatePicker
-              name="dateOfBirth"
-              label="Date of Birth"
-              max="2008-01-01"
-              required
-            />
-          </FieldWithCounter>
-          <FieldWithCounter name="bio">
-            <PaulyTextarea
-              name="bio"
-              label="Biography"
-              placeholder="Tell us about yourself..."
-              rows={3}
-            />
-          </FieldWithCounter>
+              <FieldWithCounter name="dateOfBirth">
+                <PaulyDatePicker
+                  name="dateOfBirth"
+                  label="Date of Birth"
+                  max="2008-01-01"
+                  required
+                />
+              </FieldWithCounter>
 
-          {/* ── Formatted Salary (masked input, zero re-renders) ── */}
-          <FieldWithCounter name="expectedSalary">
-            <PaulyMaskedInput
-              name="expectedSalary"
-              label="Expected Salary (VND)"
-              formatter={formatCurrency}
-              placeholder="e.g. 10,000,000"
-              required
-            />
-          </FieldWithCounter>
+              <FieldWithCounter name="bio">
+                <PaulyTextarea
+                  name="bio"
+                  label="Biography"
+                  placeholder="Tell us about yourself..."
+                  rows={3}
+                />
+              </FieldWithCounter>
 
-          {/* ── Cascading Country → City ──────────────────────── */}
-          <CountryCityGroup />
+              <FieldWithCounter name="expectedSalary">
+                <PaulyMaskedInput
+                  name="expectedSalary"
+                  label="Expected Salary (VND)"
+                  formatter={formatCurrency}
+                  placeholder="e.g. 10,000,000"
+                  required
+                />
+              </FieldWithCounter>
 
-          <FieldWithCounter name="timezone">
-            <PaulyCombobox
-              name="timezone"
-              label="Timezone"
-              options={timezoneOptions}
-              placeholder="Select timezone..."
-              searchPlaceholder="Search timezones..."
-              emptyText="No timezone found."
-              required
-            />
-          </FieldWithCounter>
+              <CountryCityGroup />
 
-          <FieldWithCounter name="plan">
-            <PaulyRadioGroup
-              name="plan"
-              label="Subscription Plan"
-              options={[
-                { label: 'Free', value: 'free' },
-                { label: 'Pro', value: 'pro' },
-                { label: 'Enterprise', value: 'enterprise' },
-              ]}
-              required
-            />
-          </FieldWithCounter>
+              <FieldWithCounter name="timezone">
+                <PaulyCombobox
+                  name="timezone"
+                  label="Timezone"
+                  options={timezoneOptions}
+                  placeholder="Select timezone..."
+                  searchPlaceholder="Search timezones..."
+                  emptyText="No timezone found."
+                  required
+                />
+              </FieldWithCounter>
+            </>
+          )}
 
-          {/* ── Separator ─────────────────────────────────────────── */}
-          <hr style={{ border: 'none', borderTop: '1px solid #e5e7eb', margin: '8px 0 20px' }} />
+          {/* ══════════════ STEP 2: Preferences ══════════════ */}
+          {step === 2 && (
+            <>
+              {/* ── Satisfaction Slider ─────────────────────────── */}
+              <FieldWithCounter name="satisfaction">
+                <PaulySlider
+                  name="satisfaction"
+                  label="Expected Satisfaction (0–100)"
+                  min={0}
+                  max={100}
+                  step={1}
+                />
+              </FieldWithCounter>
 
-          {/* ── Single Checkbox (uncontrolled, zero re-renders) ──── */}
-          <FieldWithCounter name="acceptTerms">
-            <PaulyCheckbox
-              name="acceptTerms"
-              label="I accept the terms and conditions"
-              required
-            />
-          </FieldWithCounter>
+              <FieldWithCounter name="plan">
+                <PaulyRadioGroup
+                  name="plan"
+                  label="Subscription Plan"
+                  options={[
+                    { label: 'Free', value: 'free' },
+                    { label: 'Pro', value: 'pro' },
+                    { label: 'Enterprise', value: 'enterprise' },
+                  ]}
+                  required
+                />
+              </FieldWithCounter>
 
-          {/* ── Checkbox Group (composite, re-renders on toggle) ─── */}
-          <FieldWithCounter name="roles">
-            <PaulyCheckboxGroup
-              name="roles"
-              label="Select Roles"
-              options={roleOptions}
-              required
-            />
-          </FieldWithCounter>
+              <hr style={{ border: 'none', borderTop: '1px solid #e5e7eb', margin: '8px 0 20px' }} />
 
-          {/* ── Conditional Section (dynamic mount/unmount) ─────── */}
-          <FieldWithCounter name="hasReason">
-            <PaulyCheckbox
-              name="hasReason"
-              label="I have a specific reason"
-            />
-          </FieldWithCounter>
+              <FieldWithCounter name="acceptTerms">
+                <PaulyCheckbox
+                  name="acceptTerms"
+                  label="I accept the terms and conditions"
+                  required
+                />
+              </FieldWithCounter>
 
-          <PaulyConditional
-            watch="hasReason"
-            condition={(val) => val === true}
-          >
-            <FieldWithCounter name="reason">
-              <PaulyText
-                name="reason"
-                label="Why?"
-              />
-            </FieldWithCounter>
-          </PaulyConditional>
+              <FieldWithCounter name="roles">
+                <PaulyCheckboxGroup
+                  name="roles"
+                  label="Select Roles"
+                  options={roleOptions}
+                  required
+                />
+              </FieldWithCounter>
 
-          {/* ── Separator ─────────────────────────────────────────── */}
-          <hr style={{ border: 'none', borderTop: '1px solid #e5e7eb', margin: '8px 0 20px' }} />
+              <FieldWithCounter name="hasReason">
+                <PaulyCheckbox
+                  name="hasReason"
+                  label="I have a specific reason"
+                />
+              </FieldWithCounter>
 
-          {/* ── Signature Pad (canvas, zero re-renders during draw) ─ */}
-          <FieldWithCounter name="signature">
-            <PaulySignature
-              name="signature"
-              label="Sign Here"
-              required
-            />
-          </FieldWithCounter>
+              <PaulyConditional
+                watch="hasReason"
+                condition={(val) => val === true}
+              >
+                <FieldWithCounter name="reason">
+                  <PaulyText
+                    name="reason"
+                    label="Why?"
+                  />
+                </FieldWithCounter>
+              </PaulyConditional>
 
-          {/* ── Separator ─────────────────────────────────────────── */}
-          <hr style={{ border: 'none', borderTop: '1px solid #e5e7eb', margin: '8px 0 20px' }} />
+              <hr style={{ border: 'none', borderTop: '1px solid #e5e7eb', margin: '8px 0 20px' }} />
 
-          {/* ── Camera (getUserMedia, zero re-renders during stream) ─ */}
-          <FieldWithCounter name="avatar">
-            <PaulyCamera
-              name="avatar"
-              label="Take a Selfie"
-            />
-          </FieldWithCounter>
+              <FieldWithCounter name="signature">
+                <PaulySignature
+                  name="signature"
+                  label="Sign Here"
+                  required
+                />
+              </FieldWithCounter>
 
-          {/* ── QR Scanner (BarcodeDetector + rAF loop) ──────────── */}
-          <FieldWithCounter name="promoCodeQR">
-            <PaulyQRScanner
-              name="promoCodeQR"
-              label="Scan Promo QR"
-            />
-          </FieldWithCounter>
+              <hr style={{ border: 'none', borderTop: '1px solid #e5e7eb', margin: '8px 0 20px' }} />
 
-          {/* ── Separator ─────────────────────────────────────────── */}
-          <hr style={{ border: 'none', borderTop: '1px solid #e5e7eb', margin: '8px 0 20px' }} />
+              <FieldWithCounter name="avatar">
+                <PaulyCamera
+                  name="avatar"
+                  label="Take a Selfie"
+                />
+              </FieldWithCounter>
 
-          {/* ── Work Experience Table (array editing, row isolation) ─ */}
-          <WorkExperienceTable />
+              <FieldWithCounter name="promoCodeQR">
+                <PaulyQRScanner
+                  name="promoCodeQR"
+                  label="Scan Promo QR"
+                />
+              </FieldWithCounter>
 
-          {/* ── Separator ─────────────────────────────────────────── */}
-          <hr style={{ border: 'none', borderTop: '1px solid #e5e7eb', margin: '8px 0 20px' }} />
+              <hr style={{ border: 'none', borderTop: '1px solid #e5e7eb', margin: '8px 0 20px' }} />
 
-          {/* ── Switch Toggle ─────────────────────────────────────── */}
-          <FieldWithCounter name="marketingEmails">
-            <PaulySwitch
-              name="marketingEmails"
-              label="Receive marketing emails"
-            />
-          </FieldWithCounter>
+              <WorkExperienceTable />
 
-          {/* ── Dropzone ──────────────────────────────────────────── */}
-          <FieldWithCounter name="portfolioFiles">
-            <PaulyDropzone
-              name="portfolioFiles"
-              label="Upload Portfolio"
-              accept="image/*,.pdf"
-              maxFiles={3}
-              required
-            />
-          </FieldWithCounter>
+              <hr style={{ border: 'none', borderTop: '1px solid #e5e7eb', margin: '8px 0 20px' }} />
 
-          {/* ── Submit Button ──────────────────────────────────────── */}
-          <button
-            type="submit"
+              <FieldWithCounter name="marketingEmails">
+                <PaulySwitch
+                  name="marketingEmails"
+                  label="Receive marketing emails"
+                />
+              </FieldWithCounter>
+
+              <FieldWithCounter name="portfolioFiles">
+                <PaulyDropzone
+                  name="portfolioFiles"
+                  label="Upload Portfolio"
+                  accept="image/*,.pdf"
+                  maxFiles={3}
+                />
+              </FieldWithCounter>
+            </>
+          )}
+
+          {/* ── Step Navigation ──────────────────────────────────── */}
+          <div
             style={{
-              width: '100%',
-              padding: '12px 24px',
-              marginTop: '8px',
-              backgroundColor: '#3b82f6',
-              color: '#ffffff',
-              border: 'none',
-              borderRadius: '8px',
-              fontSize: '0.9375rem',
-              fontWeight: 600,
-              cursor: 'pointer',
-              transition: 'background-color 0.15s ease',
+              display: 'flex',
+              gap: '12px',
+              marginTop: '16px',
             }}
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.backgroundColor = '#2563eb')
-            }
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.backgroundColor = '#3b82f6')
-            }
           >
-            Submit Registration
-          </button>
+            {step === 2 && (
+              <button
+                type="button"
+                onClick={() => setStep(1)}
+                style={{
+                  flex: 1,
+                  padding: '12px 24px',
+                  backgroundColor: '#f3f4f6',
+                  color: '#374151',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '8px',
+                  fontSize: '0.9375rem',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  transition: 'background-color 0.15s ease',
+                }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.backgroundColor = '#e5e7eb')
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.backgroundColor = '#f3f4f6')
+                }
+              >
+                ← Previous
+              </button>
+            )}
+            {step === 1 ? (
+              <button
+                type="button"
+                onClick={() => setStep(2)}
+                style={{
+                  flex: 1,
+                  padding: '12px 24px',
+                  backgroundColor: '#3b82f6',
+                  color: '#ffffff',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '0.9375rem',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  transition: 'background-color 0.15s ease',
+                }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.backgroundColor = '#2563eb')
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.backgroundColor = '#3b82f6')
+                }
+              >
+                Next →
+              </button>
+            ) : (
+              <button
+                type="submit"
+                style={{
+                  flex: 1,
+                  padding: '12px 24px',
+                  backgroundColor: '#059669',
+                  color: '#ffffff',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '0.9375rem',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  transition: 'background-color 0.15s ease',
+                }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.backgroundColor = '#047857')
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.backgroundColor = '#059669')
+                }
+              >
+                ✅ Submit Registration
+              </button>
+            )}
+          </div>
         </PaulyForm>
 
         {/* ── Legend ──────────────────────────────────────────────────── */}

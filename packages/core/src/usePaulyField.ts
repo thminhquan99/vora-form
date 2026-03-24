@@ -280,6 +280,9 @@ export function usePaulyField<TValue = unknown>(
       if (target.type === 'checkbox') {
         // Checkbox — use `.checked` (boolean), not `.value`
         store.setSilentValue(name, target.checked);
+      } else if (target.type === 'range' || target.type === 'number') {
+        // Range / Number — convert string to JavaScript number
+        store.setSilentValue(name, Number(target.value));
       } else {
         // Text / email / tel / url / textarea / select — use `.value`
         store.setSilentValue(name, target.value);
