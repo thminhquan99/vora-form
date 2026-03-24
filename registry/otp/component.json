@@ -1,0 +1,20 @@
+{
+  "name": "otp",
+  "displayName": "PaulyOTPInput",
+  "description": "OTP (One-Time-Password) input with auto-focus management, paste handling, and single-field store binding. Renders individual digit boxes.",
+  "category": "input",
+  "files": [
+    "PaulyOTPInput.tsx",
+    "PaulyOTPInput.module.css",
+    "types.ts",
+    "index.ts"
+  ],
+  "dependencies": {
+    "internal": ["label", "field-error"],
+    "external": ["@pauly/core"]
+  },
+  "exports": {
+    "components": ["PaulyOTPInput"],
+    "types": ["PaulyOTPInputProps"]
+  }
+}

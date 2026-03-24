@@ -1,0 +1,20 @@
+{
+  "name": "rating",
+  "displayName": "PaulyRating",
+  "description": "Star rating component with hover preview and FormStore integration. Stores selected rating as a number. Local hover state prevents cross-field re-renders.",
+  "category": "input",
+  "files": [
+    "PaulyRating.tsx",
+    "PaulyRating.module.css",
+    "types.ts",
+    "index.ts"
+  ],
+  "dependencies": {
+    "internal": ["label", "field-error"],
+    "external": ["@pauly/core"]
+  },
+  "exports": {
+    "components": ["PaulyRating"],
+    "types": ["PaulyRatingProps"]
+  }
+}

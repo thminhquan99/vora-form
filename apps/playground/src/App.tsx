@@ -41,6 +41,8 @@ import { PaulyCombobox } from '../../../registry/combobox';
 import { PaulyMaskedInput } from '../../../registry/masked-input';
 import { PaulyDatePicker } from '../../../registry/datepicker';
 import { PaulySlider } from '../../../registry/slider';
+import { PaulyOTPInput } from '../../../registry/otp';
+import { PaulyRating } from '../../../registry/rating';
 
 // ─── Zod Schema ───────────────────────────────────────────────────────────────
 
@@ -111,6 +113,8 @@ const registrationSchema = z.object({
       'Must be at least 18 years old'
     ),
   satisfaction: z.number().min(0).max(100).default(50),
+  otpCode: z.string().length(6, 'Must be exactly 6 digits').optional(),
+  appRating: z.number().min(1, 'Please rate us').max(5).optional(),
 });
 
 const roleOptions = [
@@ -738,6 +742,23 @@ export default function App() {
                 />
               </FieldWithCounter>
 
+              {/* ── OTP Input ─────────────────────────────────── */}
+              <FieldWithCounter name="otpCode">
+                <PaulyOTPInput
+                  name="otpCode"
+                  label="Verification Code (OTP)"
+                  length={6}
+                />
+              </FieldWithCounter>
+
+              {/* ── Star Rating ───────────────────────────────── */}
+              <FieldWithCounter name="appRating">
+                <PaulyRating
+                  name="appRating"
+                  label="Rate our App"
+                  max={5}
+                />
+              </FieldWithCounter>
               <FieldWithCounter name="plan">
                 <PaulyRadioGroup
                   name="plan"

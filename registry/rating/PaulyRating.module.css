@@ -1,0 +1,83 @@
+/* ─── PaulyRating ───────────────────────────────────────────────────────── */
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.starRow {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.star {
+  cursor: pointer;
+  padding: 2px;
+  border: none;
+  background: none;
+  outline: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: transform 0.15s ease;
+}
+
+.star:hover {
+  transform: scale(1.2);
+}
+
+.star:focus-visible {
+  box-shadow:
+    0 0 0 2px var(--pauly-ring-shadow-color, rgba(59, 130, 246, 0.3));
+}
+
+.star:active {
+  transform: scale(0.95);
+}
+
+.starIcon {
+  width: 28px;
+  height: 28px;
+  transition: fill 0.1s ease, stroke 0.1s ease;
+}
+
+.starEmpty {
+  fill: none;
+  stroke: var(--pauly-rating-empty-color, #d1d5db);
+  stroke-width: 1.5;
+}
+
+.starFilled {
+  fill: var(--pauly-rating-filled-color, #f59e0b);
+  stroke: var(--pauly-rating-filled-color, #f59e0b);
+  stroke-width: 1.5;
+}
+
+.starHovered {
+  fill: var(--pauly-rating-hover-color, #fbbf24);
+  stroke: var(--pauly-rating-hover-color, #fbbf24);
+  stroke-width: 1.5;
+}
+
+/* ── Value Label ────────────────────────────────────────────────────────── */
+.valueLabel {
+  margin-left: 8px;
+  font-family: var(--pauly-font-family, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--pauly-rating-filled-color, #f59e0b);
+  min-width: 24px;
+}
+
+/* ── Disabled State ─────────────────────────────────────────────────────── */
+.star:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.star:disabled:hover {
+  transform: none;
+}
