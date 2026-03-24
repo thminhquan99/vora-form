@@ -1,0 +1,20 @@
+{
+  "name": "key-value",
+  "displayName": "PaulyKeyValue",
+  "description": "Dynamic Key-Value dictionary builder leveraging FormStore path-based updates.",
+  "category": "input",
+  "files": [
+    "PaulyKeyValue.tsx",
+    "PaulyKeyValue.module.css",
+    "types.ts",
+    "index.ts"
+  ],
+  "dependencies": {
+    "internal": ["label", "field-error", "text"],
+    "external": ["@pauly/core"]
+  },
+  "exports": {
+    "components": ["PaulyKeyValue"],
+    "types": ["PaulyKeyValueProps"]
+  }
+}

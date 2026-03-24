@@ -45,6 +45,8 @@ import { PaulyOTPInput } from '../../../registry/otp';
 import { PaulyRating } from '../../../registry/rating';
 import { PaulyTagInput } from '../../../registry/tag-input';
 import { PaulyPasswordInput } from '../../../registry/password-input';
+import { PaulyTransferList } from '../../../registry/transfer-list';
+import { PaulyKeyValue } from '../../../registry/key-value';
 
 // ─── Zod Schema ───────────────────────────────────────────────────────────────
 
@@ -119,7 +121,19 @@ const registrationSchema = z.object({
   satisfaction: z.number().min(0).max(100).default(50),
   otpCode: z.string().length(6, 'Must be exactly 6 digits').optional(),
   appRating: z.number().min(1, 'Please rate us').max(5).optional(),
+  permissions: z.array(z.string()).optional(),
+  envVars: z.array(z.object({ key: z.string(), value: z.string() })).optional(),
 });
+
+const permissionOptions = [
+  { label: 'Read Users', value: 'users:read' },
+  { label: 'Write Users', value: 'users:write' },
+  { label: 'Admin Billing', value: 'billing:admin' },
+  { label: 'View Reports', value: 'reports:view' },
+  { label: 'Manage Roles', value: 'roles:manage' },
+  { label: 'Delete Projects', value: 'projects:delete' },
+  { label: 'Create Projects', value: 'projects:create' },
+];
 
 const roleOptions = [
   { label: 'Admin', value: 'admin' },
@@ -790,6 +804,21 @@ export default function App() {
                     { label: 'Enterprise', value: 'enterprise' },
                   ]}
                   required
+                />
+              </FieldWithCounter>
+
+              <FieldWithCounter name="permissions">
+                <PaulyTransferList
+                  name="permissions"
+                  label="Assign Permissions"
+                  options={permissionOptions}
+                />
+              </FieldWithCounter>
+
+              <FieldWithCounter name="envVars">
+                <PaulyKeyValue
+                  name="envVars"
+                  label="Environment Variables"
                 />
               </FieldWithCounter>
 
