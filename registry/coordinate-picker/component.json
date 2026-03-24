@@ -1,0 +1,20 @@
+{
+  "name": "coordinate-picker",
+  "displayName": "PaulyCoordinatePicker",
+  "description": "A visual coordinate map picker that converts clicks into X/Y percentages.",
+  "category": "input",
+  "files": [
+    "PaulyCoordinatePicker.tsx",
+    "PaulyCoordinatePicker.module.css",
+    "types.ts",
+    "index.ts"
+  ],
+  "dependencies": {
+    "internal": ["label", "field-error"],
+    "external": ["@pauly/core"]
+  },
+  "exports": {
+    "components": ["PaulyCoordinatePicker"],
+    "types": ["PaulyCoordinatePickerProps", "Coordinate"]
+  }
+}

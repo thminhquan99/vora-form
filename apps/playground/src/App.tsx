@@ -51,6 +51,9 @@ import { PaulyTreeSelect } from '../../../registry/tree-select';
 import { PaulyCreditCard } from '../../../registry/credit-card';
 import { PaulyMentions } from '../../../registry/mentions';
 import { PaulyWidgetBuilder } from '../../../registry/widget-builder';
+import { PaulyCodeEditor } from '../../../registry/code-editor';
+import { PaulyPatternLock } from '../../../registry/pattern-lock';
+import { PaulyCoordinatePicker } from '../../../registry/coordinate-picker';
 
 // ─── Zod Schema ───────────────────────────────────────────────────────────────
 
@@ -131,6 +134,9 @@ const registrationSchema = z.object({
   creditCard: z.string().optional(),
   feedback: z.string().optional(),
   customLayout: z.any().optional(),
+  customJsonConfig: z.string().optional(),
+  securityPattern: z.array(z.number()).optional(),
+  deliveryLocation: z.object({ x: z.number(), y: z.number() }).nullable().optional(),
 });
 
 const categoryTreeOptions = [
@@ -551,7 +557,7 @@ function WorkExperienceTable() {
 // ─── App ──────────────────────────────────────────────────────────────────────
 
 export default function App() {
-  const [step, setStep] = useState(2);
+  const [step, setStep] = useState(1);
 
   const handleSubmit = (values: Record<string, unknown>, store: import('@pauly/core').FormStore) => {
     const dirtyValues = store.getDirtyValues();
@@ -884,6 +890,31 @@ export default function App() {
                 <PaulyWidgetBuilder
                   name="customLayout"
                   label="Custom Dashboard Layout"
+                />
+              </FieldWithCounter>
+
+              <hr style={{ border: 'none', borderTop: '1px solid #e5e7eb', margin: '8px 0 20px' }} />
+
+              <FieldWithCounter name="customJsonConfig">
+                <PaulyCodeEditor
+                  name="customJsonConfig"
+                  label="JSON Configuration"
+                  language="json"
+                  placeholder='{\n  "autosave": true\n}'
+                />
+              </FieldWithCounter>
+
+              <FieldWithCounter name="securityPattern">
+                <PaulyPatternLock
+                  name="securityPattern"
+                  label="App Security Pattern"
+                />
+              </FieldWithCounter>
+
+              <FieldWithCounter name="deliveryLocation">
+                <PaulyCoordinatePicker
+                  name="deliveryLocation"
+                  label="Pin Delivery Location"
                 />
               </FieldWithCounter>
 

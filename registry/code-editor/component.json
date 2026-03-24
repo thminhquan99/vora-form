@@ -1,0 +1,20 @@
+{
+  "name": "code-editor",
+  "displayName": "PaulyCodeEditor",
+  "description": "A monospace textarea capable of intercepting Tabs to auto-indent, powered by zero re-render.",
+  "category": "input",
+  "files": [
+    "PaulyCodeEditor.tsx",
+    "PaulyCodeEditor.module.css",
+    "types.ts",
+    "index.ts"
+  ],
+  "dependencies": {
+    "internal": ["label", "field-error"],
+    "external": ["@pauly/core"]
+  },
+  "exports": {
+    "components": ["PaulyCodeEditor"],
+    "types": ["PaulyCodeEditorProps"]
+  }
+}

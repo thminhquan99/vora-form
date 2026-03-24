@@ -1,0 +1,20 @@
+{
+  "name": "pattern-lock",
+  "displayName": "PaulyPatternLock",
+  "description": "An Android-style 3x3 pattern lock layout, pushing dot indices into FormStore.",
+  "category": "input",
+  "files": [
+    "PaulyPatternLock.tsx",
+    "PaulyPatternLock.module.css",
+    "types.ts",
+    "index.ts"
+  ],
+  "dependencies": {
+    "internal": ["label", "field-error"],
+    "external": ["@pauly/core"]
+  },
+  "exports": {
+    "components": ["PaulyPatternLock"],
+    "types": ["PaulyPatternLockProps"]
+  }
+}
