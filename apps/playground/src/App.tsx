@@ -38,6 +38,7 @@ import {
 import { PaulySwitch } from '../../../registry/switch';
 import { PaulyDropzone } from '../../../registry/dropzone';
 import { PaulyCombobox } from '../../../registry/combobox';
+import { PaulyMaskedInput } from '../../../registry/masked-input';
 
 // ─── Zod Schema ───────────────────────────────────────────────────────────────
 
@@ -97,6 +98,7 @@ const registrationSchema = z.object({
     )
     .optional(),
   timezone: z.string().min(1, 'Please select a timezone'),
+  expectedSalary: z.string().min(1, 'Salary is required'),
 });
 
 const roleOptions = [
@@ -106,6 +108,17 @@ const roleOptions = [
 ];
 
 const validate = createZodAdapter(registrationSchema);
+
+// ─── Currency Formatter ───────────────────────────────────────────────────────
+
+/**
+ * Strips non-digit characters, then inserts commas for thousands grouping.
+ * 1000000 → 1,000,000
+ */
+const formatCurrency = (val: string): string => {
+  const digits = val.replace(/\D/g, '');
+  return digits.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+};
 
 // ─── Cascading Data ───────────────────────────────────────────────────────────
 
@@ -599,6 +612,17 @@ export default function App() {
               label="Biography"
               placeholder="Tell us about yourself..."
               rows={3}
+            />
+          </FieldWithCounter>
+
+          {/* ── Formatted Salary (masked input, zero re-renders) ── */}
+          <FieldWithCounter name="expectedSalary">
+            <PaulyMaskedInput
+              name="expectedSalary"
+              label="Expected Salary (VND)"
+              formatter={formatCurrency}
+              placeholder="e.g. 10,000,000"
+              required
             />
           </FieldWithCounter>
 

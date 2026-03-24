@@ -1,0 +1,20 @@
+{
+  "name": "masked-input",
+  "displayName": "PaulyMaskedInput",
+  "description": "Formatted text input with native DOM cursor management. Applies a formatter function on every keystroke while preserving cursor position — zero re-renders.",
+  "category": "input",
+  "files": [
+    "PaulyMaskedInput.tsx",
+    "PaulyMaskedInput.module.css",
+    "types.ts",
+    "index.ts"
+  ],
+  "dependencies": {
+    "internal": ["label", "field-error"],
+    "external": ["@pauly/core"]
+  },
+  "exports": {
+    "components": ["PaulyMaskedInput"],
+    "types": ["PaulyMaskedInputProps"]
+  }
+}
