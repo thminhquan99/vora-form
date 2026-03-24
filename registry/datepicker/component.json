@@ -1,0 +1,20 @@
+{
+  "name": "datepicker",
+  "displayName": "PaulyDatePicker",
+  "description": "Native date picker (<input type=\"date\">) wrapped in zero-re-render architecture. Stores dates as ISO YYYY-MM-DD strings. Supports min/max constraints.",
+  "category": "input",
+  "files": [
+    "PaulyDatePicker.tsx",
+    "PaulyDatePicker.module.css",
+    "types.ts",
+    "index.ts"
+  ],
+  "dependencies": {
+    "internal": ["label", "field-error"],
+    "external": ["@pauly/core"]
+  },
+  "exports": {
+    "components": ["PaulyDatePicker"],
+    "types": ["PaulyDatePickerProps"]
+  }
+}

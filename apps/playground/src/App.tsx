@@ -39,6 +39,7 @@ import { PaulySwitch } from '../../../registry/switch';
 import { PaulyDropzone } from '../../../registry/dropzone';
 import { PaulyCombobox } from '../../../registry/combobox';
 import { PaulyMaskedInput } from '../../../registry/masked-input';
+import { PaulyDatePicker } from '../../../registry/datepicker';
 
 // ─── Zod Schema ───────────────────────────────────────────────────────────────
 
@@ -99,6 +100,15 @@ const registrationSchema = z.object({
     .optional(),
   timezone: z.string().min(1, 'Please select a timezone'),
   expectedSalary: z.string().min(1, 'Salary is required'),
+  dateOfBirth: z
+    .string()
+    .min(1, 'Date of birth is required')
+    .refine(
+      (val) =>
+        new Date(val) <=
+        new Date(new Date().setFullYear(new Date().getFullYear() - 18)),
+      'Must be at least 18 years old'
+    ),
 });
 
 const roleOptions = [
@@ -606,6 +616,15 @@ export default function App() {
             />
           </FieldWithCounter>
 
+          {/* ── Date of Birth (native date picker) ────────────── */}
+          <FieldWithCounter name="dateOfBirth">
+            <PaulyDatePicker
+              name="dateOfBirth"
+              label="Date of Birth"
+              max="2008-01-01"
+              required
+            />
+          </FieldWithCounter>
           <FieldWithCounter name="bio">
             <PaulyTextarea
               name="bio"
