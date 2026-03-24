@@ -1,0 +1,4 @@
+{
+  "name": "seating-chart",
+  "dependencies": ["@pauly/core"]
+}

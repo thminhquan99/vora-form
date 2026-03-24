@@ -57,6 +57,9 @@ import { PaulyCoordinatePicker } from '../../../registry/coordinate-picker';
 import { PaulyImageCropper } from '../../../registry/image-cropper';
 import { PaulySpreadsheet } from '../../../registry/spreadsheet';
 import { PaulyFormula } from '../../../registry/formula/PaulyFormula';
+import { PaulyNodeGraph } from '../../../registry/node-graph';
+import { PaulySeatingChart } from '../../../registry/seating-chart';
+import { PaulyGanttTimeline } from '../../../registry/gantt-timeline';
 
 // ─── Zod Schema ───────────────────────────────────────────────────────────────
 
@@ -147,6 +150,9 @@ const registrationSchema = z.object({
   }).nullable().optional(),
   financialData: z.array(z.array(z.string())).optional(),
   emailTemplate: z.string().optional(),
+  workflow: z.any().optional(),
+  seats: z.array(z.string()).optional(),
+  projectTimeline: z.any().optional(),
 });
 
 const categoryTreeOptions = [
@@ -196,6 +202,28 @@ const mockVariables = [
   { label: 'First Name', value: 'firstName' },
   { label: 'Company', value: 'company' }
 ];
+
+const theaterMapSVG = `
+<svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+  <!-- Stage -->
+  <rect x="50" y="20" width="300" height="40" fill="#cbd5e1" rx="8" />
+  <text x="200" y="45" font-family="sans-serif" font-size="16" text-anchor="middle" fill="#475569">STAGE</text>
+  
+  <!-- Row A -->
+  <circle cx="100" cy="120" r="15" fill="#e2e8f0" class="seat" data-seat-id="A1" />
+  <circle cx="150" cy="120" r="15" fill="#e2e8f0" class="seat" data-seat-id="A2" />
+  <circle cx="200" cy="120" r="15" fill="#e2e8f0" class="seat" data-seat-id="A3" />
+  <circle cx="250" cy="120" r="15" fill="#e2e8f0" class="seat" data-seat-id="A4" />
+  <circle cx="300" cy="120" r="15" fill="#e2e8f0" class="seat" data-seat-id="A5" />
+
+  <!-- Row B -->
+  <circle cx="100" cy="170" r="15" fill="#e2e8f0" class="seat" data-seat-id="B1" />
+  <circle cx="150" cy="170" r="15" fill="#e2e8f0" class="seat" data-seat-id="B2" />
+  <circle cx="200" cy="170" r="15" fill="#e2e8f0" class="seat" data-seat-id="B3" />
+  <circle cx="250" cy="170" r="15" fill="#e2e8f0" class="seat" data-seat-id="B4" />
+  <circle cx="300" cy="170" r="15" fill="#e2e8f0" class="seat" data-seat-id="B5" />
+</svg>
+`;
 
 const validate = createZodAdapter(registrationSchema);
 
@@ -965,6 +993,30 @@ export default function App() {
                   name="emailTemplate"
                   label="Automated Email Subject"
                   variables={mockVariables}
+                />
+              </FieldWithCounter>
+
+              <FieldWithCounter name="workflow">
+                <PaulyNodeGraph
+                  name="workflow"
+                  label="Execution Workflow"
+                />
+              </FieldWithCounter>
+
+              <FieldWithCounter name="seats">
+                <PaulySeatingChart
+                  name="seats"
+                  label="Select Theater Seats"
+                  svgContent={theaterMapSVG}
+                />
+              </FieldWithCounter>
+
+              <FieldWithCounter name="projectTimeline">
+                <PaulyGanttTimeline
+                  name="projectTimeline"
+                  label="Project Timeline"
+                  startDate="2024-01-01"
+                  endDate="2024-01-31"
                 />
               </FieldWithCounter>
 

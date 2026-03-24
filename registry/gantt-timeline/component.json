@@ -1,0 +1,4 @@
+{
+  "name": "gantt-timeline",
+  "dependencies": ["@pauly/core"]
+}

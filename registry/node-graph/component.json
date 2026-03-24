@@ -1,0 +1,4 @@
+{
+  "name": "node-graph",
+  "dependencies": ["@pauly/core"]
+}
