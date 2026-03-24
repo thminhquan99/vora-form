@@ -124,23 +124,28 @@ export function VRSpreadsheet({
         <div 
           className={styles.table} 
           style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}
+          role="grid"
+          aria-label={label || 'Spreadsheet'}
         >
           {gridRows.map(r => (
-            gridCols.map(c => (
-              <div key={`${r}-${c}`} className={styles.cell}>
-                <input
-                  id={`${inputId}-cell-${r}-${c}`}
-                  type="text"
-                  className={styles.input}
-                  onInput={(e) => handleInput(r, c, e.currentTarget.value)}
-                  onKeyDown={(e) => handleKeyDown(e, r, c)}
-                  onPaste={(e) => handlePaste(e, r, c)}
-                  // Uncontrolled natively
-                  defaultValue={initialValue?.[r]?.[c] || ''}
-                  aria-label={`Cell ${r}, ${c}`}
-                />
-              </div>
-            ))
+            <div key={`row-${r}`} role="row" style={{ display: 'contents' }}>
+              {gridCols.map(c => (
+                <div key={`${r}-${c}`} className={styles.cell}>
+                  <input
+                    id={`${inputId}-cell-${r}-${c}`}
+                    type="text"
+                    className={styles.input}
+                    onInput={(e) => handleInput(r, c, e.currentTarget.value)}
+                    onKeyDown={(e) => handleKeyDown(e, r, c)}
+                    onPaste={(e) => handlePaste(e, r, c)}
+                    // Uncontrolled natively
+                    defaultValue={initialValue?.[r]?.[c] || ''}
+                    role="gridcell"
+                    aria-label={`Row ${r + 1}, Column ${c + 1}`}
+                  />
+                </div>
+              ))}
+            </div>
           ))}
         </div>
       </div>

@@ -50,11 +50,22 @@ export function VRSeatingChart({
       for (let i = scripts.length - 1; i >= 0; i--) {
         scripts[i].parentNode?.removeChild(scripts[i]);
       }
+      
+      // Strict ARIA Injection onto Native Elements
+      const seats = doc.querySelectorAll('.seat');
+      seats.forEach((seat) => {
+        seat.setAttribute('role', 'checkbox');
+        seat.setAttribute('tabindex', '0');
+        const seatId = seat.id || seat.getAttribute('data-seat-id');
+        const isChecked = seatId && Array.isArray(initialValue) && initialValue.includes(seatId);
+        seat.setAttribute('aria-checked', isChecked ? 'true' : 'false');
+      });
+
       return doc.documentElement.outerHTML;
     } catch {
       return '';
     }
-  }, [svgContent]);
+  }, [svgContent, initialValue]);
 
   // 3. Initialize & External Value Sync (Reset & Hydration Bypass)
   useEffect(() => {
@@ -71,8 +82,10 @@ export function VRSeatingChart({
       const seatId = seat.id || seat.getAttribute('data-seat-id');
       if (seatId && selectedRef.current.includes(seatId)) {
         seat.classList.add('active'); 
+        seat.setAttribute('aria-checked', 'true');
       } else {
         seat.classList.remove('active');
+        seat.setAttribute('aria-checked', 'false');
       }
     });
   }, [field.value, safeSVGContent]);
@@ -159,6 +172,7 @@ export function VRSeatingChart({
         if (seatId) {
           closestSeat.classList.toggle('active');
           const isSelected = closestSeat.classList.contains('active');
+          closestSeat.setAttribute('aria-checked', isSelected ? 'true' : 'false');
           
           let selected = [...selectedRef.current];
           if (isSelected) {
@@ -184,6 +198,8 @@ export function VRSeatingChart({
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
+        role="application"
+        aria-label={label || 'Seating Chart'}
       >
         <div className={styles.controls}>
           <button type="button" className={styles.controlBtn} onClick={() => handleZoom(0.5)} aria-label="Zoom In">

@@ -5,9 +5,9 @@
 ## 1. 🔴 CRITICAL (High Priority for MVP1.1)
 
 ### Accessibility (A11y) & Navigation Compliance
-- [ ] **Complex Component ARIA Audit:** Deeply interactive components (`VRSpreadsheet`, `VRPatternLock`, `VRNodeGraph`, `VRGanttTimeline`) critically lack comprehensive WAI-ARIA implementations (`role`, `aria-activedescendant`, `aria-valuenow`, etc.).
-- [ ] **Canvas/SVG Screen Reader Support:** Completely missing focus management and semantic text fallback structures for Canvas and SVG-rendered elements (e.g., `VRSeatingChart`, `VRImageCropper`).
-- [ ] **Keyboard Navigation:** Strict enforcement needed for full arrow-key and semantic `Tab` routing across non-native input bounds.
+- [x] **Complex Component ARIA Audit:** Deeply interactive components (`VRSpreadsheet`, `VRPatternLock`, `VRNodeGraph`, `VRGanttTimeline`) critically lack comprehensive WAI-ARIA implementations (`role`, `aria-activedescendant`, `aria-valuenow`, etc.).
+- [x] **Canvas/SVG Screen Reader Support:** Completely missing focus management and semantic text fallback structures for Canvas and SVG-rendered elements (e.g., `VRSeatingChart`, `VRImageCropper`).
+- [x] **Keyboard Navigation:** Strict enforcement needed for full arrow-key and semantic `Tab` routing across non-native input bounds.
 
 ### E2E Test Coverage
 - [ ] **PointerEvent Simulation:** Zero robust End-to-End suites currently exist. We urgently require Playwright or Puppeteer integration capable of synthesizing precise, fractional PointerEvent drag-and-drop metrics.

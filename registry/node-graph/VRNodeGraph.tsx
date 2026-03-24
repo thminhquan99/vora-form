@@ -237,6 +237,14 @@ export function VRNodeGraph({
     return () => window.removeEventListener('pointerup', handleUp);
   }, []);
 
+  const handleNodeKeyDown = (e: React.KeyboardEvent, nodeId: string) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      const el = document.getElementById(`node-${inputId}-${nodeId}`);
+      if (el) el.classList.toggle(styles.selected ?? 'selected');
+    }
+  };
+
   return (
     <div className={`${styles.wrapper} ${className ?? ''}`} id={`${inputId}-wrapper`} ref={field.ref}>
       {label && <VRLabel htmlFor={inputId} required={required}>{label}</VRLabel>}
@@ -249,6 +257,8 @@ export function VRNodeGraph({
         className={styles.canvas} 
         ref={canvasRef}
         onPointerMove={onPointerMove}
+        role="application"
+        aria-label={label || 'Node Graph'}
       >
         <svg className={styles.svgOverlay} ref={svgRef}>
           {dataRef.current.edges.map(edge => (
@@ -264,6 +274,10 @@ export function VRNodeGraph({
             className={styles.node}
             style={{ transform: `translate(${node.x}px, ${node.y}px)` }}
             onPointerDown={(e) => onPointerDown(e, node.id, 'node')}
+            role="button"
+            tabIndex={0}
+            aria-label={`Node: ${node.label}`}
+            onKeyDown={(e) => handleNodeKeyDown(e, node.id)}
           >
             <div className={`${styles.port} ${styles.portInput}`} data-node-id={node.id} />
             {node.label}

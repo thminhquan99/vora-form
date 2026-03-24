@@ -162,6 +162,8 @@ export function VRGanttTimeline({
           onPointerMove={onPointerMove}
           onPointerUp={onPointerUp}
           onPointerLeave={onPointerUp}
+          role="application"
+          aria-label={label || 'Gantt Timeline'}
         >
           {/* Background Grid */}
           <div className={styles.grid} style={{ backgroundSize: `${dayWidth}px 100%`, width: '100%' }} />
@@ -187,6 +189,13 @@ export function VRGanttTimeline({
               className={styles.task}
               style={{ top: `${40 + idx * 44}px` }}
               onPointerDown={(e) => onPointerDown(e, task.id, 'move')}
+              role="slider"
+              tabIndex={0}
+              aria-label={task.title}
+              aria-valuemin={startTs}
+              aria-valuemax={endTs}
+              aria-valuenow={new Date(task.start).getTime()}
+              aria-valuetext={`${task.start} to ${task.end}`}
             >
               <div 
                 className={`${styles.resizeHandle} ${styles.resizeHandleLeft}`} 
