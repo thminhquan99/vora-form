@@ -21,21 +21,25 @@ export function PaulyTagInput({
 
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Merge the internal ref and the FormStore's ref
+  // Merge the internal ref and the FormStore's ref safely
   const mergedRef = useCallback(
     (el: HTMLInputElement | null) => {
-      (inputRef as React.MutableRefObject<HTMLInputElement | null>).current = el;
-      if (typeof field.ref === 'function') {
+      if (inputRef) {
+        (inputRef as React.MutableRefObject<HTMLInputElement | null>).current = el;
+      }
+      if (field?.ref && typeof field.ref === 'function') {
         field.ref(el);
+      } else if (field?.ref && 'current' in field.ref) {
+        (field.ref as React.MutableRefObject<HTMLInputElement | null>).current = el;
       }
     },
-    [field.ref]
+    [field?.ref]
   );
 
   const inputId = id ?? name;
   const errorId = `${name}-error`;
   const hasError = !!field.error;
-  const tags = field.value ?? [];
+  const tags = Array.isArray(field.value) ? field.value : [];
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {

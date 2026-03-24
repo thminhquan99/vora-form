@@ -55,6 +55,8 @@ import { PaulyCodeEditor } from '../../../registry/code-editor';
 import { PaulyPatternLock } from '../../../registry/pattern-lock';
 import { PaulyCoordinatePicker } from '../../../registry/coordinate-picker';
 import { PaulyImageCropper } from '../../../registry/image-cropper';
+import { PaulySpreadsheet } from '../../../registry/spreadsheet';
+import { PaulyFormula } from '../../../registry/formula/PaulyFormula';
 
 // ─── Zod Schema ───────────────────────────────────────────────────────────────
 
@@ -138,11 +140,13 @@ const registrationSchema = z.object({
   customJsonConfig: z.string().optional(),
   securityPattern: z.array(z.number()).optional(),
   deliveryLocation: z.object({ x: z.number(), y: z.number() }).nullable().optional(),
-  profileCroppedPicture: z.object({ 
-    originalUrl: z.string(), 
-    zoom: z.number(), 
-    crop: z.object({ x: z.number(), y: z.number(), width: z.number(), height: z.number() }) 
+  profileCroppedPicture: z.object({
+    originalUrl: z.string(),
+    zoom: z.number(),
+    crop: z.object({ x: z.number(), y: z.number(), width: z.number(), height: z.number() })
   }).nullable().optional(),
+  financialData: z.array(z.array(z.string())).optional(),
+  emailTemplate: z.string().optional(),
 });
 
 const categoryTreeOptions = [
@@ -186,6 +190,11 @@ const roleOptions = [
   { label: 'Admin', value: 'admin' },
   { label: 'Editor', value: 'editor' },
   { label: 'Viewer', value: 'viewer' },
+];
+
+const mockVariables = [
+  { label: 'First Name', value: 'firstName' },
+  { label: 'Company', value: 'company' }
 ];
 
 const validate = createZodAdapter(registrationSchema);
@@ -713,8 +722,8 @@ export default function App() {
         </div>
 
         {/* ── Form ───────────────────────────────────────────────────── */}
-        <PaulyForm 
-          validate={validate} 
+        <PaulyForm
+          validate={validate}
           onSubmit={handleSubmit}
           initialValues={{
             profileCroppedPicture: {
@@ -939,6 +948,23 @@ export default function App() {
                   name="profileCroppedPicture"
                   label="Profile Picture (Crop & Zoom)"
                   aspectRatio={1}
+                />
+              </FieldWithCounter>
+
+              <FieldWithCounter name="financialData">
+                <PaulySpreadsheet
+                  name="financialData"
+                  label="Financial Projections (Paste from Excel)"
+                  rows={5}
+                  cols={4}
+                />
+              </FieldWithCounter>
+
+              <FieldWithCounter name="emailTemplate">
+                <PaulyFormula
+                  name="emailTemplate"
+                  label="Automated Email Subject"
+                  variables={mockVariables}
                 />
               </FieldWithCounter>
 

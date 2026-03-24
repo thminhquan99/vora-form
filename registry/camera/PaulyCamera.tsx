@@ -90,7 +90,11 @@ export function PaulyCamera({
 
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        videoRef.current.play();
+        videoRef.current.play().catch(err => {
+          if (err.name !== 'AbortError') {
+            console.error('[PaulyCamera] play() failed:', err);
+          }
+        });
       }
     } catch (err) {
       console.error('[PaulyCamera] Failed to access camera:', err);

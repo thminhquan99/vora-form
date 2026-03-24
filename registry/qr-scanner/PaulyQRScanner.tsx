@@ -141,7 +141,13 @@ export function PaulyQRScanner({
       if (!video) return;
 
       video.srcObject = stream;
-      await video.play();
+      
+      try {
+        await video.play();
+      } catch (err: any) {
+        if (err.name === 'AbortError') return;
+        throw err;
+      }
 
       // ── Detection loop (rAF — zero React) ───────────────────────
       const detector = detectorRef.current;

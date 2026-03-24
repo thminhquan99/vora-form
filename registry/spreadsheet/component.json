@@ -1,0 +1,10 @@
+{
+  "name": "spreadsheet",
+  "dependencies": ["@pauly/core"],
+  "files": [
+    "PaulySpreadsheet.tsx",
+    "PaulySpreadsheet.module.css",
+    "types.ts",
+    "index.ts"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "name": "formula",
+  "dependencies": ["@pauly/core"],
+  "files": [
+    "PaulyFormula.tsx",
+    "PaulyFormula.module.css",
+    "types.ts",
+    "index.ts"
+  ]
+}
