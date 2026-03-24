@@ -67,6 +67,8 @@ export function useAsyncValidation<TValue = unknown>(
   validateFnRef.current = validateFn;
   debounceMsRef.current = debounceMs;
 
+  const isFirstMount = useRef(true);
+
   useEffect(() => {
     let timerId: ReturnType<typeof setTimeout> | null = null;
     let aborted = false;
@@ -76,6 +78,11 @@ export function useAsyncValidation<TValue = unknown>(
     // - 'value': fires when composite widgets call setValue (toggle, etc.)
     // Neither of these subscriptions trigger useSyncExternalStore re-renders.
     const handler = () => {
+      if (isFirstMount.current) {
+        isFirstMount.current = false;
+        return;
+      }
+
       // Clear any pending debounce timer
       if (timerId !== null) {
         clearTimeout(timerId);
