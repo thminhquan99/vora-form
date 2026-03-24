@@ -54,6 +54,7 @@ import { PaulyWidgetBuilder } from '../../../registry/widget-builder';
 import { PaulyCodeEditor } from '../../../registry/code-editor';
 import { PaulyPatternLock } from '../../../registry/pattern-lock';
 import { PaulyCoordinatePicker } from '../../../registry/coordinate-picker';
+import { PaulyImageCropper } from '../../../registry/image-cropper';
 
 // ─── Zod Schema ───────────────────────────────────────────────────────────────
 
@@ -137,6 +138,11 @@ const registrationSchema = z.object({
   customJsonConfig: z.string().optional(),
   securityPattern: z.array(z.number()).optional(),
   deliveryLocation: z.object({ x: z.number(), y: z.number() }).nullable().optional(),
+  profileCroppedPicture: z.object({ 
+    originalUrl: z.string(), 
+    zoom: z.number(), 
+    crop: z.object({ x: z.number(), y: z.number(), width: z.number(), height: z.number() }) 
+  }).nullable().optional(),
 });
 
 const categoryTreeOptions = [
@@ -707,7 +713,17 @@ export default function App() {
         </div>
 
         {/* ── Form ───────────────────────────────────────────────────── */}
-        <PaulyForm validate={validate} onSubmit={handleSubmit}>
+        <PaulyForm 
+          validate={validate} 
+          onSubmit={handleSubmit}
+          initialValues={{
+            profileCroppedPicture: {
+              originalUrl: 'https://images.unsplash.com/photo-1550525811-e5869dd03032?auto=format&fit=crop&w=800&q=80',
+              zoom: 1,
+              crop: { x: 50, y: 50, width: 200, height: 200 }
+            }
+          }}
+        >
           {/* ══════════════ STEP 1: Personal Info ══════════════ */}
           {step === 1 && (
             <>
@@ -915,6 +931,14 @@ export default function App() {
                 <PaulyCoordinatePicker
                   name="deliveryLocation"
                   label="Pin Delivery Location"
+                />
+              </FieldWithCounter>
+
+              <FieldWithCounter name="profileCroppedPicture">
+                <PaulyImageCropper
+                  name="profileCroppedPicture"
+                  label="Profile Picture (Crop & Zoom)"
+                  aspectRatio={1}
                 />
               </FieldWithCounter>
 

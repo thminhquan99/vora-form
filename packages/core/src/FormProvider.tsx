@@ -107,6 +107,12 @@ export interface PaulyFormProps {
 
   /** Custom CSS class for the `<form>` element. */
   className?: string;
+
+  /**
+   * Global initial values for the form.
+   * Useful for seeding data from an API or setting defaults for complex fields.
+   */
+  initialValues?: Record<string, unknown>;
 }
 
 /**
@@ -144,11 +150,12 @@ export function PaulyForm({
   onSubmit,
   validate,
   className,
+  initialValues,
 }: PaulyFormProps): React.JSX.Element {
   // ── Stable store instance (never changes after mount) ───────────────────
   const storeRef = useRef<FormStore | null>(null);
   if (storeRef.current === null) {
-    storeRef.current = new FormStore();
+    storeRef.current = new FormStore(initialValues);
   }
   const store = storeRef.current;
 

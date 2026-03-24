@@ -205,6 +205,17 @@ export class FormStore {
    */
   private listeners: Map<string, Set<Listener>> = new Map();
 
+  // ── Constructor ───────────────────────────────────────────────────────────
+
+  constructor(initialData?: Record<string, unknown>) {
+    if (initialData) {
+      for (const [key, value] of Object.entries(initialData)) {
+        this.values.set(key, value);
+        this.initialValues.set(key, value);
+      }
+    }
+  }
+
   // ── Private Helpers ───────────────────────────────────────────────────────
 
   /**

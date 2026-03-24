@@ -1,0 +1,20 @@
+{
+  "name": "image-cropper",
+  "displayName": "PaulyImageCropper",
+  "description": "A zero-re-render high performance image cropper leveraging native HTML Canvas.",
+  "category": "input",
+  "files": [
+    "PaulyImageCropper.tsx",
+    "PaulyImageCropper.module.css",
+    "types.ts",
+    "index.ts"
+  ],
+  "dependencies": {
+    "internal": ["label", "field-error"],
+    "external": ["@pauly/core"]
+  },
+  "exports": {
+    "components": ["PaulyImageCropper"],
+    "types": ["PaulyImageCropperProps", "ImageCropData"]
+  }
+}
