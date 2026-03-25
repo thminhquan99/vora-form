@@ -21,37 +21,26 @@ Drop VoraForm into your app in under a minute.
 ### 1. Install
 
 ```bash
-npm install @vora-form/core zod
+npm install @vora-form/core
 ```
+*(Note: Zod is completely optional! VoraForm features a blazingly fast native validation engine out of the box.)*
 
 ### 2. Copy-Paste a Lightning-Fast Form
 
-Here is a complete, working Login Form featuring Zod schema validation. Notice there's absolutely no `useState`—VoraForm handles the magic completely under the hood.
+Here is a complete, working Login Form using the native validation engine. Notice there's absolutely no `useState`—VoraForm handles the magic completely under the hood.
 
 ```tsx
 import React from 'react';
-import { z } from 'zod';
-import { VoraForm, createZodAdapter } from '@vora-form/core';
+import { VoraForm } from '@vora-form/core';
 import { VRText } from '@vora-form/registry/text-input'; // Adjust to your local registry path
 
-// 1. Define your Zod schema and bind the adapter
-const loginSchema = z.object({
-  email: z.string().email('Please enter a valid email address'),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
-});
-
-const validate = createZodAdapter(loginSchema);
-
-type LoginFormValues = z.infer<typeof loginSchema>;
-
 export default function LoginForm() {
-  const handleSubmit = (values: LoginFormValues) => {
+  const handleSubmit = (values: Record<string, unknown>) => {
     console.log('Secure payload ready:', values);
   };
 
   return (
     <VoraForm 
-      validate={validate} 
       onSubmit={handleSubmit}
       className="p-6 bg-white rounded-lg shadow-md"
     >
@@ -62,14 +51,18 @@ export default function LoginForm() {
         name="email" 
         label="Email Address" 
         placeholder="you@company.com" 
-        required
+        required 
+        requiredMessage="Email is required"
+        pattern={{ value: /^\S+@\S+\.\S+$/, message: "Invalid email format" }}
       />
 
       <VRText 
         name="password" 
         label="Password" 
         type="password" 
-        required
+        required 
+        requiredMessage="Password is required"
+        validate={(val) => typeof val === 'string' && val.length < 8 ? "Must be 8+ chars" : undefined}
       />
 
       <button type="submit" className="mt-4 bg-blue-600 text-white font-bold py-2 px-4 rounded">

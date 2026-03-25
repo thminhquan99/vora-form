@@ -63,6 +63,15 @@ export interface VRFieldProps<
 
   /** Custom CSS class. */
   className?: string;
+
+  /** Native validation: Required error message */
+  requiredMessage?: string;
+
+  /** Native validation: Regex pattern and error message */
+  pattern?: { value: RegExp; message: string };
+
+  /** Native validation: Custom synchronous validate function */
+  validate?: (value: any) => string | undefined;
 }
 
 // ─── Validation Types ─────────────────────────────────────────────────────────

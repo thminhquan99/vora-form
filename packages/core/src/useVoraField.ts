@@ -62,7 +62,7 @@
  * cross-field re-render guarantee.
  */
 
-import { useCallback, useMemo, useRef, useSyncExternalStore } from 'react';
+import { useCallback, useMemo, useRef, useSyncExternalStore, useEffect } from 'react';
 
 import { useFormContext } from './FormProvider';
 import type { NativeFieldElement } from './utils/ref-store';
@@ -159,9 +159,49 @@ export interface UseVRFieldReturn<TValue> {
  * ```
  */
 export function useVoraField<TValue = unknown>(
-  name: string
+  name: string,
+  rules?: {
+    required?: boolean;
+    requiredMessage?: string;
+    pattern?: { value: RegExp; message: string };
+    validate?: (value: any) => string | undefined;
+  }
 ): UseVRFieldReturn<TValue> {
-  const { store, validate } = useFormContext();
+  const { store, validate: formValidate } = useFormContext();
+
+  // ── Native Validation Hook Registration ──────────────────────────────────
+  useEffect(() => {
+    if (!rules) return;
+    const cleanupFns: Array<() => void> = [];
+
+    if (rules.required) {
+      cleanupFns.push(
+        store.registerRule(name, (val) => {
+          if (val === undefined || val === null || val === '' || (Array.isArray(val) && val.length === 0)) {
+            return rules.requiredMessage || 'This field is required';
+          }
+          return undefined;
+        })
+      );
+    }
+
+    if (rules.pattern) {
+      cleanupFns.push(
+        store.registerRule(name, (val) => {
+          if (typeof val === 'string' && val.length > 0 && !rules.pattern!.value.test(val)) {
+            return rules.pattern!.message;
+          }
+          return undefined;
+        })
+      );
+    }
+
+    if (rules.validate) {
+      cleanupFns.push(store.registerRule(name, rules.validate));
+    }
+
+    return () => cleanupFns.forEach((fn) => fn());
+  }, [store, name, rules?.required, rules?.requiredMessage, rules?.pattern, rules?.validate]);
 
   // ── Value subscription via useSyncExternalStore ─────────────────────────
   //
@@ -313,9 +353,9 @@ export function useVoraField<TValue = unknown>(
     // Mark field as touched on first blur
     store.setTouched(name);
 
-    if (validate) {
+    if (formValidate) {
       const allValues = store.getAllValues();
-      const errors = validate(allValues);
+      const errors = formValidate(allValues);
       const fieldError = errors[name];
 
       if (fieldError) {
@@ -323,8 +363,15 @@ export function useVoraField<TValue = unknown>(
       } else {
         store.clearError(name);
       }
+    } else {
+      // Fallback: Run internal validation for this specific field only
+      // Native validation runs across all fields simultaneously during submit,
+      // but during onBlur we simply execute store.validateInternal() safely if needed,
+      // though typically native browser attributes handle single-field blurs best.
+      // Easiest is to just re-validate everything natively into the store:
+      store.validateInternal();
     }
-  }, [store, name, validate]);
+  }, [store, name, formValidate]);
 
   // ── Return ─────────────────────────────────────────────────────────────
 

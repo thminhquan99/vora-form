@@ -184,6 +184,18 @@ export function VoraForm({
           store.focusField(errorPaths[0]);
           return;
         }
+      } else {
+        // Fallback to internal native prop validation engine (Zod-optional)
+        const isValid = store.validateInternal();
+        if (!isValid) {
+          // Find the first field with an error and focus it
+          const allErrors = store.getAllErrors();
+          const firstErrorPath = Object.keys(allErrors)[0];
+          if (firstErrorPath) {
+             store.focusField(firstErrorPath);
+          }
+          return;
+        }
       }
 
       // No errors — call the developer's onSubmit

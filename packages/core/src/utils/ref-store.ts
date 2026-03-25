@@ -453,6 +453,51 @@ export class FormStore {
     return result;
   }
 
+  // ── Internal Validation Engine ────────────────────────────────────────────
+
+  /** Internal validation logic keyed by field path. */
+  private fieldRules: Map<string, Array<(val: any) => string | undefined>> = new Map();
+
+  /** Registers a native prop validation rule for a field. */
+  registerRule(path: string, rule: (val: any) => string | undefined): () => void {
+    if (!this.fieldRules.has(path)) {
+      this.fieldRules.set(path, []);
+    }
+    this.fieldRules.get(path)!.push(rule);
+    
+    return () => {
+      const rules = this.fieldRules.get(path);
+      if (rules) {
+        const index = rules.indexOf(rule);
+        if (index > -1) rules.splice(index, 1);
+        if (rules.length === 0) this.fieldRules.delete(path);
+      }
+    };
+  }
+
+  /**
+   * Evaluates all native validation rules injected by field components.
+   * Runs sequentially across all fields, populating the `errors` Map.
+   */
+  validateInternal(): boolean {
+    this.clearAllErrors();
+    const values = this.getAllValues();
+    let isValid = true;
+
+    for (const [path, rules] of this.fieldRules) {
+      const val = values[path];
+      for (const rule of rules) {
+        const error = rule(val);
+        if (error) {
+          this.setError(path, error);
+          isValid = false;
+          break; // Show only the first sequential error for this field
+        }
+      }
+    }
+    return isValid;
+  }
+
   // ── Error Management ──────────────────────────────────────────────────────
 
   /**
