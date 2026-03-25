@@ -1,11 +1,14 @@
 'use client';
 
-import React, { useRef, useEffect, useCallback } from 'react';
+import React, { useRef, useEffect, useCallback, useId } from 'react';
 import { useVoraField, useInitialSnapshot } from '@vora/core';
 import { VRLabel } from '../label';
 import { VRFieldError } from '../field-error';
 import type { VRSpreadsheetProps } from './types';
 import styles from './VRSpreadsheet.module.css';
+
+const sanitizeCell = (val: string): string =>
+  val.replace(/<[^>]*>/g, '').trim();
 
 export function VRSpreadsheet({
   name,
@@ -18,6 +21,8 @@ export function VRSpreadsheet({
 }: VRSpreadsheetProps): React.JSX.Element {
   const field = useVoraField<string[][]>(name);
   const inputId = id ?? name;
+  const instanceId = useId();
+  const cellPrefix = `vrs-${instanceId.replace(/:/g, '')}`;
   const hasError = !!field.error;
 
   // Snapshot Pattern: Initialize exactly once
@@ -68,7 +73,7 @@ export function VRSpreadsheet({
 
       if (nextR !== r || nextC !== c) {
         e.preventDefault();
-        const targetId = `${inputId}-cell-${nextR}-${nextC}`;
+        const targetId = `${cellPrefix}-cell-${nextR}-${nextC}`;
         const el = document.getElementById(targetId) as HTMLInputElement;
         if (el) {
           el.focus();
@@ -98,12 +103,12 @@ export function VRSpreadsheet({
       
       for (let c = startC; c < maxC; c++) {
         const pasteColIdx = c - startC;
-        const mappedValue = pasteCols[pasteColIdx] || '';
+        const mappedValue = sanitizeCell(pasteCols[pasteColIdx] || '');
         
         matrixRef.current[r][c] = mappedValue;
         
         // Dom sync directly
-        const targetId = `${inputId}-cell-${r}-${c}`;
+        const targetId = `${cellPrefix}-cell-${r}-${c}`;
         const el = document.getElementById(targetId) as HTMLInputElement;
         if (el) el.value = mappedValue;
       }
@@ -118,7 +123,7 @@ export function VRSpreadsheet({
 
   return (
     <div className={`${styles.wrapper} ${className ?? ''}`} id={inputId} ref={field.ref}>
-      {label && <VRLabel htmlFor={`${inputId}-cell-0-0`} required={required}>{label}</VRLabel>}
+      {label && <VRLabel htmlFor={`${cellPrefix}-cell-0-0`} required={required}>{label}</VRLabel>}
 
       <div className={styles.tableContainer}>
         <div 
@@ -132,7 +137,7 @@ export function VRSpreadsheet({
               {gridCols.map(c => (
                 <div key={`${r}-${c}`} className={styles.cell}>
                   <input
-                    id={`${inputId}-cell-${r}-${c}`}
+                    id={`${cellPrefix}-cell-${r}-${c}`}
                     type="text"
                     className={`${styles.input} ${hasError && field.isTouched && styles.inputError ? styles.inputError : ''}`}
                     onInput={(e) => handleInput(r, c, e.currentTarget.value)}
