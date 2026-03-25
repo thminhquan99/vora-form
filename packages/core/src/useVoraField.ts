@@ -204,7 +204,28 @@ export function useVoraField<TValue = unknown>(
     }
 
     if (rules.validate) {
-      cleanupFns.push(store.registerRule(name, rules.validate));
+      if (rules.validate.constructor.name === 'AsyncFunction') {
+        console.warn(
+          `[VoraForm] The validate prop on field "${name}" returned a Promise. ` +
+          `Synchronous validate must return string | undefined. ` +
+          `Use useAsyncValidation() for async validation instead.`
+        );
+      }
+
+      const originalValidate = rules.validate;
+      const safeValidate = (val: any): string | undefined => {
+        const result = originalValidate(val);
+
+        // Detect Promise return — async validators are not supported in
+        // registerRule (which is synchronous). Silently ignore and let
+        // useAsyncValidation handle it instead.
+        if (result !== null && typeof result === 'object' && typeof (result as any).then === 'function') {
+          return undefined; // Treat as no error — do not set "[object Promise]"
+        }
+
+        return result as string | undefined;
+      };
+      cleanupFns.push(store.registerRule(name, safeValidate));
     }
 
     return () => cleanupFns.forEach((fn) => fn());

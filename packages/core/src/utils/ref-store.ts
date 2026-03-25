@@ -522,7 +522,9 @@ export class FormStore {
       const val = values[path];
       for (const rule of rules) {
         const error = rule(val);
-        if (error) {
+        // Guard: if a rule accidentally returns a Promise, skip it rather
+        // than setting "[object Promise]" as the error string.
+        if (error && !(typeof error === 'object' && typeof (error as any).then === 'function')) {
           this.setError(path, error);
           isValid = false;
           break; // Show only the first sequential error for this field
