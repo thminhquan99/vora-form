@@ -1,12 +1,12 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { useVoraField } from '@vora/core';
-import { VRText } from '../text-input';
 import { VRLabel } from '../label';
 import { VRFieldError } from '../field-error';
 import type { VRKeyValueProps } from './types';
 import styles from './VRKeyValue.module.css';
+import textStyles from '../text-input/VRText.module.css';
 
 export function VRKeyValue({
   name,
@@ -16,54 +16,70 @@ export function VRKeyValue({
   className,
 }: VRKeyValueProps): React.JSX.Element {
   const field = useVoraField<Array<{ key: string; value: string }>>(name);
-  const items = field.value ?? [];
+
+  // Mirror store value in local state
+  const [rows, setRows] = useState<Array<{key: string; value: string}>>(
+    () => field.value ?? []
+  );
 
   // Track unique IDs for rows to prevent input value shifting on deletion
-  const [rowIds, setRowIds] = useState<number[]>([]);
-  const nextId = useRef(0);
+  const nextId = useRef(rows.length);
+  const [rowIds, setRowIds] = useState<number[]>(() => rows.map((_, i) => i));
 
-  // Sync rowIds length with store array length
-  useEffect(() => {
-    const currentLen = items.length;
-    if (rowIds.length < currentLen) {
-      setRowIds((curr) => {
-        const needed = currentLen - curr.length;
-        return [...curr, ...Array.from({ length: needed }, () => nextId.current++)];
-      });
-    } else if (rowIds.length > currentLen) {
-      setRowIds((curr) => curr.slice(0, currentLen));
-    }
-  }, [items.length]);
+  const handleChange = (index: number, fieldName: 'key' | 'value', val: string) => {
+    const next = rows.map((row, i) =>
+      i === index ? { ...row, [fieldName]: val } : row
+    );
+    setRows(next);
+    field.setValue(next); // Single write to parent path
+  };
 
   const append = useCallback(() => {
-    field.setValue([...items, { key: '', value: '' }]);
+    const next = [...rows, { key: '', value: '' }];
+    setRows(next);
+    field.setValue(next);
     setRowIds((curr) => [...curr, nextId.current++]);
-  }, [field, items]);
+  }, [field, rows]);
 
   const remove = useCallback(
     (indexToRemove: number) => {
-      const newItems = items.filter((_, i) => i !== indexToRemove);
-      field.setValue(newItems);
+      const next = rows.filter((_, i) => i !== indexToRemove);
+      setRows(next);
+      field.setValue(next);
       setRowIds((curr) => curr.filter((_, i) => i !== indexToRemove));
     },
-    [field, items]
+    [field, rows]
   );
 
   return (
     <div className={`${styles.wrapper} ${className ?? ''}`} id={name}>
       {label && <VRLabel htmlFor={`${name}.0.key`}>{label}</VRLabel>}
 
-      {items.map((_, index) => {
+      {rows.map((row, index) => {
         // Fallback to index if rowIds isn't fully synced yet
         const rowKey = rowIds[index] ?? `fallback-${index}`;
 
         return (
           <div key={rowKey} className={styles.row}>
             <div className={styles.keyInput}>
-              <VRText name={`${name}.${index}.key`} placeholder={keyPlaceholder} />
+              <input
+                type="text"
+                value={row.key}
+                onChange={(e) => handleChange(index, 'key', e.target.value)}
+                className={textStyles.input}
+                placeholder={keyPlaceholder}
+                id={`${name}.${index}.key`}
+              />
             </div>
             <div className={styles.valueInput}>
-              <VRText name={`${name}.${index}.value`} placeholder={valuePlaceholder} />
+              <input
+                type="text"
+                value={row.value}
+                onChange={(e) => handleChange(index, 'value', e.target.value)}
+                className={textStyles.input}
+                placeholder={valuePlaceholder}
+                id={`${name}.${index}.value`}
+              />
             </div>
             <button
               type="button"
