@@ -57,6 +57,23 @@ interface BarcodeDetectorConstructor {
  * | Rescan             | 1 (mode switch) | 1 (null)      |
  * | Sibling fields     | 0               | 0             |
  */
+/**
+ * ### Browser Compatibility — BarcodeDetector API
+ *
+ * BarcodeDetector is currently supported in:
+ *   - Chrome/Edge 83+ (desktop & Android)
+ *   - Safari 17.4+ (macOS & iOS)
+ *   - NOT supported in Firefox (as of 2025)
+ *
+ * This component already handles the unsupported case via feature detection:
+ *   if (!('BarcodeDetector' in window)) { ... fallback ... }
+ *
+ * No action required — track Safari rollout for team awareness.
+ * When Safari adoption of 17.4+ is confirmed sufficient for your user base,
+ * this note can be removed.
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/BarcodeDetector
+ */
 export function VRQRScanner({
   name,
   label,
