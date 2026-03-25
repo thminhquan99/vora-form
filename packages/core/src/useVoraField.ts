@@ -184,7 +184,13 @@ export function useVoraField<TValue = unknown>(
       cleanupFns.push(
         store.registerRule(name, (val) => {
           const isEmptyString = typeof val === 'string' && val.trim() === '';
-          if (val === undefined || val === null || isEmptyString || (Array.isArray(val) && val.length === 0)) {
+          const isEmptyObject =
+            val !== null &&
+            typeof val === 'object' &&
+            !Array.isArray(val) &&
+            Object.keys(val).length === 0;
+
+          if (val === undefined || val === null || isEmptyString || (Array.isArray(val) && val.length === 0) || isEmptyObject) {
             return rules.requiredMessage || 'This field is required';
           }
           return undefined;
