@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useRef, useState, useEffect, useCallback } from 'react';
+import DOMPurify from 'dompurify';
 import { useVoraField, useInitialSnapshot } from '@vora/core';
 import { VRLabel } from '../label';
 import { VRFieldError } from '../field-error';
@@ -32,7 +33,7 @@ export function VRFormula({
 
   useEffect(() => {
     if (editorRef.current && initialValue) {
-      editorRef.current.innerHTML = initialValue;
+      editorRef.current.innerHTML = DOMPurify.sanitize(initialValue);
     }
   }, []);
 
