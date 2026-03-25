@@ -466,6 +466,21 @@ export class FormStore {
    */
   getAllValues(): Record<string, unknown> {
     const result: Record<string, unknown> = {};
+    // Only include currently mounted fields (those with an active ref)
+    for (const path of this.refs.keys()) {
+      if (this.values.has(path)) {
+        result[path] = this.values.get(path);
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Returns all values, including those for fields currently unmounted.
+   * Useful for multi-step forms where you need the complete persistent state.
+   */
+  getAllValuesIncludingHidden(): Record<string, unknown> {
+    const result: Record<string, unknown> = {};
     for (const [path, value] of this.values) {
       result[path] = value;
     }
@@ -812,15 +827,13 @@ export class FormStore {
    */
   getDirtyValues(): Record<string, unknown> {
     const result: Record<string, unknown> = {};
-
-    for (const [path, currentValue] of this.values) {
+    for (const path of this.refs.keys()) {
+      const currentValue = this.values.get(path);
       const initialValue = this.initialValues.get(path);
-
       if (!isDeepEqual(currentValue, initialValue)) {
         result[path] = currentValue;
       }
     }
-
     return result;
   }
 
