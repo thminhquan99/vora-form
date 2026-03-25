@@ -25,6 +25,7 @@
  */
 
 import type { ValidateFunction, ValidationErrors } from '../types';
+import { unflattenDotNotation } from '../utils/unflatten';
 
 // ─── Zod Type Placeholder ─────────────────────────────────────────────────────
 
@@ -91,7 +92,9 @@ export interface ZodLikeSchema {
  */
 export function createZodAdapter(schema: ZodLikeSchema): ValidateFunction {
   return (values: Record<string, unknown>): ValidationErrors => {
-    const result = schema.safeParse(values);
+    // Expand dot-notation flat values into a nested object shape for Zod
+    const nestedValues = unflattenDotNotation(values);
+    const result = schema.safeParse(nestedValues);
 
     if (result.success) {
       return {};

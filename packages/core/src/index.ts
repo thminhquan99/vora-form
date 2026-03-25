@@ -41,3 +41,6 @@ export type {
 // ── Validation Adapters ───────────────────────────────────────────────────────
 export { createZodAdapter } from './validation/zod-adapter';
 export type { ZodLikeSchema } from './validation/zod-adapter';
+
+// ── Utils ─────────────────────────────────────────────────────────────────────
+export { unflattenDotNotation } from './utils/unflatten';
