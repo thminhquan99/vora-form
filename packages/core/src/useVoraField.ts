@@ -104,8 +104,11 @@ export interface UseVRFieldReturn<TValue> {
   setValue: (value: TValue) => void;
 
   /**
-   * Domain value setter without triggering re-renders (silent).
-   * For composite widgets that want to sync state without cascading React updates.
+   * @internal
+   * Silently syncs a value to the store without triggering React re-renders.
+   * ONLY use this inside VoraForm's own primitive components (e.g. VRSpreadsheet).
+   * Using this in composite consumer widgets WILL break React synchronization.
+   * Use setValue() instead for all external composite widget use cases.
    */
   setSilentValue: (value: TValue) => void;
 
