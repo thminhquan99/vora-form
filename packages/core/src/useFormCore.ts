@@ -37,7 +37,7 @@
  * ```
  */
 
-import { useCallback } from 'react';
+import { useCallback, useSyncExternalStore } from 'react';
 
 import { useFormContext } from './FormProvider';
 import type { FormStore } from './utils/ref-store';
@@ -116,7 +116,13 @@ export interface UseFormCoreReturn {
  * @throws Error if used outside `<VoraForm>`
  */
 export function useFormCore(): UseFormCoreReturn {
-  const { store, isSubmitting } = useFormContext();
+  const { store } = useFormContext();
+
+  const isSubmitting = useSyncExternalStore(
+    useCallback((onStoreChange) => store.subscribe('global', onStoreChange, 'submitting'), [store]),
+    useCallback(() => store.getIsSubmitting(), [store]),
+    useCallback(() => store.getIsSubmitting(), [store])
+  );
 
   // All callbacks bind to the stable store ref — they never change.
   const getValue = useCallback(

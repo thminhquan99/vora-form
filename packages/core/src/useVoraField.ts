@@ -104,6 +104,12 @@ export interface UseVRFieldReturn<TValue> {
   setValue: (value: TValue) => void;
 
   /**
+   * Domain value setter without triggering re-renders (silent).
+   * For composite widgets that want to sync state without cascading React updates.
+   */
+  setSilentValue: (value: TValue) => void;
+
+  /**
    * Blur handler — marks the field as touched and triggers single-field
    * validation if a validation function is configured on the form.
    */
@@ -177,7 +183,8 @@ export function useVoraField<TValue = unknown>(
     if (rules.required) {
       cleanupFns.push(
         store.registerRule(name, (val) => {
-          if (val === undefined || val === null || val === '' || (Array.isArray(val) && val.length === 0)) {
+          const isEmptyString = typeof val === 'string' && val.trim() === '';
+          if (val === undefined || val === null || isEmptyString || (Array.isArray(val) && val.length === 0)) {
             return rules.requiredMessage || 'This field is required';
           }
           return undefined;
@@ -344,6 +351,13 @@ export function useVoraField<TValue = unknown>(
     [store, name]
   );
 
+  const setSilentValue = useCallback(
+    (val: TValue) => {
+      store.setSilentValue(name, val);
+    },
+    [store, name]
+  );
+
   // ── onBlur handler ─────────────────────────────────────────────────────
   //
   // Triggers single-field validation on blur. Only validates the specific
@@ -382,10 +396,11 @@ export function useVoraField<TValue = unknown>(
       ref: fieldRef,
       onChange,
       setValue,
+      setSilentValue,
       onBlur,
       isTouched,
       name,
     }),
-    [value, error, fieldRef, onChange, setValue, onBlur, isTouched, name]
+    [value, error, fieldRef, onChange, setValue, setSilentValue, onBlur, isTouched, name]
   );
 }

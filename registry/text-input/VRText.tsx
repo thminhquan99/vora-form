@@ -73,8 +73,24 @@ export function VRText({
         name={name}
         type={type}
         defaultValue={field.value ?? ''}
-        onChange={field.onChange}
-        onBlur={field.onBlur}
+        onChange={(e) => {
+          if (e.target.value.startsWith(' ')) {
+            e.target.value = e.target.value.trimStart();
+          }
+          if (e.target.value.includes('  ')) {
+            const cursor = e.target.selectionStart;
+            e.target.value = e.target.value.replace(/\s{2,}/g, ' ');
+            if (cursor) e.target.setSelectionRange(cursor - 1, cursor - 1);
+          }
+          field.onChange(e);
+        }}
+        onBlur={(e) => {
+          if (e.target.value !== e.target.value.trim()) {
+            e.target.value = e.target.value.trim();
+            field.onChange(e);
+          }
+          field.onBlur();
+        }}
         placeholder={placeholder}
         autoComplete={autoComplete}
         maxLength={maxLength}

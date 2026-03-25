@@ -42,11 +42,6 @@ export interface FormContextValue {
    */
   validate?: ValidateFunction;
 
-  /**
-   * Whether the form is currently submitting.
-   * Managed by handleSubmit to disable submit buttons.
-   */
-  isSubmitting: boolean;
 }
 
 /**
@@ -159,9 +154,6 @@ export function VoraForm({
   }
   const store = storeRef.current;
 
-  // ── Submitting state (form-level only, does not affect field components) ─
-  const [isSubmitting, setIsSubmitting] = React.useState(false);
-
   // ── Submit handler ──────────────────────────────────────────────────────
   const handleSubmit = React.useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
@@ -179,6 +171,7 @@ export function VoraForm({
           // Map errors to the store so field components can display them
           for (const path of errorPaths) {
             store.setError(path, errors[path]);
+            store.setTouched(path); // Fix Ghost Errors: UI requires isTouched to show error
           }
           // Focus the first errored field for accessibility
           store.focusField(errorPaths[0]);
@@ -190,6 +183,9 @@ export function VoraForm({
         if (!isValid) {
           // Find the first field with an error and focus it
           const allErrors = store.getAllErrors();
+          for (const path of Object.keys(allErrors)) {
+            store.setTouched(path);
+          }
           const firstErrorPath = Object.keys(allErrors)[0];
           if (firstErrorPath) {
              store.focusField(firstErrorPath);
@@ -199,23 +195,20 @@ export function VoraForm({
       }
 
       // No errors — call the developer's onSubmit
-      setIsSubmitting(true);
+      store.setSubmitting(true);
       try {
         await onSubmit(values, store);
       } finally {
-        setIsSubmitting(false);
+        store.setSubmitting(false);
       }
     },
     [store, validate, onSubmit]
   );
 
-  // ── Context value (referentially stable except for isSubmitting) ─────────
-  // We intentionally recreate this object only when isSubmitting changes.
-  // Field components do NOT read isSubmitting — only <VRSubmit> does,
-  // so this re-render is scoped to the submit button only.
+  // ── Context value (100% referentially stable) ─────────
   const contextValue = React.useMemo<FormContextValue>(
-    () => ({ store, validate, isSubmitting }),
-    [store, validate, isSubmitting]
+    () => ({ store, validate }),
+    [store, validate]
   );
 
   return (

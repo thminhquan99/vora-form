@@ -306,6 +306,10 @@ const timezoneOptions = [
  * - NEVER increment during normal typing
  */
 function RenderCounter({ label }: { label: string }) {
+  // Subscribe to the field path to accurately track its re-renders!
+  // If the zero-render architecture fails, this hook will trigger a re-render.
+  useVoraField(label);
+
   const renderCount = useRef(0);
   renderCount.current += 1;
 

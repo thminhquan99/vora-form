@@ -41,9 +41,8 @@ export function VRSpreadsheet({
 
   // Synchronize completely mutably across DOM and FormStore
   const syncToStore = useCallback(() => {
-    // We deep clone matrixRef.current to create a new array ref for `store.setValue` to trigger correct proxy diffs
     const snapshot = matrixRef.current.map((row: string[]) => [...row]);
-    field.setValue(snapshot);
+    field.setSilentValue(snapshot);
   }, [field]);
 
   const handleInput = (r: number, c: number, value: string) => {

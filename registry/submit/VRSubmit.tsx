@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { useFormContext } from '@vora/core';
+import { useFormCore } from '@vora/core';
 import styles from './VRSubmit.module.css';
 
 export interface VRSubmitProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -19,7 +19,7 @@ export function VRSubmit({
   disabled,
   ...props
 }: VRSubmitProps): React.JSX.Element {
-  const { isSubmitting } = useFormContext();
+  const { isSubmitting } = useFormCore();
 
   const isDisabled = disabled || isSubmitting;
 

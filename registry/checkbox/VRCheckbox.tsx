@@ -47,7 +47,7 @@ export function VRCheckbox({
           name={name}
           type="checkbox"
           defaultChecked={!!field.value}
-          onChange={(e) => field.setValue(e.target.checked)}
+          onChange={field.onChange}
           onBlur={field.onBlur}
           disabled={disabled}
           required={required}

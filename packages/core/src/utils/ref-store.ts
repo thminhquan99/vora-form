@@ -99,7 +99,7 @@ export type Listener = () => void;
  * The subset of subscriber topics. Allows subscribing to value changes,
  * error changes, or both.
  */
-export type SubscriptionTopic = 'value' | 'error' | 'input' | 'touched';
+export type SubscriptionTopic = 'value' | 'error' | 'input' | 'touched' | 'submitting';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -194,6 +194,11 @@ export class FormStore {
    * had a chance to fill in the field.
    */
   private touched: Set<string> = new Set();
+
+  /**
+   * Global submitting state.
+   */
+  private submitting: boolean = false;
 
   /**
    * Per-path, per-topic subscriber sets.
@@ -319,6 +324,7 @@ export class FormStore {
     this.listeners.delete(this.listenerKey(path, 'error'));
     this.listeners.delete(this.listenerKey(path, 'input'));
     this.listeners.delete(this.listenerKey(path, 'touched'));
+    // Note: 'submitting' listeners use a special global path 'global'
   }
 
   // ── Value Access ──────────────────────────────────────────────────────────
@@ -375,7 +381,12 @@ export class FormStore {
    * ```
    */
   setValue(path: string, value: unknown): void {
+    const prevValue = this.values.get(path);
     this.values.set(path, value);
+
+    if (prevValue !== value && this.errors.has(path)) {
+      this.clearError(path);
+    }
 
     // Sync to DOM for native inputs so the visible value updates immediately
     const ref = this.refs.get(path);
@@ -422,7 +433,13 @@ export class FormStore {
    * @param value - The new domain value
    */
   setSilentValue(path: string, value: unknown): void {
+    const prevValue = this.values.get(path);
     this.values.set(path, value);
+
+    // Auto-clear error when user types to improve UX natively
+    if (prevValue !== value && this.errors.has(path)) {
+      this.clearError(path);
+    }
 
     // Notify 'input' subscribers — this is used by useAsyncValidation
     // to trigger debounced validation without a React re-render.
@@ -725,6 +742,23 @@ export class FormStore {
    */
   isTouched(path: string): boolean {
     return this.touched.has(path);
+  }
+
+  /**
+   * Sets the submitting state and notifies 'submitting' subscribers.
+   */
+  setSubmitting(isSubmitting: boolean): void {
+    if (this.submitting !== isSubmitting) {
+      this.submitting = isSubmitting;
+      this.notify('global', 'submitting');
+    }
+  }
+
+  /**
+   * Returns whether the form is currently submitting.
+   */
+  getIsSubmitting(): boolean {
+    return this.submitting;
   }
 
   /**
