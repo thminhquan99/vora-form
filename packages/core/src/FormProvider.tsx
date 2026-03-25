@@ -159,6 +159,10 @@ export function VoraForm({
     async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
 
+      if (store.isValidating) {
+        return; // Block submission while async validation is pending
+      }
+
       const values = store.getAllValues();
 
       // Run validation if a validate function was provided

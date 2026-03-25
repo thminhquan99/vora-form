@@ -200,6 +200,11 @@ export class FormStore {
    */
   private submitting: boolean = false;
 
+  // ============================================================================
+  // FIX-2: Async Validation State Tracking
+  // ============================================================================
+  private _pendingValidations: number = 0;
+
   /**
    * Per-path, per-topic subscriber sets.
    *
@@ -316,15 +321,12 @@ export class FormStore {
    * @param path - The field path to unregister
    */
   unregisterField(path: string): void {
-    // Only remove the DOM ref — data stays in the store
+    // Only remove the DOM ref — listeners are owned by subscribing components
+    // and cleaned up when THOSE components unmount via their unsubscribe
+    // functions (returned by subscribe()). Deleting listeners here would
+    // permanently break sibling components (e.g. <VRFieldError>) that
+    // subscribe to the same path even after a field remounts.
     this.refs.delete(path);
-
-    // Remove listeners to prevent stale subscriptions
-    this.listeners.delete(this.listenerKey(path, 'value'));
-    this.listeners.delete(this.listenerKey(path, 'error'));
-    this.listeners.delete(this.listenerKey(path, 'input'));
-    this.listeners.delete(this.listenerKey(path, 'touched'));
-    // Note: 'submitting' listeners use a special global path 'global'
   }
 
   // ── Value Access ──────────────────────────────────────────────────────────
@@ -715,6 +717,11 @@ export class FormStore {
     this.initialValues.clear();
     this.touched.clear();
     this.listeners.clear();
+
+    // ============================================================================
+    // FIX-2: Async Validation State Tracking (Reset)
+    // ============================================================================
+    this._pendingValidations = 0;
   }
 
   // ── Touched & Dirty Tracking ─────────────────────────────────────────────
@@ -754,11 +761,37 @@ export class FormStore {
     }
   }
 
+  // ============================================================================
+  // FIX-2: Async Validation State Tracking (Methods)
+  // ============================================================================
+  incrementPendingValidations(): void {
+    this._pendingValidations++;
+    if (this._pendingValidations === 1) {
+      // Only notify on transition 0→1 to avoid spamming subscribers
+      this.notify('global', 'submitting');
+    }
+  }
+
+  decrementPendingValidations(): void {
+    this._pendingValidations = Math.max(0, this._pendingValidations - 1);
+    if (this._pendingValidations === 0) {
+      // Notify on transition 1→0 so submit button re-enables
+      this.notify('global', 'submitting');
+    }
+  }
+
   /**
    * Returns whether the form is currently submitting.
    */
   getIsSubmitting(): boolean {
     return this.submitting;
+  }
+
+  // ============================================================================
+  // FIX-2: Async Validation State Tracking (Getter)
+  // ============================================================================
+  get isValidating(): boolean {
+    return this._pendingValidations > 0;
   }
 
   /**

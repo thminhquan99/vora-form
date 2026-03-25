@@ -91,11 +91,15 @@ export function useAsyncValidation<TValue = unknown>(
       timerId = setTimeout(async () => {
         if (aborted) return;
 
+        store.incrementPendingValidations();
         const value = store.getValue<TValue>(name);
 
         try {
           const error = await validateFnRef.current(value as TValue);
           if (aborted) return;
+
+          // Discard the result if the form is currently submitting
+          if (store.getIsSubmitting()) return;
 
           if (error) {
             store.setError(name, error);
@@ -105,9 +109,11 @@ export function useAsyncValidation<TValue = unknown>(
         } catch {
           // Swallow validation errors — the field stays in its current
           // error state. In production, you'd likely want to log this.
-          if (!aborted) {
+          if (!aborted && !store.getIsSubmitting()) {
             store.clearError(name);
           }
+        } finally {
+          store.decrementPendingValidations();
         }
       }, debounceMsRef.current);
     };

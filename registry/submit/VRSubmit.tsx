@@ -19,9 +19,9 @@ export function VRSubmit({
   disabled,
   ...props
 }: VRSubmitProps): React.JSX.Element {
-  const { isSubmitting } = useFormCore();
+  const { isSubmitting, isValidating } = useFormCore();
 
-  const isDisabled = disabled || isSubmitting;
+  const isDisabled = disabled || isSubmitting || isValidating;
 
   return (
     <button
@@ -30,7 +30,7 @@ export function VRSubmit({
       className={`${styles.submitButton} ${className ?? ''}`}
       {...props}
     >
-      {isSubmitting ? 'Submitting...' : children}
+      {isSubmitting ? 'Submitting...' : isValidating ? 'Validating...' : children}
     </button>
   );
 }

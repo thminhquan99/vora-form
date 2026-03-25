@@ -94,6 +94,9 @@ export interface UseFormCoreReturn {
   /** Whether the form is currently submitting. */
   isSubmitting: boolean;
 
+  /** Whether the form currently has pending async validations. */
+  isValidating: boolean;
+
   /**
    * The raw store instance — escape hatch for advanced use cases.
    * Prefer the named methods above for type safety.
@@ -122,6 +125,13 @@ export function useFormCore(): UseFormCoreReturn {
     useCallback((onStoreChange) => store.subscribe('global', onStoreChange, 'submitting'), [store]),
     useCallback(() => store.getIsSubmitting(), [store]),
     useCallback(() => store.getIsSubmitting(), [store])
+  );
+
+  // Re-use the 'submitting' topic for isValidating since it fires on both transitions
+  const isValidating = useSyncExternalStore(
+    useCallback((onStoreChange) => store.subscribe('global', onStoreChange, 'submitting'), [store]),
+    useCallback(() => store.isValidating, [store]),
+    useCallback(() => store.isValidating, [store])
   );
 
   // All callbacks bind to the stable store ref — they never change.
@@ -199,6 +209,7 @@ export function useFormCore(): UseFormCoreReturn {
     hasErrors,
     getDirtyValues,
     isSubmitting,
+    isValidating,
     store,
   };
 }
