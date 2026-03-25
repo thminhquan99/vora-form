@@ -63,9 +63,9 @@ export function VRSelect({
         disabled={disabled}
         required={required}
         aria-required={required || undefined}
-        aria-invalid={hasError || undefined}
-        aria-describedby={hasError ? errorId : undefined}
-        className={`${styles.select} ${hasError ? styles.selectError : ''}`}
+        aria-invalid={hasError && field.isTouched ? "true" : "false"}
+        aria-describedby={hasError && field.isTouched ? errorId : undefined}
+        className={`${styles.select} ${hasError && field.isTouched ? styles.selectError : ''}`}
       >
         {placeholder && (
           <option value="" disabled>

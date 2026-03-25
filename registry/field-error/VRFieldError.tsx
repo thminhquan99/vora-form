@@ -31,9 +31,9 @@ export function VRFieldError({
   className,
   role = 'alert',
 }: VRFieldErrorProps): React.JSX.Element | null {
-  const { error } = useVoraField(name);
+  const { error, isTouched } = useVoraField(name);
 
-  if (!error) {
+  if (!error || !isTouched) {
     return null;
   }
 

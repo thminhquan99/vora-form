@@ -52,9 +52,9 @@ export function VRCheckbox({
           disabled={disabled}
           required={required}
           aria-required={required || undefined}
-          aria-invalid={hasError || undefined}
-          aria-describedby={hasError ? errorId : undefined}
-          className={`${styles.checkbox} ${hasError ? styles.checkboxError : ''}`}
+          aria-invalid={hasError && field.isTouched ? "true" : "false"}
+          aria-describedby={hasError && field.isTouched ? errorId : undefined}
+          className={`${styles.checkbox} ${hasError && field.isTouched ? styles.checkboxError : ''}`}
         />
         <label
           htmlFor={inputId}

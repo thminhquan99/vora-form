@@ -18,6 +18,7 @@ export function VRSpreadsheet({
 }: VRSpreadsheetProps): React.JSX.Element {
   const field = useVoraField<string[][]>(name);
   const inputId = id ?? name;
+  const hasError = !!field.error;
 
   // Snapshot Pattern: Initialize exactly once
   const initialValue = useInitialSnapshot(field.value);
@@ -134,7 +135,7 @@ export function VRSpreadsheet({
                   <input
                     id={`${inputId}-cell-${r}-${c}`}
                     type="text"
-                    className={styles.input}
+                    className={`${styles.input} ${hasError && field.isTouched && styles.inputError ? styles.inputError : ''}`}
                     onInput={(e) => handleInput(r, c, e.currentTarget.value)}
                     onKeyDown={(e) => handleKeyDown(e, r, c)}
                     onPaste={(e) => handlePaste(e, r, c)}
@@ -142,6 +143,8 @@ export function VRSpreadsheet({
                     defaultValue={initialValue?.[r]?.[c] || ''}
                     role="gridcell"
                     aria-label={`Row ${r + 1}, Column ${c + 1}`}
+                    aria-invalid={hasError && field.isTouched ? "true" : "false"}
+                    aria-describedby={hasError && field.isTouched ? `${name}-error` : undefined}
                   />
                 </div>
               ))}

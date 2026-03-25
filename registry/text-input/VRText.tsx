@@ -81,9 +81,9 @@ export function VRText({
         disabled={disabled}
         required={required}
         aria-required={required || undefined}
-        aria-invalid={hasError || undefined}
-        aria-describedby={hasError ? errorId : undefined}
-        className={`${styles.input} ${hasError ? styles.inputError : ''}`}
+        aria-invalid={hasError && field.isTouched ? "true" : "false"}
+        aria-describedby={hasError && field.isTouched ? errorId : undefined}
+        className={`${styles.input} ${hasError && field.isTouched ? styles.inputError : ''}`}
       />
 
       {/* ── Inline Error ──────────────────────────────────────────────── */}
