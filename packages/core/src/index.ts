@@ -44,3 +44,4 @@ export type { ZodLikeSchema } from './validation/zod-adapter';
 
 // ── Utils ─────────────────────────────────────────────────────────────────────
 export { unflattenDotNotation } from './utils/unflatten';
+export { isDeepEqual } from './utils/is-equal';

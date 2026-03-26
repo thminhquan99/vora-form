@@ -173,17 +173,25 @@ export function useVoraField<TValue = unknown>(
     required?: boolean;
     requiredMessage?: string;
     pattern?: { value: RegExp; message: string };
-    validate?: (value: any) => string | undefined;
+    validate?: (value: TValue) => string | undefined;
   }
 ): UseVRFieldReturn<TValue> {
-  const { store, validate: formValidate } = useFormContext();
+  const { store, getValidate } = useFormContext();
 
-  // ── Native Validation Hook Registration ──────────────────────────────────
+  // ── FIX C4: Stabilize rules via useRef ──────────────────────────────────
+  //
+  // Object references in `rules` (pattern, validate) change on every parent
+  // render if not memoized. Storing them in a ref breaks the dependency cycle
+  // so the useEffect only re-runs when `store` or `name` changes.
+  const rulesRef = useRef(rules);
+  useEffect(() => { rulesRef.current = rules; }, [rules]);
+
   useEffect(() => {
-    if (!rules) return;
+    const currentRules = rulesRef.current;
+    if (!currentRules) return;
     const cleanupFns: Array<() => void> = [];
 
-    if (rules.required) {
+    if (currentRules.required) {
       cleanupFns.push(
         store.registerRule(name, (val) => {
           const isEmptyString = typeof val === 'string' && val.trim() === '';
@@ -194,26 +202,27 @@ export function useVoraField<TValue = unknown>(
             Object.keys(val).length === 0;
 
           if (val === undefined || val === null || isEmptyString || (Array.isArray(val) && val.length === 0) || isEmptyObject) {
-            return rules.requiredMessage || 'This field is required';
+            return currentRules.requiredMessage || 'This field is required';
           }
           return undefined;
         })
       );
     }
 
-    if (rules.pattern) {
+    if (currentRules.pattern) {
+      const pattern = currentRules.pattern;
       cleanupFns.push(
         store.registerRule(name, (val) => {
-          if (typeof val === 'string' && val.length > 0 && !rules.pattern!.value.test(val)) {
-            return rules.pattern!.message;
+          if (typeof val === 'string' && val.length > 0 && !pattern.value.test(val)) {
+            return pattern.message;
           }
           return undefined;
         })
       );
     }
 
-    if (rules.validate) {
-      if (rules.validate.constructor.name === 'AsyncFunction') {
+    if (currentRules.validate) {
+      if (currentRules.validate.constructor.name === 'AsyncFunction') {
         console.warn(
           `[VoraForm] The validate prop on field "${name}" returned a Promise. ` +
           `Synchronous validate must return string | undefined. ` +
@@ -221,24 +230,23 @@ export function useVoraField<TValue = unknown>(
         );
       }
 
-      const originalValidate = rules.validate;
-      const safeValidate = (val: any): string | undefined => {
+      const originalValidate = currentRules.validate;
+      const safeValidate = (val: TValue): string | undefined => {
         const result = originalValidate(val);
 
         // Detect Promise return — async validators are not supported in
-        // registerRule (which is synchronous). Silently ignore and let
-        // useAsyncValidation handle it instead.
+        // registerRule (which is synchronous). Silently ignore.
         if (result !== null && typeof result === 'object' && typeof (result as any).then === 'function') {
-          return undefined; // Treat as no error — do not set "[object Promise]"
+          return undefined;
         }
 
         return result as string | undefined;
       };
-      cleanupFns.push(store.registerRule(name, safeValidate));
+      cleanupFns.push(store.registerRule(name, safeValidate as (val: unknown) => string | undefined));
     }
 
     return () => cleanupFns.forEach((fn) => fn());
-  }, [store, name, rules?.required, rules?.requiredMessage, rules?.pattern, rules?.validate]);
+  }, [store, name]); // FIX C4: REMOVED object dependencies — read from ref
 
   // ── Value subscription via useSyncExternalStore ─────────────────────────
   //
@@ -393,11 +401,19 @@ export function useVoraField<TValue = unknown>(
   // Triggers single-field validation on blur. Only validates the specific
   // field that lost focus — no other fields are affected.
 
+  // ── FIX C3: onBlur validates THIS field only ─────────────────────────────
+  //
+  // Previously called `store.validateInternal()` which clears ALL errors
+  // and re-validates every field. Now only validates the blurred field.
+
   const onBlur = useCallback(() => {
     // Mark field as touched on first blur
     store.setTouched(name);
 
+    const formValidate = getValidate();
     if (formValidate) {
+      // External schema validation (Zod) — run full schema but only
+      // apply the error for THIS field
       const allValues = store.getAllValues();
       const errors = formValidate(allValues);
       const fieldError = errors[name];
@@ -408,14 +424,10 @@ export function useVoraField<TValue = unknown>(
         store.clearError(name);
       }
     } else {
-      // Fallback: Run internal validation for this specific field only
-      // Native validation runs across all fields simultaneously during submit,
-      // but during onBlur we simply execute store.validateInternal() safely if needed,
-      // though typically native browser attributes handle single-field blurs best.
-      // Easiest is to just re-validate everything natively into the store:
-      store.validateInternal();
+      // Internal native validation for THIS FIELD ONLY
+      store.validateField(name);
     }
-  }, [store, name, formValidate]);
+  }, [store, name, getValidate]);
 
   // ── Return ─────────────────────────────────────────────────────────────
 

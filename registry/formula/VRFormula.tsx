@@ -37,6 +37,15 @@ export function VRFormula({
     }
   }, []);
 
+  // FIX-1: Synchronize external value updates (e.g. formRef.setValue, reset)
+  useEffect(() => {
+    if (editorRef.current && field.value !== undefined && field.value !== editorRef.current.innerHTML) {
+      // Small optimization: only update if different from current innerHTML
+      // to avoid cursor jumps if this somehow fires during local input
+      editorRef.current.innerHTML = DOMPurify.sanitize(field.value);
+    }
+  }, [field.value]);
+
   const syncToStore = useCallback(() => {
     if (editorRef.current) {
       field.setValue(editorRef.current.innerHTML);
@@ -102,14 +111,30 @@ export function VRFormula({
       }
     }
 
-    // Insert the Pill HTML natively
-    const pillHtml = `<span contenteditable="false" class="vora-pill" data-value="${variable.value}">@${variable.label}</span>&nbsp;`;
+    // Insert the Pill HTML using Range/Selection API
+    const pillHtml = `<span contenteditable="false" class="vora-pill" data-value="${variable.value}">@${variable.label}</span>`;
     
     // Restore selection to the modified range
     selection.removeAllRanges();
     selection.addRange(range);
-    
-    document.execCommand('insertHTML', false, pillHtml);
+
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = DOMPurify.sanitize(pillHtml, {
+      ALLOWED_TAGS: ['span'],
+      ALLOWED_ATTR: ['contenteditable', 'class', 'data-value'],
+    });
+    const pillNode = tempDiv.firstChild;
+    if (pillNode) {
+      range.insertNode(pillNode);
+      // Move cursor after the inserted pill
+      range.setStartAfter(pillNode);
+      range.collapse(true);
+      selection.removeAllRanges();
+      selection.addRange(range);
+    }
+
+    // Insert a space after the pill so cursor lands outside it
+    document.execCommand('insertText', false, '\u00A0');
 
     setDropdownOpen(false);
     setSearchQuery('');

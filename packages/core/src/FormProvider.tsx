@@ -19,7 +19,7 @@
  * `useSyncExternalStore` in the `useVoraField` hook.
  */
 
-import React, { createContext, useContext, useRef } from 'react';
+import React, { createContext, useContext, useRef, useEffect } from 'react';
 
 import { FormStore } from './utils/ref-store';
 import type { ValidateFunction } from './types';
@@ -37,11 +37,13 @@ export interface FormContextValue {
   store: FormStore;
 
   /**
-   * Optional validation function produced by a schema adapter (e.g., Zod).
-   * Called by `handleSubmit` before invoking `onSubmit`.
+   * Getter for the current validation function. Returns the latest
+   * `validate` prop without breaking context referential stability.
+   *
+   * Stored in a `useRef` internally — the context value never changes
+   * when the parent provides a new `validate` reference.
    */
-  validate?: ValidateFunction;
-
+  getValidate: () => ValidateFunction | undefined;
 }
 
 /**
@@ -154,6 +156,13 @@ export function VoraForm({
   }
   const store = storeRef.current;
 
+  // ── FIX C5: Stable validate ref ────────────────────────────────────────
+  // Store `validate` in a ref so the context value never changes when the
+  // parent provides a new `validate` function reference. Consumers access
+  // it through the `getValidate()` getter, which always reads the latest.
+  const validateRef = useRef(validate);
+  useEffect(() => { validateRef.current = validate; }, [validate]);
+
   // ── Submit handler ──────────────────────────────────────────────────────
   const handleSubmit = React.useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
@@ -164,11 +173,12 @@ export function VoraForm({
       }
 
       const values = store.getAllValues();
+      const currentValidate = validateRef.current;
 
       // Run validation if a validate function was provided
-      if (validate) {
+      if (currentValidate) {
         store.clearAllErrors();
-        const errors = validate(values);
+        const errors = currentValidate(values);
         const errorPaths = Object.keys(errors);
 
         if (errorPaths.length > 0) {
@@ -206,13 +216,18 @@ export function VoraForm({
         store.setSubmitting(false);
       }
     },
-    [store, validate, onSubmit]
+    [store, onSubmit] // REMOVED validate — read from ref instead
   );
 
-  // ── Context value (100% referentially stable) ─────────
+  // ── Context value (100% referentially stable) ──────────────────────────
+  // ONLY depends on `store` — which is created once via useRef.
+  // `getValidate` is a stable closure over `validateRef`.
   const contextValue = React.useMemo<FormContextValue>(
-    () => ({ store, validate }),
-    [store, validate]
+    () => ({
+      store,
+      getValidate: () => validateRef.current,
+    }),
+    [store]
   );
 
   return (

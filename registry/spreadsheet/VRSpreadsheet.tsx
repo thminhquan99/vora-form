@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useEffect, useCallback, useId } from 'react';
-import { useVoraField, useInitialSnapshot } from '@vora/core';
+import { useVoraField, useInitialSnapshot, isDeepEqual } from '@vora/core';
 import { VRLabel } from '../label';
 import { VRFieldError } from '../field-error';
 import type { VRSpreadsheetProps } from './types';
@@ -43,6 +43,29 @@ export function VRSpreadsheet({
       }
     }
   }, [rows, cols]);
+
+  // FIX-1: Synchronize external value updates (e.g. formRef.setValue, reset)
+  // Even though we are uncontrolled-first, we MUST react to external data changes
+  // to ensure features like "Reset Form" or "Prefill from API" work correctly.
+  useEffect(() => {
+    if (!field.value || !Array.isArray(field.value)) return;
+
+    // Only update if the store's value is different from our local buffer
+    // to avoid cycles and race conditions.
+    if (!isDeepEqual(field.value, matrixRef.current)) {
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const newValue = field.value?.[r]?.[c] || '';
+          if (matrixRef.current[r][c] !== newValue) {
+            matrixRef.current[r][c] = newValue;
+            const targetId = `${cellPrefix}-cell-${r}-${c}`;
+            const el = document.getElementById(targetId) as HTMLInputElement;
+            if (el) el.value = newValue;
+          }
+        }
+      }
+    }
+  }, [field.value, rows, cols, cellPrefix]);
 
   // Synchronize completely mutably across DOM and FormStore
   const syncToStore = useCallback(() => {

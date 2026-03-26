@@ -99,7 +99,7 @@ export type Listener = () => void;
  * The subset of subscriber topics. Allows subscribing to value changes,
  * error changes, or both.
  */
-export type SubscriptionTopic = 'value' | 'error' | 'input' | 'touched' | 'submitting';
+export type SubscriptionTopic = 'value' | 'error' | 'input' | 'touched' | 'submitting' | 'validating';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -534,6 +534,34 @@ export class FormStore {
     return isValid;
   }
 
+  /**
+   * FIX C3: Validates a SINGLE field's rules only.
+   *
+   * Unlike `validateInternal()` which clears ALL errors and re-validates
+   * every field, this method only touches the specified path. This is the
+   * correct behavior for `onBlur` validation — the user blurred one field,
+   * so only that field should be validated.
+   *
+   * @param path - The field path to validate
+   * @returns `true` if the field is valid, `false` if it has errors
+   */
+  validateField(path: string): boolean {
+    this.clearError(path);
+    const rules = this.fieldRules.get(path);
+    if (!rules) return true; // No rules registered for this field
+
+    const val = this.getValue(path);
+    for (const rule of rules) {
+      const error = rule(val);
+      // Guard: skip Promise returns (async validators handled separately)
+      if (error && !(typeof error === 'object' && typeof (error as any).then === 'function')) {
+        this.setError(path, error);
+        return false; // Stop at first error for this field
+      }
+    }
+    return true;
+  }
+
   // ── Error Management ──────────────────────────────────────────────────────
 
   /**
@@ -784,16 +812,16 @@ export class FormStore {
   incrementPendingValidations(): void {
     this._pendingValidations++;
     if (this._pendingValidations === 1) {
-      // Only notify on transition 0→1 to avoid spamming subscribers
-      this.notify('global', 'submitting');
+      // FIX C2: Notify on dedicated 'validating' topic, not 'submitting'
+      this.notify('global', 'validating');
     }
   }
 
   decrementPendingValidations(): void {
     this._pendingValidations = Math.max(0, this._pendingValidations - 1);
     if (this._pendingValidations === 0) {
-      // Notify on transition 1→0 so submit button re-enables
-      this.notify('global', 'submitting');
+      // FIX C2: Notify on dedicated 'validating' topic
+      this.notify('global', 'validating');
     }
   }
 

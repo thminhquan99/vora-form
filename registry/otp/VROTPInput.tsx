@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useRef, useId } from 'react';
 import { useVoraField } from '@vora/core';
 import { VRLabel } from '../label';
 import { VRFieldError } from '../field-error';
@@ -31,7 +31,8 @@ export function VROTPInput({
   const field = useVoraField<string>(name);
   const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
 
-  const inputId = id ?? name;
+  const instanceId = useId();
+  const inputId = id ?? instanceId;
   const errorId = `${name}-error`;
   const hasError = !!field.error;
 

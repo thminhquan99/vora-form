@@ -127,9 +127,9 @@ export function useFormCore(): UseFormCoreReturn {
     useCallback(() => store.getIsSubmitting(), [store])
   );
 
-  // Re-use the 'submitting' topic for isValidating since it fires on both transitions
+  // FIX C2: Use dedicated 'validating' topic instead of piggyback on 'submitting'
   const isValidating = useSyncExternalStore(
-    useCallback((onStoreChange) => store.subscribe('global', onStoreChange, 'submitting'), [store]),
+    useCallback((onStoreChange) => store.subscribe('global', onStoreChange, 'validating'), [store]),
     useCallback(() => store.isValidating, [store]),
     useCallback(() => store.isValidating, [store])
   );
