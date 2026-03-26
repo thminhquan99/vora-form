@@ -246,8 +246,7 @@ export function useVoraField<TValue = unknown>(
     }
 
     return () => cleanupFns.forEach((fn) => fn());
-  }, [store, name]); // FIX C4: REMOVED object dependencies — read from ref
-
+  }, [store, name]); // FIX C4: Rely on stabilize rulesRef for registration logic
   // ── Consolidated field subscription via useSyncExternalStore ───────────
   const lastSnapshot = useRef<{
     value: TValue | undefined;
@@ -368,6 +367,7 @@ export function useVoraField<TValue = unknown>(
   // and re-validates every field. Now only validates the blurred field.
 
   const onBlur = useCallback(() => {
+    if (!store) return; // Defensive: ensure store hasn't been torn down
     // Mark field as touched on first blur
     store.setTouched(name);
 

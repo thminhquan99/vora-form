@@ -71,11 +71,7 @@ export function VRCamera({
   useEffect(() => {
     const el = wrapperRef.current;
     if (el && field.ref) {
-      if (typeof field.ref === 'function') {
-        field.ref(el);
-      } else {
-        (field.ref as React.MutableRefObject<HTMLDivElement | null>).current = el;
-      }
+      field.ref(el);
     }
   }, [field.ref]);
 

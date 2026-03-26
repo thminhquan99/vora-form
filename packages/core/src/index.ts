@@ -43,5 +43,6 @@ export { createZodAdapter } from './validation/zod-adapter';
 export type { ZodLikeSchema } from './validation/zod-adapter';
 
 // ── Utils ─────────────────────────────────────────────────────────────────────
+export { serializeHtmlToTemplate, sanitizeText } from './utils/dom-sync';
 export { unflattenDotNotation } from './utils/unflatten';
 export { isDeepEqual } from './utils/is-equal';

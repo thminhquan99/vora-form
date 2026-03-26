@@ -1,4 +1,8 @@
+// @vitest-environment jsdom
+import { describe, it, expect, vi } from 'vitest';
 import { FormStore } from '../ref-store';
+
+const jest = { fn: vi.fn }; // bridge for existing tests
 
 describe('FormStore — registerField & getValue', () => {
   it('registers a native input element and seeds its value into the values Map', () => {
@@ -34,7 +38,7 @@ describe('FormStore — registerField & getValue', () => {
     expect(store.getValue('testField')).toBe('keepme');
   });
 
-  it('purgeField completely removes field from the store', () => {
+  it('purgeField completely removes field from the store and clears listeners', () => {
     const store = new FormStore();
     const input = document.createElement('input');
     input.value = 'gone';
@@ -42,12 +46,27 @@ describe('FormStore — registerField & getValue', () => {
     store.setError('testField', 'error');
     store.setTouched('testField');
 
+    const mockListener = jest.fn();
+    store.subscribe('testField', mockListener, 'value');
+
     store.purgeField('testField');
     
     expect(store.getValue('testField')).toBeUndefined();
     expect(store.getError('testField')).toBeUndefined();
     expect(store.isTouched('testField')).toBe(false);
     expect(store.fieldCount).toBe(0);
+
+    // Verify rules are gone — validateInternal should stay true even if field had failing rules
+    const isValid = store.validateInternal();
+    expect(isValid).toBe(true);
+
+    // Verify listeners receive one final notification during purge (FIX 2)
+    expect(mockListener).toHaveBeenCalledTimes(1);
+    mockListener.mockClear();
+
+    // Verify listeners are gone AFTER purge — no further notifications
+    store.setValue('testField', 'new-val');
+    expect(mockListener).not.toHaveBeenCalled();
   });
 });
 
@@ -118,13 +137,13 @@ describe('FormStore — setValue & getSilentValue', () => {
 });
 
 describe('FormStore — getAllValues', () => {
-  it('only returns values for currently mounted fields (those with an active ref)', () => {
+  it('returns values for BOTH mounted and unmounted fields to ensure submission integrity', () => {
     const store = new FormStore();
     const inputA = document.createElement('input');
     inputA.value = 'mounted';
     store.registerField('fieldA', inputA as any);
     
-    // Register and then unregister fieldB
+    // Register and then unregister fieldB (simulates unmounting in dynamic UI)
     const inputB = document.createElement('input');
     inputB.value = 'unmounted';
     store.registerField('fieldB', inputB as any);
@@ -132,15 +151,16 @@ describe('FormStore — getAllValues', () => {
 
     const allValues = store.getAllValues();
     expect(allValues).toEqual({
-      fieldA: 'mounted'
+      fieldA: 'mounted',
+      fieldB: 'unmounted' // FIX-D1: Now included to prevent data loss in conditional forms
     });
   });
 
-  it('does not return values for unregistered (unmounted) fields', () => {
+  it('correctly returns values for unregistered (unmounted) fields', () => {
     const store = new FormStore();
     // Simulate a value artificially existing without a hook/ref mounted
     store.setSilentValue('orphan', 'hidden'); 
-    expect(store.getAllValues()).toEqual({});
+    expect(store.getAllValues()).toEqual({ orphan: 'hidden' });
   });
 
   it('unflattens dot notation when requested', () => {
@@ -288,6 +308,22 @@ describe('FormStore — error management', () => {
     store.clearError('field');
     expect(store.getError('field')).toBeUndefined();
   });
+
+  it('clearError() without type clears both sync and async', () => {
+    const store = new FormStore();
+    store.setError('field', 'sync-err', 'sync');
+    store.setError('async-field', 'async-err', 'async');
+    store.setError('mixed-field', 'sync-err', 'sync');
+    store.setError('mixed-field', 'async-err', 'async');
+
+    store.clearError('mixed-field');
+    expect(store.getError('mixed-field')).toBeUndefined();
+    expect(store.getErrorState('mixed-field')).toBeUndefined();
+    
+    // Verify other fields are untouched
+    expect(store.getError('field')).toBe('sync-err');
+    expect(store.getError('async-field')).toBe('async-err');
+  });
 });
 
 describe('FormStore — pub/sub', () => {
@@ -315,6 +351,56 @@ describe('FormStore — pub/sub', () => {
     store.setValue('pathA', 'test');
     expect(listenerA).toHaveBeenCalledTimes(1);
     expect(listenerB).not.toHaveBeenCalled();
+  });
+
+  it('batch() consolidates multiple notifications into one per path:topic', () => {
+    const store = new FormStore();
+    const listenerA = jest.fn();
+    const listenerB = jest.fn();
+    const listenerErr = jest.fn();
+
+    store.subscribe('fieldA', listenerA, 'value');
+    store.subscribe('fieldB', listenerB, 'value');
+    store.subscribe('fieldA', listenerErr, 'error');
+
+    store.batch(() => {
+      store.setValue('fieldA', 'v1');
+      store.setValue('fieldA', 'v2');
+      store.setValue('fieldB', 'v3');
+      store.setError('fieldA', 'err1');
+      store.setError('fieldA', 'err2');
+
+      // Notifications should NOT fire yet
+      expect(listenerA).not.toHaveBeenCalled();
+      expect(listenerB).not.toHaveBeenCalled();
+      expect(listenerErr).not.toHaveBeenCalled();
+    });
+
+    // Outer batch ended — should trigger once per unique key
+    expect(listenerA).toHaveBeenCalledTimes(1);
+    expect(listenerB).toHaveBeenCalledTimes(1);
+    expect(listenerErr).toHaveBeenCalledTimes(1);
+    
+    expect(store.getValue('fieldA')).toBe('v2');
+    expect(store.getValue('fieldB')).toBe('v3');
+    expect(store.getError('fieldA')).toBe('err2');
+  });
+
+  it('nested batches only notify after the outermost batch completes', () => {
+    const store = new FormStore();
+    const listener = jest.fn();
+    store.subscribe('field', listener, 'value');
+
+    store.batch(() => {
+      store.setValue('field', 'inner1');
+      store.batch(() => {
+        store.setValue('field', 'inner2');
+      });
+      expect(listener).not.toHaveBeenCalled();
+    });
+
+    expect(listener).toHaveBeenCalledTimes(1);
+    expect(store.getValue('field')).toBe('inner2');
   });
 });
 

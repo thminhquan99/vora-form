@@ -100,7 +100,17 @@ export type Listener = () => void;
  * The subset of subscriber topics. Allows subscribing to value changes,
  * error changes, or both.
  */
-export type SubscriptionTopic = 'value' | 'error' | 'input' | 'touched' | 'submitting' | 'validating' | 'field';
+export type SubscriptionTopic =
+  | 'value'
+  | 'error'
+  | 'input'
+  | 'touched'
+  | 'submitting'
+  | 'validating'
+  | 'field';
+
+/** Internal reserved symbol for form-level state topics to avoid path collisions */
+export const VORA_INTERNAL_KEY = Symbol('vora_internal');
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -132,6 +142,14 @@ export type ValidationErrorState = {
   sync?: string;
   async?: string;
 };
+
+/**
+ * Type-safe Validator function.
+ * Supports both sync and async return types.
+ */
+export type Validator = (
+  value: unknown
+) => string | undefined;
 
 /**
  * Vanilla TypeScript form store — no React, no framework dependencies.
@@ -225,7 +243,14 @@ export class FormStore {
    * A component that only cares about errors never re-renders for value
    * changes, and vice versa.
    */
-  private listeners: Map<string, Set<Listener>> = new Map();
+  private listeners: Map<string | symbol, Set<Listener>> = new Map();
+  
+  /** 
+   * Tracks whether a batch update is currently active. 
+   * If > 0, notifications are queued until the outermost batch ends.
+   */
+  private _batchDepth: number = 0;
+  private _pendingBatchNotifications: Set<string | symbol> = new Set();
 
   // ── Constructor ───────────────────────────────────────────────────────────
 
@@ -245,9 +270,13 @@ export class FormStore {
    *
    * @param path  - Field path, e.g. `"email"` or `"address.city"`
    * @param topic - Subscription topic: `"value"` or `"error"`
-   * @returns A composite string key, e.g. `"email:value"`
+   * @returns A composite string key or the original symbol
    */
-  private listenerKey(path: string, topic: SubscriptionTopic): string {
+  private listenerKey(
+    path: string | symbol,
+    topic: SubscriptionTopic
+  ): string | symbol {
+    if (typeof path === 'symbol') return path; // Internal topics use the symbol directly
     return `${path}:${topic}`;
   }
 
@@ -279,7 +308,8 @@ export class FormStore {
    */
   registerField(
     path: string,
-    element: NativeFieldElement | HTMLElement
+    element: NativeFieldElement | HTMLElement,
+    options?: { purgeOnUnmount?: boolean }
   ): () => void {
     this.refs.set(path, element);
 
@@ -304,12 +334,21 @@ export class FormStore {
       }
     }
 
-    // Capture initial value for dirty tracking (only on first registration)
+    // Capture initial value for dirty tracking (only on first EVER registration)
+    // This prevents re-setting initialValue if a field re-mounts with a different 
+    // internal defaultValue prop that wasn't synced yet.
     if (!this.initialValues.has(path)) {
       this.initialValues.set(path, this.values.get(path));
     }
 
-    return () => this.unregisterField(path);
+    return () => {
+      // If we are unregistering, we only remove the ref.
+      // Values and errors persist for multi-step form support unless purgeOnUnmount is set.
+      this.unregisterField(path);
+      if (options?.purgeOnUnmount) {
+        this.purgeField(path);
+      }
+    };
   }
 
   /**
@@ -333,10 +372,11 @@ export class FormStore {
    * - Domain value
    * - Validation errors
    * - Touched status
+   * - Internal validation rules (fieldRules)
    * - Initial value (dirty tracking)
    *
    * Use this for dynamic fields that are permanently removed from the UI
-   * to prevent memory leaks.
+   * to prevent memory leaks and orphaned validation logic.
    *
    * @param path - The field path to purge
    */
@@ -346,12 +386,65 @@ export class FormStore {
     this.errors.delete(path);
     this.initialValues.delete(path);
     this.touched.delete(path);
+
+    // ── FIX: Clear all persistent rules for this path ─────────────────────
     this.fieldRules.delete(path);
 
-    // Notify listeners so UI can clean up
+    // FIX 2: Notify listeners BEFORE deleting them so UI can react to purge
     this.notify(path, 'value');
     this.notify(path, 'error');
     this.notify(path, 'touched');
+    this.notify(path, 'field');
+
+    // Now safe to remove listener sets for this path
+    const topics: SubscriptionTopic[] = ['value', 'error', 'input', 'touched', 'field'];
+    topics.forEach(topic => {
+      this.listeners.delete(this.listenerKey(path, topic));
+    });
+  }
+
+  /**
+   * FIX: Reclaims memory by purging data for fields that are no longer
+   * mounted in the DOM.
+   *
+   * By default, VoraForm preserves values for unmounted fields to support
+   * multi-step forms. For long-lived forms with highly dynamic field 
+   * populations, this can lead to memory growth.
+   *
+   * Calling this method manually will remove all state (values, errors, touched)
+   * for any path that does NOT have a corresponding entry in the `refs` Map.
+   */
+  purgeUnmountedFields(): void {
+    const mountedPaths = new Set(this.refs.keys());
+    const allPaths = new Set([
+      ...this.values.keys(),
+      ...this.errors.keys(),
+      ...this.touched.keys(),
+      ...this.initialValues.keys(),
+      ...this.fieldRules.keys()
+    ]);
+
+    this.batch(() => {
+      for (const path of allPaths) {
+        if (!mountedPaths.has(path)) {
+          this.purgeField(path);
+        }
+      }
+    });
+  }
+
+  /**
+   * Returns a list of paths that have state (values/errors) but no active DOM ref.
+   * Useful for debugging orphaned state in dynamic forms.
+   */
+  getOrphanedPaths(): string[] {
+    const orphans: string[] = [];
+    for (const path of this.values.keys()) {
+      if (!this.refs.has(path)) {
+        orphans.push(path);
+      }
+    }
+    return orphans;
   }
 
   // ── Value Access ──────────────────────────────────────────────────────────
@@ -416,8 +509,9 @@ export class FormStore {
 
     this.values.set(path, value);
 
+    // FIX 3: Only clear sync errors — async errors are managed by useAsyncValidation
     if (this.errors.has(path)) {
-      this.clearError(path);
+      this.clearError(path, 'sync');
     }
 
     // Sync to DOM for native inputs so the visible value updates immediately
@@ -431,6 +525,7 @@ export class FormStore {
     }
 
     this.notify(path, 'value');
+    // Notify 'field' topic which consolidates all field-level updates
     this.notify(path, 'field');
   }
 
@@ -473,9 +568,9 @@ export class FormStore {
 
     this.values.set(path, value);
 
-    // Auto-clear error when user types to improve UX natively
+    // FIX 3: Only clear sync errors — async errors are managed by useAsyncValidation
     if (this.errors.has(path)) {
-      this.clearError(path);
+      this.clearError(path, 'sync');
     }
 
     // Notify 'input' subscribers — this is used by useAsyncValidation
@@ -495,11 +590,12 @@ export class FormStore {
    */
   getAllValues(options?: { unflatten?: boolean }): Record<string, unknown> {
     const result: Record<string, unknown> = {};
-    // Only include currently mounted fields (those with an active ref)
-    for (const path of this.refs.keys()) {
-      if (this.values.has(path)) {
-        result[path] = this.values.get(path);
-      }
+    
+    // FIX-D1: Use values Map as primary source instead of only currently mounted refs.
+    // This ensures data integrity in multi-step/conditional forms where fields
+    // may be unmounted but their state must persist for submission.
+    for (const [path, value] of this.values.entries()) {
+      result[path] = value;
     }
 
     if (options?.unflatten) {
@@ -509,25 +605,13 @@ export class FormStore {
     return result;
   }
 
-  /**
-   * Returns all values, including those for fields currently unmounted.
-   * Useful for multi-step forms where you need the complete persistent state.
-   */
-  getAllValuesIncludingHidden(): Record<string, unknown> {
-    const result: Record<string, unknown> = {};
-    for (const [path, value] of this.values) {
-      result[path] = value;
-    }
-    return result;
-  }
-
   // ── Internal Validation Engine ────────────────────────────────────────────
 
   /** Internal validation logic keyed by field path. */
-  private fieldRules: Map<string, Array<(val: any) => string | undefined>> = new Map();
+  private fieldRules: Map<string, Validator[]> = new Map();
 
   /** Registers a native prop validation rule for a field. */
-  registerRule(path: string, rule: (val: any) => string | undefined): () => void {
+  registerRule(path: string, rule: Validator): () => void {
     if (!this.fieldRules.has(path)) {
       this.fieldRules.set(path, []);
     }
@@ -548,7 +632,10 @@ export class FormStore {
    * Runs sequentially across all fields, populating the `errors` Map.
    */
   validateInternal(): boolean {
-    this.clearAllErrors();
+    // FIX 4: Only clear sync errors — async errors are managed by useAsyncValidation
+    for (const [path] of this.errors) {
+      this.clearError(path, 'sync');
+    }
     const values = this.getAllValues();
     let isValid = true;
 
@@ -556,9 +643,9 @@ export class FormStore {
       const val = values[path];
       for (const rule of rules) {
         const error = rule(val);
-        // Guard: if a rule accidentally returns a Promise, skip it rather
-        // than setting "[object Promise]" as the error string.
-        if (error && !(typeof error === 'object' && typeof (error as any).then === 'function')) {
+        // Guard: if a rule accidentally returns a Promise, skip it in sequential
+        // validation (async should be handled by dedicated async hooks).
+        if (error && typeof error === 'string') {
           this.setError(path, error, 'sync');
           isValid = false;
           break; // Show only the first sequential error for this field
@@ -587,8 +674,8 @@ export class FormStore {
     const val = this.getValue(path);
     for (const rule of rules) {
       const error = rule(val);
-      // Guard: skip Promise returns (async validators handled separately)
-      if (error && !(typeof error === 'object' && typeof (error as any).then === 'function')) {
+      // Guard: skip Promise returns
+      if (error && typeof error === 'string') {
         this.setError(path, error, 'sync');
         return false; // Stop at first error for this field
       }
@@ -660,7 +747,8 @@ export class FormStore {
         this.notify(path, 'error');
         this.notify(path, 'field');
       }
-      // Clear both
+    } else {
+      // Clear both (when no type is provided)
       this.errors.delete(path);
       this.notify(path, 'error');
       this.notify(path, 'field');
@@ -777,7 +865,7 @@ export class FormStore {
    * ```
    */
   subscribe(
-    path: string,
+    path: string | symbol,
     listener: Listener,
     topic: SubscriptionTopic = 'value'
   ): () => void {
@@ -808,15 +896,79 @@ export class FormStore {
    * Called internally by `setValue()`, `setError()`, `clearError()`, etc.
    * Can also be called externally to force a subscriber refresh.
    *
+   * If a `batch()` is active, notifications are collected and fired once
+   * when the batch completes.
+   *
    * @param path  - The field path whose subscribers to notify
    * @param topic - The topic to notify: `"value"` (default) or `"error"`
    */
-  notify(path: string, topic: SubscriptionTopic = 'value'): void {
+  notify(
+    path: string | symbol,
+    topic: SubscriptionTopic = 'value'
+  ): void {
     const key = this.listenerKey(path, topic);
+
+    if (this._batchDepth > 0) {
+      this._pendingBatchNotifications.add(key);
+      return;
+    }
+
     const set = this.listeners.get(key);
     if (set) {
-      for (const listener of set) {
+      // Create a stable array copy to prevent issues if listeners 
+      // trigger further synchronous updates/unsubscribes.
+      const callbacks = Array.from(set);
+      for (const listener of callbacks) {
         listener();
+      }
+    }
+  }
+
+  /**
+   * Consolidates multiple store updates into a single notification cycle.
+   * 
+   * Useful when updating multiple fields at once (e.g., in a loop during 
+   * submission or resetting multiple fields). Each unique path:topic 
+   * combination will only trigger its listeners ONCE at the end of 
+   * the batch.
+   * 
+   * Supports nested batches — only the outermost batch completion 
+   * triggers the notifications.
+   * 
+   * @param fn - Synchronous function containing multiple store updates.
+   * 
+   * @example
+   * ```ts
+   * store.batch(() => {
+   *   store.setValue('fieldA', 1);
+   *   store.setValue('fieldB', 2);
+   *   store.setError('fieldA', 'error');
+   * }); 
+   * // → Subscribers for A:value, B:value, and A:error are notified together.
+   * ```
+   */
+  batch(fn: () => void): void {
+    this._batchDepth++;
+    try {
+      fn();
+    } finally {
+      this._batchDepth--;
+      
+      // If we've reached the outermost batch, fire all collected notifications
+      if (this._batchDepth === 0 && this._pendingBatchNotifications.size > 0) {
+        // Defensive copy to ensure stable iteration
+        const pending = Array.from(this._pendingBatchNotifications);
+        this._pendingBatchNotifications.clear();
+        
+        for (const key of pending) {
+          const set = this.listeners.get(key);
+          if (set) {
+            const callbacks = Array.from(set);
+            for (const listener of callbacks) {
+              listener();
+            }
+          }
+        }
       }
     }
   }
@@ -877,7 +1029,7 @@ export class FormStore {
   setSubmitting(isSubmitting: boolean): void {
     if (this.submitting !== isSubmitting) {
       this.submitting = isSubmitting;
-      this.notify('global', 'submitting');
+      this.notify(VORA_INTERNAL_KEY, 'submitting');
     }
   }
 
@@ -887,16 +1039,14 @@ export class FormStore {
   incrementPendingValidations(): void {
     this._pendingValidations++;
     if (this._pendingValidations === 1) {
-      // FIX C2: Notify on dedicated 'validating' topic, not 'submitting'
-      this.notify('global', 'validating');
+      this.notify(VORA_INTERNAL_KEY, 'validating');
     }
   }
 
   decrementPendingValidations(): void {
     this._pendingValidations = Math.max(0, this._pendingValidations - 1);
     if (this._pendingValidations === 0) {
-      // FIX C2: Notify on dedicated 'validating' topic
-      this.notify('global', 'validating');
+      this.notify(VORA_INTERNAL_KEY, 'validating');
     }
   }
 
@@ -932,7 +1082,9 @@ export class FormStore {
    */
   getDirtyValues(): Record<string, unknown> {
     const result: Record<string, unknown> = {};
-    for (const path of this.refs.keys()) {
+    // FIX: Iterate over ALL known values, not just currently mounted refs
+    // This supports multi-step forms where a field might be unmounted but still dirty.
+    for (const path of this.values.keys()) {
       const currentValue = this.values.get(path);
       const initialValue = this.initialValues.get(path);
       if (!isDeepEqual(currentValue, initialValue)) {
@@ -940,6 +1092,21 @@ export class FormStore {
       }
     }
     return result;
+  }
+
+  /**
+   * Resets a field's dirty state by updating its `initialValue` to match its 
+   * current value. 
+   * 
+   * Useful for partial saves or "Save & Continue" flows where the 
+   * current state should become the new baseline for dirty tracking.
+   * 
+   * @param path - The field path to clear dirty status for
+   */
+  clearDirty(path: string): void {
+    if (this.values.has(path)) {
+      this.initialValues.set(path, this.values.get(path));
+    }
   }
 
   /**

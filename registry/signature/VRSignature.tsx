@@ -88,11 +88,7 @@ export function VRSignature({
   useEffect(() => {
     const canvas = canvasRef.current;
     if (canvas && field.ref) {
-      if (typeof field.ref === 'function') {
-        field.ref(canvas);
-      } else {
-        (field.ref as React.MutableRefObject<HTMLCanvasElement | null>).current = canvas;
-      }
+      field.ref(canvas);
     }
   }, [field.ref]);
 

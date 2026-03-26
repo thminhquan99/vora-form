@@ -402,7 +402,7 @@ function UsernameField() {
       }
       return undefined;
     },
-    600
+    { debounceMs: 600 }
   );
 
   return (

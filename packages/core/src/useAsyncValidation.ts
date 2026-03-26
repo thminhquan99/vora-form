@@ -52,29 +52,32 @@ import { useFormContext } from './FormProvider';
  * @typeParam TValue - The field's domain value type
  * @param name        - Field path to subscribe to
  * @param validateFn  - Async function returning an error string or `undefined`
- * @param debounceMs  - Debounce delay in milliseconds (default: 500)
+ * @param config      - Configuration options (debounce, error messages)
  */
 export function useAsyncValidation<TValue = unknown>(
   name: string,
   validateFn: (value: TValue, signal: AbortSignal) => Promise<string | undefined>,
-  debounceMs: number = 500
+  config: { debounceMs?: number; errorMessage?: string } = {}
 ): void {
   const { store } = useFormContext();
+  const { debounceMs = 500, errorMessage = 'Validation service unavailable' } = config;
 
   // Refs to keep the latest values without re-renders
   const validateFnRef = useRef(validateFn);
   const debounceMsRef = useRef(debounceMs);
+  const errorMessageRef = useRef(errorMessage);
   validateFnRef.current = validateFn;
   debounceMsRef.current = debounceMs;
+  errorMessageRef.current = errorMessage;
 
   const isFirstMount = useRef(true);
   const abortControllerRef = useRef<AbortController | null>(null);
+  const latestRequestId = useRef(0);
+  const isIncremented = useRef(false);
 
   useEffect(() => {
     let timerId: ReturnType<typeof setTimeout> | null = null;
     let aborted = false;
-    // Track the latest validation request ID
-    const latestRequestId = useRef(0);
 
     // Subscribe to BOTH topics:
     // - 'input': fires when native inputs call setSilentValue (typing)
@@ -92,27 +95,45 @@ export function useAsyncValidation<TValue = unknown>(
       }
       abortControllerRef.current = new AbortController();
 
-      // Clear any pending debounce timer
+      // ── FIX: Balancing Pending Validations ──────────────────────────────
+      // If a timer is already active, we just clear it (the increment is already recorded).
+      // If no timer is active AND we haven't already incremented for an in-flight 
+      // request, we increment now to show the "validating" state IMMEDIATELY.
       if (timerId !== null) {
         clearTimeout(timerId);
+      } else if (!isIncremented.current) {
+        store.incrementPendingValidations();
+        isIncremented.current = true;
       }
 
       timerId = setTimeout(async () => {
         if (aborted) return;
 
+        // Signifies debounce phase ended; we are now in the async execution phase.
+        // We do NOT set timerId to null yet, as we want to reuse the 'increment'
+        // if user types while we are awaiting the promise.
+        
         const currentRequestId = ++latestRequestId.current;
         const currentAbortController = abortControllerRef.current;
-        store.incrementPendingValidations();
+        if (!currentAbortController) {
+          if (isIncremented.current) {
+            store.decrementPendingValidations();
+            isIncremented.current = false;
+          }
+          timerId = null;
+          return;
+        }
+
         const value = store.getValue<TValue>(name);
 
         try {
           const error = await validateFnRef.current(
             value as TValue,
-            currentAbortController!.signal
+            currentAbortController.signal
           );
 
           // If a new request has started since this one, or the component unmounted,
-          // discard this result.
+          // discard this result. The finally block will handle count if it's the latest.
           if (aborted || currentRequestId !== latestRequestId.current) return;
 
           // Discard the result if the form is currently submitting
@@ -123,16 +144,23 @@ export function useAsyncValidation<TValue = unknown>(
           } else {
             store.clearError(name, 'async');
           }
-        } catch (err: any) {
-          // Swallow validation errors — the field stays in its current
-          // error state. If it was an AbortError, just silently exit.
-          if (err?.name === 'AbortError') return;
+        } catch (err: unknown) {
+          if (err instanceof Error && err.name === 'AbortError') return;
 
+          // SPECIAL AUDIT FIX: If a non-abort error occurs (e.g. network failure), 
+          // we use the configurable error message or a generic one.
           if (!aborted && currentRequestId === latestRequestId.current && !store.getIsSubmitting()) {
-            store.clearError(name, 'async');
+            store.setError(name, errorMessageRef.current, 'async');
           }
         } finally {
-          store.decrementPendingValidations();
+          // Only decrement if this is the LATEST request in the chain.
+          // If a new request started while we were awaiting, it will have
+          // reused our increment and will handle its own decrement eventually.
+          if (!aborted && currentRequestId === latestRequestId.current) {
+            store.decrementPendingValidations();
+            isIncremented.current = false;
+            timerId = null;
+          }
         }
       }, debounceMsRef.current);
     };
@@ -148,6 +176,12 @@ export function useAsyncValidation<TValue = unknown>(
       }
       if (timerId !== null) {
         clearTimeout(timerId);
+      }
+      // CRITICAL FIX: If we unmount while any validation state is pending, 
+      // reconcile the store count exactly once.
+      if (isIncremented.current) {
+        store.decrementPendingValidations();
+        isIncremented.current = false;
       }
       unsubInput();
       unsubValue();

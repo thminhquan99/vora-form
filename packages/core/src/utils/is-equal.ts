@@ -2,7 +2,10 @@
  * Recursively asserts deep equality between two values.
  * Strictly escapes complex DOM objects and Binary streams to prevent cyclical crashes.
  */
-export function isDeepEqual(a: any, b: any, depth = 0): boolean {
+
+const IS_BROWSER = typeof window !== 'undefined';
+
+export function isDeepEqual(a: unknown, b: unknown, depth = 0): boolean {
   // Fast path: Exact same reference
   if (a === b) return true;
 
@@ -23,7 +26,7 @@ export function isDeepEqual(a: any, b: any, depth = 0): boolean {
   // We strictly rely on the fast path (a === b) above. If they are different references,
   // we refuse to traverse them and immediately return false.
   if (
-    typeof window !== 'undefined' &&
+    IS_BROWSER &&
     (
       a instanceof File ||
       b instanceof File ||
@@ -50,14 +53,16 @@ export function isDeepEqual(a: any, b: any, depth = 0): boolean {
 
   // Plain Objects
   if (typeof a === 'object' && typeof b === 'object') {
-    const keysA = Object.keys(a);
-    const keysB = Object.keys(b);
+    const objA = a as Record<string, unknown>;
+    const objB = b as Record<string, unknown>;
+    const keysA = Object.keys(objA);
+    const keysB = Object.keys(objB);
 
     if (keysA.length !== keysB.length) return false;
 
     for (const key of keysA) {
-      if (!Object.prototype.hasOwnProperty.call(b, key)) return false;
-      if (!isDeepEqual(a[key], b[key], depth + 1)) return false;
+      if (!Object.prototype.hasOwnProperty.call(objB, key)) return false;
+      if (!isDeepEqual(objA[key], objB[key], depth + 1)) return false;
     }
     return true;
   }

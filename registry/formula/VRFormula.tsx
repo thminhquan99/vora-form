@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useRef, useState, useEffect, useCallback } from 'react';
+import React, { useRef, useState, useEffect, useCallback, useMemo } from 'react';
 import DOMPurify from 'dompurify';
-import { useVoraField, useInitialSnapshot } from '@vora/core';
+import { useVoraField, useInitialSnapshot, serializeHtmlToTemplate } from '@vora/core';
 import { VRLabel } from '../label';
 import { VRFieldError } from '../field-error';
 import type { VoraFormulaProps, FormulaVariable } from './types';
@@ -15,6 +15,7 @@ export function VRFormula({
   className,
   id,
   variables,
+  serializationDebounceMs = 150,
 }: VoraFormulaProps): React.JSX.Element {
   const field = useVoraField<string>(name);
   const inputId = id ?? name;
@@ -27,13 +28,58 @@ export function VRFormula({
   const [activeIndex, setActiveIndex] = useState(0);
   const dropdownCoords = useRef({ top: 0, left: 0 });
   const savedRange = useRef<Range | null>(null);
+  const lastHtmlRef = useRef<string>('');
 
   // Snapshot Pattern: Initialize exactly once
   const initialValue = useInitialSnapshot(field.value);
 
+  // ── Helpers ─────────────────────────────────────────────────────────────
+
+  /**
+   * Converts HTML content from contenteditable back to a template string.
+   * Example: <span ... data-value="v1">@Var1</span> -> {{v1}}
+   * 
+   * Uses robust DOM tree walking via serializeHtmlToTemplate to ensure
+   * attribute order and browser-specific HTML serialization differences
+   * do not corrupt the template data.
+   */
+  const serialize = useCallback((html: string): string => {
+    return serializeHtmlToTemplate(html);
+  }, []);
+
+  /**
+   * Converts a template string back to HTML for the editor.
+   * Example: {{v1}} -> <span ... data-value="v1">@Var1</span>
+   */
+  const deserialize = useCallback((template: string): string => {
+    if (!template) return '';
+    
+    // Replace {{var}} with the Pill HTML
+    let html = template.replace(/\{\{([a-zA-Z0-9_]+)\}\}/g, (match, val) => {
+      const variable = variables.find(v => v.value === val);
+      const label = variable ? variable.label : val;
+      
+      const cleanLabel = DOMPurify.sanitize(label).replace(/"/g, '&quot;');
+      const cleanValue = DOMPurify.sanitize(val).replace(/"/g, '&quot;');
+      
+      return `<span contenteditable="false" class="vora-pill" data-value="${cleanValue}">@${cleanLabel}</span>`;
+    });
+
+    // Strip any stray template markers that might have been pasted or corrupted
+    html = html.replace(/\{\{|\}\}/g, '');
+
+    // Convert newlines back to <br> for display
+    html = html.replace(/\n/g, '<br>');
+
+    return DOMPurify.sanitize(html, {
+      ALLOWED_TAGS: ['span', 'br'],
+      ALLOWED_ATTR: ['contenteditable', 'class', 'data-value'],
+    });
+  }, [variables]);
+
   useEffect(() => {
     if (editorRef.current && initialValue) {
-      editorRef.current.innerHTML = DOMPurify.sanitize(initialValue);
+      editorRef.current.innerHTML = deserialize(initialValue);
     }
   }, []);
 
@@ -43,24 +89,29 @@ export function VRFormula({
     
     // Only update if:
     // 1. We have a target element
-    // 2. The store value is different from current display
+    // 2. The store value (serialized) is different from current display (serialized)
     // 3. AND the user IS NOT currently typing/focused (to avoid cursor jumps)
-    //    EXCEPT if it's the very first mount where we definitely want to sync.
-    if (
-      editorRef.current && 
-      field.value !== undefined && 
-      field.value !== editorRef.current.innerHTML &&
-      !isFocused
-    ) {
-      editorRef.current.innerHTML = DOMPurify.sanitize(field.value);
+    if (editorRef.current && field.value !== undefined) {
+      const currentContent = serialize(editorRef.current.innerHTML);
+      
+      // Normalize both for comparison (ignore &nbsp; vs space differences)
+      const normalizedStoreValue = field.value.replace(/\u00A0/g, ' ').trim();
+      const normalizedCurrentContent = currentContent.replace(/\u00A0/g, ' ').trim();
+
+      if (normalizedStoreValue !== normalizedCurrentContent && !isFocused) {
+        editorRef.current.innerHTML = deserialize(field.value);
+        // FIX: Synchronize our optimization ref to avoid stale comparison on next input
+        lastHtmlRef.current = editorRef.current.innerHTML;
+      }
     }
-  }, [field.value]);
+  }, [field.value, serialize, deserialize]);
 
   const syncToStore = useCallback(() => {
     if (editorRef.current) {
-      field.setValue(editorRef.current.innerHTML);
+      const template = serialize(editorRef.current.innerHTML);
+      field.setValue(template);
     }
-  }, [field]);
+  }, [field, serialize]);
 
   const detectTrigger = () => {
     const selection = window.getSelection();
@@ -82,8 +133,6 @@ export function VRFormula({
         setDropdownOpen(true);
         setActiveIndex(0);
         
-        // Approximate coordinates (for a perfect Notion clone you'd get the bounding rect of the Range)
-        // MVP: Just drop it below the editor for now, CSS handles position: absolute below wrapper.
         return true;
       }
     }
@@ -92,8 +141,36 @@ export function VRFormula({
     return false;
   };
 
+  const lastInputTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (lastInputTimer.current) {
+        clearTimeout(lastInputTimer.current);
+      }
+    };
+  }, []);
+
   const handleInput = () => {
-    syncToStore();
+    if (editorRef.current) {
+      const currentHtml = editorRef.current.innerHTML;
+      
+      // Optimization: Skip heavy serialization if DOM content hasn't changed
+      if (currentHtml === lastHtmlRef.current) return;
+      lastHtmlRef.current = currentHtml;
+
+      // ── OPTIMIZATION: Debounce heavy serialization ──────────────────────
+      if (lastInputTimer.current) {
+        clearTimeout(lastInputTimer.current);
+      }
+
+      lastInputTimer.current = setTimeout(() => {
+        if (editorRef.current) {
+          const template = serialize(editorRef.current.innerHTML);
+          field.setSilentValue(template);
+        }
+      }, serializationDebounceMs); // Slightly longer debounce for better performance on large formulas
+    }
     detectTrigger();
   };
 
@@ -108,8 +185,6 @@ export function VRFormula({
     const range = savedRange.current;
     const node = range.startContainer;
 
-    // First delete the trigger sequence "{{..."
-    // Because we know we are actively typing it, we can modify the text node directly
     if (node.nodeType === Node.TEXT_NODE) {
       const textBeforeCursor = node.textContent?.slice(0, range.startOffset) || '';
       const triggerMatch = textBeforeCursor.match(/\{\{([a-zA-Z0-9_]*)$/);
@@ -121,10 +196,11 @@ export function VRFormula({
       }
     }
 
-    // Insert the Pill HTML using Range/Selection API
-    const pillHtml = `<span contenteditable="false" class="vora-pill" data-value="${variable.value}">@${variable.label}</span>`;
+    // Defense in depth: Sanitize variable components before injection
+    const cleanLabel = DOMPurify.sanitize(variable.label).replace(/"/g, '&quot;');
+    const cleanValue = DOMPurify.sanitize(variable.value).replace(/"/g, '&quot;');
+    const pillHtml = `<span contenteditable="false" class="vora-pill" data-value="${cleanValue}">@${cleanLabel}</span>`;
     
-    // Restore selection to the modified range
     selection.removeAllRanges();
     selection.addRange(range);
 
@@ -136,10 +212,8 @@ export function VRFormula({
     const pillNode = tempDiv.firstChild;
     if (pillNode) {
       range.insertNode(pillNode);
-      // Move cursor after the inserted pill
       range.setStartAfter(pillNode);
       
-      // Insert a space after the pill so cursor lands outside it
       const spaceNode = document.createTextNode('\u00A0');
       range.insertNode(spaceNode);
       range.setStartAfter(spaceNode);
@@ -157,28 +231,44 @@ export function VRFormula({
 
   const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
     e.preventDefault();
+    
+    // ── FIX: Robust Paste Sanitization ──────────────────────────────────
+    // Strip all HTML formatting to prevent XSS and DOM corruption.
+    // Contenteditable editors are notoriously prone to "rich" paste bugs.
     const text = e.clipboardData.getData('text/plain');
-    document.execCommand('insertText', false, text);
+    const cleanText = text.replace(/\{\{/g, '').replace(/\}\}/g, ''); // Strip template markers from paste
+
+    const selection = window.getSelection();
+    if (!selection || !selection.rangeCount) return;
+    
+    const range = selection.getRangeAt(0);
+    range.deleteContents();
+    
+    const textNode = document.createTextNode(cleanText);
+    range.insertNode(textNode);
+    
+    // Move cursor to end of pasted text
+    range.setStartAfter(textNode);
+    range.setEndAfter(textNode);
+    selection.removeAllRanges();
+    selection.addRange(range);
+    
+    syncToStore();
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (!dropdownOpen) return;
 
-    const filteredVars = variables.filter(v => 
-      v.label.toLowerCase().includes(searchQuery.toLowerCase()) || 
-      v.value.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-
     if (e.key === 'ArrowDown') {
       e.preventDefault();
-      setActiveIndex((prev: number) => (prev + 1) % filteredVars.length);
+      setActiveIndex((prev: number) => (prev + 1) % filteredVariables.length);
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
-      setActiveIndex((prev: number) => (prev - 1 + filteredVars.length) % filteredVars.length);
+      setActiveIndex((prev: number) => (prev - 1 + filteredVariables.length) % filteredVariables.length);
     } else if (e.key === 'Enter') {
       e.preventDefault();
-      if (filteredVars[activeIndex]) {
-        insertVariable(filteredVars[activeIndex]);
+      if (filteredVariables[activeIndex]) {
+        insertVariable(filteredVariables[activeIndex]);
       }
     } else if (e.key === 'Escape') {
       e.preventDefault();
@@ -186,10 +276,14 @@ export function VRFormula({
     }
   };
 
-  const filteredVariables = variables.filter(v => 
-    v.label.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    v.value.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredVariables = useMemo(() => {
+    return variables.filter(v => 
+      v.label.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      v.value.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [variables, searchQuery]);
+
+  const dropdownId = `${inputId}-dropdown`;
 
   return (
     <div className={`${styles.wrapper} ${className ?? ''}`} id={`${inputId}-wrapper`}>
@@ -209,15 +303,30 @@ export function VRFormula({
         onPaste={handlePaste}
         data-placeholder="Type something or use {{ to insert a variable..."
         aria-label={label || 'Formula Editor'}
+        // ARIA for Combobox pattern
+        role="combobox"
+        aria-autocomplete="list"
+        aria-expanded={dropdownOpen}
+        aria-haspopup="listbox"
+        aria-controls={dropdownOpen ? dropdownId : undefined}
+        aria-activedescendant={dropdownOpen && filteredVariables[activeIndex] ? `${inputId}-opt-${filteredVariables[activeIndex].value}` : undefined}
       />
 
       {dropdownOpen && filteredVariables.length > 0 && (
-        <div className={styles.dropdown}>
+        <div 
+          id={dropdownId}
+          className={styles.dropdown}
+          role="listbox"
+          aria-label="Variable suggestions"
+        >
           {filteredVariables.map((variable, index) => (
             <div
               key={variable.value}
+              id={`${inputId}-opt-${variable.value}`}
               className={styles.dropdownItem}
               data-active={index === activeIndex}
+              role="option"
+              aria-selected={index === activeIndex}
               onMouseDown={(e) => {
                 // Prevent onBlur clearing selection range before onClick fires
                 e.preventDefault(); 

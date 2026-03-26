@@ -1,5 +1,6 @@
 export function unflattenDotNotation(
-  flat: Record<string, unknown>
+  flat: Record<string, unknown>,
+  options: { compact?: boolean } = { compact: true }
 ): Record<string, unknown> {
   const result: Record<string, any> = {};
 
@@ -47,6 +48,8 @@ export function unflattenDotNotation(
     }
   }
 
-  compactArrays(result);
+  if (options.compact !== false) {
+    compactArrays(result);
+  }
   return result;
 }

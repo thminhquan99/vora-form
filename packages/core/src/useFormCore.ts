@@ -40,7 +40,7 @@
 import { useCallback, useSyncExternalStore } from 'react';
 
 import { useFormContext } from './FormProvider';
-import type { FormStore } from './utils/ref-store';
+import { FormStore, VORA_INTERNAL_KEY } from './utils/ref-store';
 
 // ─── Return Type ──────────────────────────────────────────────────────────────
 
@@ -122,14 +122,14 @@ export function useFormCore(): UseFormCoreReturn {
   const { store } = useFormContext();
 
   const isSubmitting = useSyncExternalStore(
-    useCallback((onStoreChange) => store.subscribe('global', onStoreChange, 'submitting'), [store]),
+    useCallback((onStoreChange) => store.subscribe(VORA_INTERNAL_KEY, onStoreChange, 'submitting'), [store]),
     useCallback(() => store.getIsSubmitting(), [store]),
     useCallback(() => store.getIsSubmitting(), [store])
   );
 
   // FIX C2: Use dedicated 'validating' topic instead of piggyback on 'submitting'
   const isValidating = useSyncExternalStore(
-    useCallback((onStoreChange) => store.subscribe('global', onStoreChange, 'validating'), [store]),
+    useCallback((onStoreChange) => store.subscribe(VORA_INTERNAL_KEY, onStoreChange, 'validating'), [store]),
     useCallback(() => store.isValidating, [store]),
     useCallback(() => store.isValidating, [store])
   );

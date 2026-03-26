@@ -1,14 +1,13 @@
 'use client';
 
 import React, { useRef, useEffect, useCallback, useId } from 'react';
-import { useVoraField, useInitialSnapshot, isDeepEqual } from '@vora/core';
+import { useVoraField, useInitialSnapshot, isDeepEqual, sanitizeText } from '@vora/core';
 import { VRLabel } from '../label';
 import { VRFieldError } from '../field-error';
 import type { VRSpreadsheetProps } from './types';
 import styles from './VRSpreadsheet.module.css';
 
-const sanitizeCell = (val: string): string =>
-  val.replace(/<[^>]*>/g, '').trim();
+// Removed local regex-based sanitizeCell
 
 export function VRSpreadsheet({
   name,
@@ -126,7 +125,7 @@ export function VRSpreadsheet({
       
       for (let c = startC; c < maxC; c++) {
         const pasteColIdx = c - startC;
-        const mappedValue = sanitizeCell(pasteCols[pasteColIdx] || '');
+        const mappedValue = sanitizeText(pasteCols[pasteColIdx] || '');
         
         matrixRef.current[r][c] = mappedValue;
         

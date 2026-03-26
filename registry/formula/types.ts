@@ -11,4 +11,5 @@ export interface VoraFormulaProps extends VRFieldProps<string, HTMLDivElement> {
   required?: boolean;
   className?: string;
   variables: FormulaVariable[];
+  serializationDebounceMs?: number;
 }

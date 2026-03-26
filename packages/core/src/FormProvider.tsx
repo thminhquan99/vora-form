@@ -21,6 +21,8 @@
 
 import React, { createContext, useContext, useRef, useEffect } from 'react';
 
+import { isDeepEqual } from './utils/is-equal';
+
 import { FormStore } from './utils/ref-store';
 import type { ValidateFunction } from './types';
 
@@ -163,6 +165,23 @@ export function VoraForm({
   const validateRef = useRef(validate);
   useEffect(() => { validateRef.current = validate; }, [validate]);
 
+  // ── FIX 1: Synchronize initialValues prop changes (deep-compare guarded) ─
+  // If the initialValues prop changes (e.g., after an API fetch), we sync
+  // the new values into the store. Uses deep equality to avoid redundant
+  // re-initializations when the parent passes an inline object literal.
+  const prevInitialValuesRef = useRef(initialValues);
+  useEffect(() => {
+    if (initialValues && !isDeepEqual(initialValues, prevInitialValuesRef.current)) {
+      prevInitialValuesRef.current = initialValues;
+      store.batch(() => {
+        for (const [path, value] of Object.entries(initialValues)) {
+          store.setValue(path, value);
+          store.clearDirty(path);
+        }
+      });
+    }
+  }, [store, initialValues]);
+
   // ── Submit handler ──────────────────────────────────────────────────────
   const handleSubmit = React.useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
@@ -177,17 +196,22 @@ export function VoraForm({
 
       // Run validation if a validate function was provided
       if (currentValidate) {
-        store.clearAllErrors();
         const errors = currentValidate(values);
         const errorPaths = Object.keys(errors);
 
-        if (errorPaths.length > 0) {
-          // Map errors to the store so field components can display them
-          for (const path of errorPaths) {
-            store.setError(path, errors[path]);
-            store.setTouched(path); // Fix Ghost Errors: UI requires isTouched to show error
+        // FIX 5: Single batch for clear + set to avoid two notification waves
+        store.batch(() => {
+          store.clearAllErrors();
+          if (errorPaths.length > 0) {
+            for (const path of errorPaths) {
+              store.setError(path, errors[path]);
+              store.setTouched(path);
+            }
           }
-          // Focus the first errored field for accessibility
+        });
+
+        if (errorPaths.length > 0) {
+          // Focus the first errored field for accessibility (DOM side-effect, outside batch)
           store.focusField(errorPaths[0]);
           return;
         }
@@ -197,9 +221,11 @@ export function VoraForm({
         if (!isValid) {
           // Find the first field with an error and focus it
           const allErrors = store.getAllErrors();
-          for (const path of Object.keys(allErrors)) {
-            store.setTouched(path);
-          }
+          store.batch(() => {
+            for (const path of Object.keys(allErrors)) {
+              store.setTouched(path);
+            }
+          });
           const firstErrorPath = Object.keys(allErrors)[0];
           if (firstErrorPath) {
              store.focusField(firstErrorPath);

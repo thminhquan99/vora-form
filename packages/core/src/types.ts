@@ -71,7 +71,7 @@ export interface VRFieldProps<
   pattern?: { value: RegExp; message: string };
 
   /** Native validation: Custom synchronous validate function */
-  validate?: (value: any) => string | undefined;
+  validate?: (value: TValue) => string | undefined;
 }
 
 // ─── Validation Types ─────────────────────────────────────────────────────────

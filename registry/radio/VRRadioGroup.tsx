@@ -48,7 +48,6 @@ export function VRRadioGroup({
 
   return (
     <fieldset
-      ref={field.ref}
       id={groupId}
       aria-invalid={hasError || undefined}
       aria-describedby={hasError ? errorId : undefined}
@@ -62,12 +61,17 @@ export function VRRadioGroup({
       </legend>
 
       <div className={styles.optionsList}>
-        {options.map((option) => {
+        {options.map((option, index) => {
           const optionId = `${groupId}-${option.value}`;
 
           return (
             <div key={option.value} className={styles.radioRow}>
               <input
+                ref={(el) => {
+                  if (el && index === 0) {
+                    field.ref(el);
+                  }
+                }}
                 id={optionId}
                 type="radio"
                 name={name}

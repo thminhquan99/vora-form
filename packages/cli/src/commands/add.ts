@@ -148,6 +148,20 @@ async function copyComponent(
   const sourceDir = path.join(registryPath, componentName);
   const destDir = path.join(destBase, componentName);
 
+  // ── FIX 8: Guard against path traversal in manifest file entries ───
+  for (const file of manifest.files) {
+    const resolvedSrc = path.resolve(sourceDir, file);
+    const resolvedDst = path.resolve(destDir, file);
+    if (!resolvedSrc.startsWith(sourceDir)) {
+      console.error(pc.red(`✖ Suspicious file path in manifest: "${file}". Aborting.`));
+      process.exit(1);
+    }
+    if (!resolvedDst.startsWith(destDir)) {
+      console.error(pc.red(`✖ Suspicious file path in manifest: "${file}". Aborting.`));
+      process.exit(1);
+    }
+  }
+
   // ── Copy files ──────────────────────────────────────────────────────
   await fs.ensureDir(destDir);
 
