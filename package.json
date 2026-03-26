@@ -6,7 +6,6 @@
     "typecheck": "pnpm -r typecheck && tsc -p registry/tsconfig.json"
   },
   "devDependencies": {
-    "@types/dompurify": "^3.2.0",
     "typescript": "^5.4.0"
   },
   "engines": {

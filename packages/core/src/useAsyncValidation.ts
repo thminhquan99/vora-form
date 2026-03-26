@@ -72,6 +72,8 @@ export function useAsyncValidation<TValue = unknown>(
   useEffect(() => {
     let timerId: ReturnType<typeof setTimeout> | null = null;
     let aborted = false;
+    // Track the latest validation request ID
+    const latestRequestId = useRef(0);
 
     // Subscribe to BOTH topics:
     // - 'input': fires when native inputs call setSilentValue (typing)
@@ -91,12 +93,15 @@ export function useAsyncValidation<TValue = unknown>(
       timerId = setTimeout(async () => {
         if (aborted) return;
 
+        const currentRequestId = ++latestRequestId.current;
         store.incrementPendingValidations();
         const value = store.getValue<TValue>(name);
 
         try {
           const error = await validateFnRef.current(value as TValue);
-          if (aborted) return;
+          // If a new request has started since this one, or the component unmounted,
+          // discard this result.
+          if (aborted || currentRequestId !== latestRequestId.current) return;
 
           // Discard the result if the form is currently submitting
           if (store.getIsSubmitting()) return;
@@ -108,8 +113,8 @@ export function useAsyncValidation<TValue = unknown>(
           }
         } catch {
           // Swallow validation errors — the field stays in its current
-          // error state. In production, you'd likely want to log this.
-          if (!aborted && !store.getIsSubmitting()) {
+          // error state. 
+          if (!aborted && currentRequestId === latestRequestId.current && !store.getIsSubmitting()) {
             store.clearError(name);
           }
         } finally {

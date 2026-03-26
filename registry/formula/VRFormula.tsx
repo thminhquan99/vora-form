@@ -39,9 +39,19 @@ export function VRFormula({
 
   // FIX-1: Synchronize external value updates (e.g. formRef.setValue, reset)
   useEffect(() => {
-    if (editorRef.current && field.value !== undefined && field.value !== editorRef.current.innerHTML) {
-      // Small optimization: only update if different from current innerHTML
-      // to avoid cursor jumps if this somehow fires during local input
+    const isFocused = editorRef.current === document.activeElement;
+    
+    // Only update if:
+    // 1. We have a target element
+    // 2. The store value is different from current display
+    // 3. AND the user IS NOT currently typing/focused (to avoid cursor jumps)
+    //    EXCEPT if it's the very first mount where we definitely want to sync.
+    if (
+      editorRef.current && 
+      field.value !== undefined && 
+      field.value !== editorRef.current.innerHTML &&
+      !isFocused
+    ) {
       editorRef.current.innerHTML = DOMPurify.sanitize(field.value);
     }
   }, [field.value]);

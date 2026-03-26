@@ -17,11 +17,8 @@
     "paths": {
       "@vora/core": ["../packages/core/src/index.ts"]
     },
-    "typeRoots": [
-      "../node_modules/@types",
-      "../packages/core/node_modules/@types"
-    ]
+    "typeRoots": ["../node_modules/@types"]
   },
-  "include": ["./**/*.ts", "./**/*.tsx", "./**/*.d.ts"],
-  "exclude": ["node_modules", "dist", "**/__tests__/**"]
+  "include": ["."],
+  "exclude": ["node_modules", "dist", "**/__tests__"]
 }

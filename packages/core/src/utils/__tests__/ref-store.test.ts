@@ -135,7 +135,7 @@ describe('FormStore — validateInternal', () => {
     const store = new FormStore();
     const input = document.createElement('input');
     store.registerField('field', input as any);
-    store.registerRule('field', (val) => Promise.resolve('Error') as any);
+    store.registerRule('field', (_val) => Promise.resolve('Error') as any);
     
     const isValid = store.validateInternal();
     // Silently ignores the Promise
