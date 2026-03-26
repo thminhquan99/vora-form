@@ -248,78 +248,39 @@ export function useVoraField<TValue = unknown>(
     return () => cleanupFns.forEach((fn) => fn());
   }, [store, name]); // FIX C4: REMOVED object dependencies — read from ref
 
-  // ── Value subscription via useSyncExternalStore ─────────────────────────
-  //
-  // `subscribe` is called once per mount. It wires up the store's pub/sub
-  // for exactly this field path and "value" topic. The returned unsubscribe
-  // function is called on unmount.
-  //
-  // `getSnapshot` is called on every render to read the current value.
-  // React compares the snapshot with `Object.is` — if it hasn't changed,
-  // the component does NOT re-render.
+  // ── Consolidated field subscription via useSyncExternalStore ───────────
+  const lastSnapshot = useRef<{
+    value: TValue | undefined;
+    error: string | undefined;
+    isTouched: boolean;
+  } | null>(null);
 
-  const subscribeValue = useCallback(
-    (onStoreChange: () => void) =>
-      store.subscribe(name, onStoreChange, 'value'),
+  const subscribeField = useCallback(
+    (onStoreChange: () => void) => store.subscribe(name, onStoreChange, 'field'),
     [store, name]
   );
 
-  const getValueSnapshot = useCallback(
-    () => store.getValue<TValue>(name),
-    [store, name]
-  );
+  const getFieldSnapshot = useCallback(() => {
+    const next = store.getFieldState<TValue>(name);
+    const prev = lastSnapshot.current;
 
-  const value = useSyncExternalStore(
-    subscribeValue,
-    getValueSnapshot,
-    getValueSnapshot // SSR fallback — same as client (store is empty on server)
-  );
+    if (
+      prev &&
+      prev.value === next.value &&
+      prev.error === next.error &&
+      prev.isTouched === next.isTouched
+    ) {
+      return prev;
+    }
 
-  // ── Error subscription via useSyncExternalStore ─────────────────────────
-  //
-  // Separate subscription on the "error" topic. A component that only
-  // displays errors (like <VRFieldError>) can subscribe to errors
-  // without being notified of value changes.
+    lastSnapshot.current = next;
+    return next;
+  }, [store, name]);
 
-  const subscribeError = useCallback(
-    (onStoreChange: () => void) =>
-      store.subscribe(name, onStoreChange, 'error'),
-    [store, name]
-  );
-
-  const getErrorSnapshot = useCallback(
-    () => store.getError(name),
-    [store, name]
-  );
-
-  const error = useSyncExternalStore(
-    subscribeError,
-    getErrorSnapshot,
-    getErrorSnapshot
-  );
-
-  // ── Touched subscription via useSyncExternalStore ────────────────────────
-  //
-  // Subscribes to the "touched" topic for this field. A field is
-  // "touched" after the user has blurred it at least once. This
-  // allows UI components to defer showing errors until after first
-  // interaction.
-
-  const subscribeTouched = useCallback(
-    (onStoreChange: () => void) =>
-      store.subscribe(name, onStoreChange, 'touched'),
-    [store, name]
-  );
-
-  const getTouchedSnapshot = useCallback(
-    () => store.isTouched(name),
-    [store, name]
-  );
-
-  const isTouched = useSyncExternalStore(
-    subscribeTouched,
-    getTouchedSnapshot,
-    getTouchedSnapshot
+  const { value, error, isTouched } = useSyncExternalStore(
+    subscribeField,
+    getFieldSnapshot,
+    getFieldSnapshot
   );
 
   // ── Ref callback ───────────────────────────────────────────────────────
@@ -419,9 +380,9 @@ export function useVoraField<TValue = unknown>(
       const fieldError = errors[name];
 
       if (fieldError) {
-        store.setError(name, fieldError);
+        store.setError(name, fieldError, 'sync');
       } else {
-        store.clearError(name);
+        store.clearError(name, 'sync');
       }
     } else {
       // Internal native validation for THIS FIELD ONLY

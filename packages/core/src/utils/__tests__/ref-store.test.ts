@@ -33,6 +33,22 @@ describe('FormStore — registerField & getValue', () => {
     // The ref should be gone (getAllValues will ignore it), but internal getValue should still retrieve it
     expect(store.getValue('testField')).toBe('keepme');
   });
+
+  it('purgeField completely removes field from the store', () => {
+    const store = new FormStore();
+    const input = document.createElement('input');
+    input.value = 'gone';
+    store.registerField('testField', input as any);
+    store.setError('testField', 'error');
+    store.setTouched('testField');
+
+    store.purgeField('testField');
+    
+    expect(store.getValue('testField')).toBeUndefined();
+    expect(store.getError('testField')).toBeUndefined();
+    expect(store.isTouched('testField')).toBe(false);
+    expect(store.fieldCount).toBe(0);
+  });
 });
 
 describe('FormStore — setValue & getSilentValue', () => {
@@ -84,6 +100,21 @@ describe('FormStore — setValue & getSilentValue', () => {
     expect(store.getError('testField')).toBeUndefined();
     expect(mockErrorListener).toHaveBeenCalled();
   });
+
+  it('setValue skips notification if values are economically equal (deep equal)', () => {
+    const store = new FormStore();
+    const mockListener = jest.fn();
+    store.setValue('testField', { a: 1 });
+    store.subscribe('testField', mockListener, 'value');
+    
+    // Set identical object structure
+    store.setValue('testField', { a: 1 });
+    expect(mockListener).not.toHaveBeenCalled();
+    
+    // Set different value
+    store.setValue('testField', { a: 2 });
+    expect(mockListener).toHaveBeenCalledTimes(1);
+  });
 });
 
 describe('FormStore — getAllValues', () => {
@@ -110,6 +141,24 @@ describe('FormStore — getAllValues', () => {
     // Simulate a value artificially existing without a hook/ref mounted
     store.setSilentValue('orphan', 'hidden'); 
     expect(store.getAllValues()).toEqual({});
+  });
+
+  it('unflattens dot notation when requested', () => {
+    const store = new FormStore();
+    const input1 = document.createElement('input');
+    const input2 = document.createElement('input');
+    store.registerField('user.firstName', input1 as any);
+    store.registerField('user.lastName', input2 as any);
+    store.setValue('user.firstName', 'John');
+    store.setValue('user.lastName', 'Doe');
+
+    const values = store.getAllValues({ unflatten: true });
+    expect(values).toEqual({
+      user: {
+        firstName: 'John',
+        lastName: 'Doe'
+      }
+    });
   });
 });
 
@@ -207,6 +256,37 @@ describe('FormStore — error management', () => {
     expect(store.getError('fieldB')).toBeUndefined();
     expect(listenerA).toHaveBeenCalledTimes(1);
     expect(listenerB).toHaveBeenCalledTimes(1);
+  });
+
+  it('structured errors: sync and async errors do not overwrite each other', () => {
+    const store = new FormStore();
+    store.setError('field', 'sync-err', 'sync');
+    store.setError('field', 'async-err', 'async');
+    
+    expect(store.getErrorState('field')).toEqual({
+      sync: 'sync-err',
+      async: 'async-err'
+    });
+    // Priority check: sync should be returned first
+    expect(store.getError('field')).toBe('sync-err');
+  });
+
+  it('structured errors: clearing sync does not clear async', () => {
+    const store = new FormStore();
+    store.setError('field', 'sync-err', 'sync');
+    store.setError('field', 'async-err', 'async');
+    
+    store.clearError('field', 'sync');
+    expect(store.getError('field')).toBe('async-err');
+  });
+
+  it('structured errors: clearError without type clears both', () => {
+    const store = new FormStore();
+    store.setError('field', 'sync-err', 'sync');
+    store.setError('field', 'async-err', 'async');
+    
+    store.clearError('field');
+    expect(store.getError('field')).toBeUndefined();
   });
 });
 

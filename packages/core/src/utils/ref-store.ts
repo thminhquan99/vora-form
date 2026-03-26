@@ -74,6 +74,7 @@
  */
 
 import { isDeepEqual } from './is-equal';
+import { unflattenDotNotation } from './unflatten';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -99,7 +100,7 @@ export type Listener = () => void;
  * The subset of subscriber topics. Allows subscribing to value changes,
  * error changes, or both.
  */
-export type SubscriptionTopic = 'value' | 'error' | 'input' | 'touched' | 'submitting' | 'validating';
+export type SubscriptionTopic = 'value' | 'error' | 'input' | 'touched' | 'submitting' | 'validating' | 'field';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -122,6 +123,15 @@ function isNativeFieldElement(el: HTMLElement): el is NativeFieldElement {
 }
 
 // ─── FormStore ────────────────────────────────────────────────────────────────
+
+/**
+ * A structured representation of a field's validation state.
+ * Sync and Async errors are tracked separately to prevent race conditions.
+ */
+export type ValidationErrorState = {
+  sync?: string;
+  async?: string;
+};
 
 /**
  * Vanilla TypeScript form store — no React, no framework dependencies.
@@ -170,12 +180,12 @@ export class FormStore {
   private values: Map<string, unknown> = new Map();
 
   /**
-   * Validation error messages keyed by field path.
+   * Validation error states keyed by field path.
    *
    * Only error state changes trigger re-renders, and only on the specific
    * `<VRFieldError>` component bound to that field path.
    */
-  private errors: Map<string, string> = new Map();
+  private errors: Map<string, ValidationErrorState> = new Map();
 
   /**
    * Initial values captured at field registration time.
@@ -303,30 +313,45 @@ export class FormStore {
   }
 
   /**
-   * Removes a field from the store entirely.
+   * Removes a field's DOM reference from the store.
    *
-   * Cleans up:
-   * - DOM ref from `refs`
-   * - Domain value from `values`
-   * - Error message from `errors`
-   * - All listeners (value + error + input + touched) for the field path
-   *
-   * **IMPORTANT**: Values, errors, initialValues, and touched state are
-   * intentionally PRESERVED. This allows multi-step forms to unmount
-   * fields without losing their data. When the field re-mounts (e.g.,
-   * user navigates back to a previous step), `registerField` will
-   * re-attach the ref and the existing store data will be used as
-   * `defaultValue`.
+   * By default, values, errors, and touched state are PRESERVED to support
+   * multi-step forms. To completely wipe a field's state (e.g., in dynamic
+   * lists), use `store.purgeField(path)` instead.
    *
    * @param path - The field path to unregister
    */
   unregisterField(path: string): void {
-    // Only remove the DOM ref — listeners are owned by subscribing components
-    // and cleaned up when THOSE components unmount via their unsubscribe
-    // functions (returned by subscribe()). Deleting listeners here would
-    // permanently break sibling components (e.g. <VRFieldError>) that
-    // subscribe to the same path even after a field remounts.
     this.refs.delete(path);
+  }
+
+  /**
+   * Completely removes a field and all its associated state from the store.
+   *
+   * Cleans up:
+   * - DOM ref
+   * - Domain value
+   * - Validation errors
+   * - Touched status
+   * - Initial value (dirty tracking)
+   *
+   * Use this for dynamic fields that are permanently removed from the UI
+   * to prevent memory leaks.
+   *
+   * @param path - The field path to purge
+   */
+  purgeField(path: string): void {
+    this.refs.delete(path);
+    this.values.delete(path);
+    this.errors.delete(path);
+    this.initialValues.delete(path);
+    this.touched.delete(path);
+    this.fieldRules.delete(path);
+
+    // Notify listeners so UI can clean up
+    this.notify(path, 'value');
+    this.notify(path, 'error');
+    this.notify(path, 'touched');
   }
 
   // ── Value Access ──────────────────────────────────────────────────────────
@@ -384,9 +409,14 @@ export class FormStore {
    */
   setValue(path: string, value: unknown): void {
     const prevValue = this.values.get(path);
+
+    // ── FIX: Deep Equality Check ──────────────────────────────────────────
+    // Prevents redundant re-renders for identical object/array contents.
+    if (isDeepEqual(prevValue, value)) return;
+
     this.values.set(path, value);
 
-    if (prevValue !== value && this.errors.has(path)) {
+    if (this.errors.has(path)) {
       this.clearError(path);
     }
 
@@ -401,6 +431,7 @@ export class FormStore {
     }
 
     this.notify(path, 'value');
+    this.notify(path, 'field');
   }
 
   /**
@@ -436,10 +467,14 @@ export class FormStore {
    */
   setSilentValue(path: string, value: unknown): void {
     const prevValue = this.values.get(path);
+
+    // ── FIX: Deep Equality Check ──────────────────────────────────────────
+    if (isDeepEqual(prevValue, value)) return;
+
     this.values.set(path, value);
 
     // Auto-clear error when user types to improve UX natively
-    if (prevValue !== value && this.errors.has(path)) {
+    if (this.errors.has(path)) {
       this.clearError(path);
     }
 
@@ -448,23 +483,17 @@ export class FormStore {
     // The 'value' topic is NOT notified, so useSyncExternalStore
     // subscriptions remain dormant (zero re-renders during typing).
     this.notify(path, 'input');
+    this.notify(path, 'field');
   }
 
   /**
-   * Returns a snapshot of all registered field values as a plain object.
+   * Returns a snapshot of all registered field values.
    *
-   * Used by `handleSubmit()` to serialize the form data before passing it
-   * to the developer's `onSubmit` callback.
-   *
-   * @returns A `Record<string, unknown>` of all field path → value pairs
-   *
-   * @example
-   * ```ts
-   * const data = store.getAllValues();
-   * // { email: 'user@example.com', signature: 'data:image/png;base64,...' }
-   * ```
+   * @param options.unflatten - If true, unflattens dot-notation paths into
+   *                            a nested object structure (e.g. "a.b" -> {a:{b:1}}).
+   * @returns A Record of all field path -> value pairs
    */
-  getAllValues(): Record<string, unknown> {
+  getAllValues(options?: { unflatten?: boolean }): Record<string, unknown> {
     const result: Record<string, unknown> = {};
     // Only include currently mounted fields (those with an active ref)
     for (const path of this.refs.keys()) {
@@ -472,6 +501,11 @@ export class FormStore {
         result[path] = this.values.get(path);
       }
     }
+
+    if (options?.unflatten) {
+      return unflattenDotNotation(result);
+    }
+
     return result;
   }
 
@@ -525,7 +559,7 @@ export class FormStore {
         // Guard: if a rule accidentally returns a Promise, skip it rather
         // than setting "[object Promise]" as the error string.
         if (error && !(typeof error === 'object' && typeof (error as any).then === 'function')) {
-          this.setError(path, error);
+          this.setError(path, error, 'sync');
           isValid = false;
           break; // Show only the first sequential error for this field
         }
@@ -546,7 +580,7 @@ export class FormStore {
    * @returns `true` if the field is valid, `false` if it has errors
    */
   validateField(path: string): boolean {
-    this.clearError(path);
+    this.clearError(path, 'sync');
     const rules = this.fieldRules.get(path);
     if (!rules) return true; // No rules registered for this field
 
@@ -555,7 +589,7 @@ export class FormStore {
       const error = rule(val);
       // Guard: skip Promise returns (async validators handled separately)
       if (error && !(typeof error === 'object' && typeof (error as any).then === 'function')) {
-        this.setError(path, error);
+        this.setError(path, error, 'sync');
         return false; // Stop at first error for this field
       }
     }
@@ -566,50 +600,75 @@ export class FormStore {
 
   /**
    * Returns the current validation error for a field, if any.
+   * Prioritizes synchronous errors over asynchronous ones.
    *
    * @param path - The field path to check
    * @returns The error message string, or `undefined` if no error
    */
   getError(path: string): string | undefined {
+    const errorState = this.errors.get(path);
+    if (!errorState) return undefined;
+    return errorState.sync || errorState.async;
+  }
+
+  /**
+   * Returns the raw structured error state for a field.
+   * Internal use only.
+   */
+  getErrorState(path: string): ValidationErrorState | undefined {
     return this.errors.get(path);
   }
 
   /**
    * Sets a validation error for a field and notifies error subscribers.
    *
-   * This is the **only** operation that is expected to trigger a targeted
-   * React re-render — specifically, the `<VRFieldError>` component
-   * bound to this field path. No other field or component re-renders.
-   *
    * @param path    - The field path to set the error on
    * @param message - The error message to display
-   *
-   * @example
-   * ```ts
-   * store.setError('email', 'Invalid email address');
-   * ```
+   * @param type    - Whether it's a 'sync' or 'async' error (defaults to 'sync')
    */
-  setError(path: string, message: string): void {
-    this.errors.set(path, message);
-    this.notify(path, 'error');
+  setError(path: string, message: string, type: 'sync' | 'async' = 'sync'): void {
+    const currentState = this.errors.get(path) || {};
+    const nextState = { ...currentState, [type]: message };
+    
+    // Only update and notify if the error message for this type changed
+    if (currentState[type] !== nextState[type]) {
+      this.errors.set(path, nextState);
+      this.notify(path, 'error');
+      this.notify(path, 'field');
+    }
   }
 
   /**
-   * Clears the validation error for a specific field and notifies
-   * error subscribers so the UI can remove the error display.
+   * Clears a validation error for a specific field and notifies.
    *
-   * @param path - The field path to clear the error for
+   * @param path - The field path to clear
+   * @param type - Which slot to clear. If omitted, clears BOTH sync and async.
    */
-  clearError(path: string): void {
-    this.errors.delete(path);
-    this.notify(path, 'error');
+  clearError(path: string, type?: 'sync' | 'async'): void {
+    const currentState = this.errors.get(path);
+    if (!currentState) return;
+
+    if (type) {
+      if (currentState[type]) {
+        const nextState = { ...currentState, [type]: undefined };
+        // Check if the overall state is now empty
+        if (!nextState.sync && !nextState.async) {
+          this.errors.delete(path);
+        } else {
+          this.errors.set(path, nextState);
+        }
+        this.notify(path, 'error');
+        this.notify(path, 'field');
+      }
+      // Clear both
+      this.errors.delete(path);
+      this.notify(path, 'error');
+      this.notify(path, 'field');
+    }
   }
 
   /**
    * Clears ALL validation errors across the entire form.
-   *
-   * Iterates every field that currently has an error and notifies its
-   * error subscribers. Used on form reset or before re-validation.
    */
   clearAllErrors(): void {
     const paths = Array.from(this.errors.keys());
@@ -620,14 +679,15 @@ export class FormStore {
   }
 
   /**
-   * Returns all current validation errors as a plain object.
-   *
-   * @returns A `Record<string, string>` of field path → error message
+   * Returns all current primary validation errors as a plain object.
    */
   getAllErrors(): Record<string, string> {
     const result: Record<string, string> = {};
-    for (const [path, message] of this.errors) {
-      result[path] = message;
+    for (const [path, state] of this.errors) {
+      const primaryError = state.sync || state.async;
+      if (primaryError) {
+        result[path] = primaryError;
+      }
     }
     return result;
   }
@@ -637,6 +697,20 @@ export class FormStore {
    */
   hasErrors(): boolean {
     return this.errors.size > 0;
+  }
+
+  /**
+   * Returns a consolidated snapshot of a field's state.
+   *
+   * @param path - The field path
+   * @returns An object containing value, error, and touched status
+   */
+  getFieldState<T = unknown>(path: string) {
+    return {
+      value: this.getValue<T>(path),
+      error: this.getError(path),
+      isTouched: this.isTouched(path),
+    };
   }
 
   // ── Ref Access ────────────────────────────────────────────────────────────
@@ -783,6 +857,7 @@ export class FormStore {
     if (!this.touched.has(path)) {
       this.touched.add(path);
       this.notify(path, 'touched');
+      this.notify(path, 'field');
     }
   }
 

@@ -19,7 +19,7 @@ export function VRFormula({
   const field = useVoraField<string>(name);
   const inputId = id ?? name;
 
-  const editorRef = useRef<HTMLDivElement>(null);
+  const editorRef = useRef<HTMLDivElement | null>(null);
   
   // Local UI State for Dropdown Only. Domain data stays in DOM + FormStore
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -138,13 +138,16 @@ export function VRFormula({
       range.insertNode(pillNode);
       // Move cursor after the inserted pill
       range.setStartAfter(pillNode);
+      
+      // Insert a space after the pill so cursor lands outside it
+      const spaceNode = document.createTextNode('\u00A0');
+      range.insertNode(spaceNode);
+      range.setStartAfter(spaceNode);
+
       range.collapse(true);
       selection.removeAllRanges();
       selection.addRange(range);
     }
-
-    // Insert a space after the pill so cursor lands outside it
-    document.execCommand('insertText', false, '\u00A0');
 
     setDropdownOpen(false);
     setSearchQuery('');
@@ -189,12 +192,15 @@ export function VRFormula({
   );
 
   return (
-    <div className={`${styles.wrapper} ${className ?? ''}`} id={`${inputId}-wrapper`} ref={field.ref}>
+    <div className={`${styles.wrapper} ${className ?? ''}`} id={`${inputId}-wrapper`}>
       {label && <VRLabel htmlFor={inputId} required={required}>{label}</VRLabel>}
 
       <div
         id={inputId}
-        ref={editorRef}
+        ref={(el) => {
+          editorRef.current = el;
+          field.ref(el);
+        }}
         className={styles.editor}
         contentEditable={true}
         onInput={handleInput}

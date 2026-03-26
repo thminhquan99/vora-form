@@ -56,7 +56,7 @@ import { useFormContext } from './FormProvider';
  */
 export function useAsyncValidation<TValue = unknown>(
   name: string,
-  validateFn: (value: TValue) => Promise<string | undefined>,
+  validateFn: (value: TValue, signal: AbortSignal) => Promise<string | undefined>,
   debounceMs: number = 500
 ): void {
   const { store } = useFormContext();
@@ -68,6 +68,7 @@ export function useAsyncValidation<TValue = unknown>(
   debounceMsRef.current = debounceMs;
 
   const isFirstMount = useRef(true);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
     let timerId: ReturnType<typeof setTimeout> | null = null;
@@ -85,6 +86,12 @@ export function useAsyncValidation<TValue = unknown>(
         return;
       }
 
+      // ── FIX: Abort Previous In-flight Request ───────────────────────────
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+      abortControllerRef.current = new AbortController();
+
       // Clear any pending debounce timer
       if (timerId !== null) {
         clearTimeout(timerId);
@@ -94,11 +101,16 @@ export function useAsyncValidation<TValue = unknown>(
         if (aborted) return;
 
         const currentRequestId = ++latestRequestId.current;
+        const currentAbortController = abortControllerRef.current;
         store.incrementPendingValidations();
         const value = store.getValue<TValue>(name);
 
         try {
-          const error = await validateFnRef.current(value as TValue);
+          const error = await validateFnRef.current(
+            value as TValue,
+            currentAbortController!.signal
+          );
+
           // If a new request has started since this one, or the component unmounted,
           // discard this result.
           if (aborted || currentRequestId !== latestRequestId.current) return;
@@ -107,15 +119,17 @@ export function useAsyncValidation<TValue = unknown>(
           if (store.getIsSubmitting()) return;
 
           if (error) {
-            store.setError(name, error);
+            store.setError(name, error, 'async');
           } else {
-            store.clearError(name);
+            store.clearError(name, 'async');
           }
-        } catch {
+        } catch (err: any) {
           // Swallow validation errors — the field stays in its current
-          // error state. 
+          // error state. If it was an AbortError, just silently exit.
+          if (err?.name === 'AbortError') return;
+
           if (!aborted && currentRequestId === latestRequestId.current && !store.getIsSubmitting()) {
-            store.clearError(name);
+            store.clearError(name, 'async');
           }
         } finally {
           store.decrementPendingValidations();
@@ -129,6 +143,9 @@ export function useAsyncValidation<TValue = unknown>(
     // Cleanup: unsubscribe, cancel pending timers, abort in-flight validation
     return () => {
       aborted = true;
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
       if (timerId !== null) {
         clearTimeout(timerId);
       }
